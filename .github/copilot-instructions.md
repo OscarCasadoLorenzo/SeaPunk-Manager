@@ -92,9 +92,8 @@ npm run build   # Builds all workspaces
 
 ⚠️ Important: Always build packages in this order:
 
-1. `packages/types`
-2. `packages/ui`
-3. `apps/*`
+1. `packages/ui`
+2. `apps/*`
 
 ### Validation Steps
 
@@ -131,9 +130,6 @@ npm run typecheck  # Checks types in all workspaces
    - Error: `Error: Cannot find module '@seapunk/ui'`
    - Solution: Build packages first: `cd packages/ui && npm run build`
 
-3. **Type Errors After Package Changes**
-   - Solution: Rebuild types package: `cd packages/types && npm run build`
-
 ## Architecture Guidelines
 
 ### Frontend Structure
@@ -154,7 +150,6 @@ npm run typecheck  # Checks types in all workspaces
 ### Shared Packages
 
 - UI Components: `/packages/ui/src/components/`
-- Types: `/packages/types/src/`
 
 ## Continuous Integration
 
@@ -215,11 +210,5 @@ Each package and app in the monorepo has its own README with detailed best pract
   - Accessibility requirements
   - Styling guidelines
   - Testing specifications
-
-- Types Package (`packages/types/README.md`):
-  - Type organization
-  - Interface design
-  - Validation requirements
-  - Documentation standards
 
 Trust these instructions for initial guidance. Only perform additional searches if specific information is missing or needs verification.
