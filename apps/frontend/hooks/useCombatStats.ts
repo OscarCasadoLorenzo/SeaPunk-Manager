@@ -1,4 +1,3 @@
-import { CreateCombatStatsRequest, UpdateCombatStatsRequest } from '@/types';
 import { useApiQuery, useApiMutation } from '@/hooks/use-api-query';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -14,11 +13,11 @@ export const useCombatStats = (characterId: string) => {
 export const useCreateCombatStats = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, CreateCombatStatsRequest>(
+  return useApiMutation(
     '/combat-stats',
     'post',
     {
-      onSuccess: (newCombatStats) => {
+      onSuccess: (newCombatStats: any) => {
         queryClient.invalidateQueries({
           queryKey: ['/combat-stats/character', newCombatStats.characterId],
         });
@@ -32,11 +31,11 @@ export const useCreateCombatStats = () => {
 export const useUpdateCombatStats = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, { id: string; data: UpdateCombatStatsRequest }>(
+  return useApiMutation(
     '/combat-stats',
     'put',
     {
-      onSuccess: (updatedCombatStats) => {
+      onSuccess: (updatedCombatStats: any) => {
         queryClient.invalidateQueries({
           queryKey: ['/combat-stats/character', updatedCombatStats.characterId],
         });
@@ -51,7 +50,7 @@ export const useUpdateCombatStats = () => {
 export const useDeleteCombatStats = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, string>(
+  return useApiMutation(
     '/combat-stats',
     'delete',
     {
@@ -66,14 +65,11 @@ export const useDeleteCombatStats = () => {
 export const useUpsertCombatStats = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<
-    any,
-    { characterId: string; data: Omit<CreateCombatStatsRequest, 'characterId'> }
-  >(
+  return useApiMutation(
     '/combat-stats/upsert',
     'post',
     {
-      onSuccess: (combatStats) => {
+      onSuccess: (combatStats: any) => {
         queryClient.invalidateQueries({
           queryKey: ['/combat-stats/character', combatStats.characterId],
         });

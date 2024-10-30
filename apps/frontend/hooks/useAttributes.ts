@@ -1,4 +1,3 @@
-import { CreateAttributeRequest, UpdateAttributeRequest } from '@/types';
 import { useApiQuery, useApiMutation } from '@/hooks/use-api-query';
 import { useQueryClient } from '@tanstack/react-query';
 
@@ -14,11 +13,11 @@ export const useAttribute = (characterId: string) => {
 export const useCreateAttribute = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, CreateAttributeRequest>(
+  return useApiMutation(
     '/attributes',
     'post',
     {
-      onSuccess: (newAttribute) => {
+      onSuccess: (newAttribute: any) => {
         queryClient.invalidateQueries({
           queryKey: ['/attributes/character', newAttribute.characterId],
         });
@@ -32,11 +31,11 @@ export const useCreateAttribute = () => {
 export const useUpdateAttribute = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, { id: string; data: UpdateAttributeRequest }>(
+  return useApiMutation(
     '/attributes',
     'put',
     {
-      onSuccess: (updatedAttribute) => {
+      onSuccess: (updatedAttribute: any) => {
         queryClient.invalidateQueries({
           queryKey: ['/attributes/character', updatedAttribute.characterId],
         });
@@ -51,7 +50,7 @@ export const useUpdateAttribute = () => {
 export const useDeleteAttribute = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, string>(
+  return useApiMutation(
     '/attributes',
     'delete',
     {
@@ -66,14 +65,11 @@ export const useDeleteAttribute = () => {
 export const useUpsertAttribute = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<
-    any,
-    { characterId: string; data: Omit<CreateAttributeRequest, 'characterId'> }
-  >(
+  return useApiMutation(
     '/attributes/upsert',
     'post',
     {
-      onSuccess: (attribute) => {
+      onSuccess: (attribute: any) => {
         queryClient.invalidateQueries({
           queryKey: ['/attributes/character', attribute.characterId],
         });

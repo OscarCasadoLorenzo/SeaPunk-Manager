@@ -1,38 +1,30 @@
 import { fetchApi } from '@/lib/api';
 import {
-  UseMutationOptions,
-  UseQueryOptions,
   useMutation,
   useQuery,
 } from '@tanstack/react-query';
 
-interface QueryConfig<TData>
-  extends Omit<UseQueryOptions<TData>, 'queryKey' | 'queryFn'> {
-  params?: Record<string, string>;
-  headers?: HeadersInit;
-}
-
-export function useApiQuery<TData>(
+export function useApiQuery(
   endpoint: string,
-  config: QueryConfig<TData> = {}
+  config: any = {}
 ) {
   const { params, headers, ...queryOptions } = config;
 
-  return useQuery<TData>({
+  return useQuery({
     queryKey: [endpoint, params],
-    queryFn: () => fetchApi<TData>(endpoint, { headers }),
+    queryFn: () => fetchApi(endpoint, { headers }),
     ...queryOptions,
   });
 }
 
-export function useApiMutation<TData, TVariables = unknown>(
+export function useApiMutation(
   endpoint: string,
-  method: 'post' | 'put' | 'delete',
-  config: Omit<UseMutationOptions<TData, Error, TVariables>, 'mutationFn'> = {}
+  method: string,
+  config: any = {}
 ) {
-  return useMutation<TData, Error, TVariables>({
-    mutationFn: (variables: TVariables) =>
-      fetchApi<TData>(endpoint, {
+  return useMutation({
+    mutationFn: (variables: any) =>
+      fetchApi(endpoint, {
         method,
         body: variables,
       }),

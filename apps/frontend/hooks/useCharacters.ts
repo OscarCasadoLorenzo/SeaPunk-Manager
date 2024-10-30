@@ -1,5 +1,4 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { CreateCharacterRequest, UpdateCharacterRequest } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useCharacters = (params?: {
@@ -33,8 +32,8 @@ export const useCharactersByPlayer = (playerId: string) => {
 export const useCreateCharacter = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, CreateCharacterRequest>('/characters', 'post', {
-    onSuccess: (newCharacter) => {
+  return useApiMutation('/characters', 'post', {
+    onSuccess: (newCharacter: any) => {
       queryClient.invalidateQueries({ queryKey: ['/characters'] });
       queryClient.invalidateQueries({
         queryKey: ['/characters/player', newCharacter.playerId],
@@ -49,11 +48,11 @@ export const useCreateCharacter = () => {
 export const useUpdateCharacter = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, { id: string; data: UpdateCharacterRequest }>(
+  return useApiMutation(
     '/characters',
     'put',
     {
-      onSuccess: (updatedCharacter, { id }) => {
+      onSuccess: (updatedCharacter: any, { id }: any) => {
         queryClient.invalidateQueries({ queryKey: ['/characters'] });
         queryClient.invalidateQueries({ queryKey: ['/characters', id] });
         queryClient.invalidateQueries({
@@ -67,7 +66,7 @@ export const useUpdateCharacter = () => {
 export const useDeleteCharacter = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, string>('/characters', 'delete', {
+  return useApiMutation('/characters', 'delete', {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/characters'] });
       queryClient.invalidateQueries({ queryKey: ['/players'] });

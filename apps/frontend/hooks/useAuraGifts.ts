@@ -1,5 +1,4 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { CreateAuraGiftRequest, UpdateAuraGiftRequest } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useAuraGifts = () => {
@@ -21,7 +20,7 @@ export const useAuraGiftByName = (name: string) => {
 export const useCreateAuraGift = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, CreateAuraGiftRequest>('/aura-gifts', 'post', {
+  return useApiMutation('/aura-gifts', 'post', {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/aura-gifts'] });
     },
@@ -31,11 +30,11 @@ export const useCreateAuraGift = () => {
 export const useUpdateAuraGift = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, { id: string; data: UpdateAuraGiftRequest }>(
+  return useApiMutation(
     '/aura-gifts',
     'put',
     {
-      onSuccess: (_, variables) => {
+      onSuccess: (_: any, variables: any) => {
         queryClient.invalidateQueries({ queryKey: ['/aura-gifts'] });
         queryClient.invalidateQueries({
           queryKey: ['/aura-gifts', variables.id],
@@ -48,7 +47,7 @@ export const useUpdateAuraGift = () => {
 export const useDeleteAuraGift = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation<any, string>('/aura-gifts', 'delete', {
+  return useApiMutation('/aura-gifts', 'delete', {
     onSuccess: () => {
       queryClient.invalidateQueries({ queryKey: ['/aura-gifts'] });
     },

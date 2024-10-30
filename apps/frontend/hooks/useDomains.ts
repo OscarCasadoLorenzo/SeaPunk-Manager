@@ -1,4 +1,3 @@
-import { CreateDomainRequest, UpdateDomainRequest } from '@/types';
 import { useApiQuery, useApiMutation } from '@/hooks/use-api-query';
 import { useQueryClient } from '@tanstack/react-query';
 
