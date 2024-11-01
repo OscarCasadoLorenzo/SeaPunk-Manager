@@ -32,10 +32,6 @@ export function SettingsForm() {
     },
   });
 
-  const handleThemeChange = (value: string) => {
-    mutation.mutate({ ...settings, theme: value });
-  };
-
   const handleToggleChange = (field: string) => (checked: boolean) => {
     mutation.mutate({ ...settings, [field]: checked });
   };
@@ -45,20 +41,6 @@ export function SettingsForm() {
   return (
     <Card className='p-6'>
       <div className='space-y-6'>
-        <div className='space-y-2'>
-          <Label>Theme</Label>
-          <Select value={settings.theme} onValueChange={handleThemeChange}>
-            <SelectTrigger>
-              <SelectValue />
-            </SelectTrigger>
-            <SelectContent>
-              <SelectItem value='light'>Light</SelectItem>
-              <SelectItem value='dark'>Dark</SelectItem>
-              <SelectItem value='system'>System</SelectItem>
-            </SelectContent>
-          </Select>
-        </div>
-
         <div className='flex items-center justify-between'>
           <Label htmlFor='notifications'>Notifications</Label>
           <Switch

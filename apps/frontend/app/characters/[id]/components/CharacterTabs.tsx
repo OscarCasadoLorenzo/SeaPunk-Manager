@@ -1,7 +1,7 @@
 'use client';
 
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/components/ui/tabs';
-import { Character } from '@/types';
+
 import { AttributesTab } from './AttributesTab';
 import { CombatTab } from './CombatTab';
 import { InventoryTab } from './InventoryTab';

@@ -2,13 +2,8 @@
 
 import { useCharacterHealth } from '@/hooks/useCharacterHealth';
 import { useCombatStats } from '@/hooks/useCombatStats';
-import type { Character } from '@seapunk/types';
 import { Button, Input, Progress } from '@seapunk/ui';
 import { useState } from 'react';
-
-interface HealthManagementPanelProps {
-  character: Character;
-}
 
 export function HealthManagementPanel({
   character,

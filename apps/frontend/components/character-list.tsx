@@ -1,7 +1,7 @@
 'use client';
 
 import { useApiQuery } from '@/hooks/use-api-query';
-import { type Character } from '@seapunk/types';
+
 import { LoadingSpinner } from './loading-spinner';
 
 export function CharacterList() {

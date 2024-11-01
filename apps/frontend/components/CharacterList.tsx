@@ -1,6 +1,5 @@
 'use client';
 
-import { Character } from '@/types';
 import Link from 'next/link';
 
 interface CharacterListProps {
