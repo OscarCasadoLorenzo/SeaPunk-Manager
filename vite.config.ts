@@ -7,6 +7,7 @@ export default defineConfig({
   resolve: {
     alias: {
       '@ui': '/src/ui',
+      '@ui/*': '/src/ui/*',
     },
   },
 });
