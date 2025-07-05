@@ -1,0 +1,80 @@
+# Node
+node_modules/
+.npm/
+
+# Build output
+dist/
+build/
+.vite/
+.vscode/
+.vscode-test/
+coverage/
+*.tsbuildinfo
+*.log
+*.tgz
+*.tmp
+*.cache
+.cache/
+
+# OS
+.DS_Store
+Thumbs.db
+
+# Env
+.env
+.env.*
+
+# Editor
+.idea/
+*.swp
+*.swo
+*.code-workspace
+
+# Electron
+out/
+release/
+
+# Test
+playwright-report/
+
+# Misc
+*.local
+*.bak
+*.orig
+*.rej
+
+# Prisma
+prisma/dev.db
+prisma/dev.db-journal
+
+# Mac
+.AppleDouble
+.LSOverride
+Icon?
+
+# Others
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+pnpm-debug.log*
+
+# VSCode
+.history/
+
+# TypeScript
+*.tsbuildinfo
+
+# JetBrains
+.idea/
+
+# SvelteKit
+.svelte-kit/
+
+# Next.js
+.next/
+
+# Bun
+.bun/
+
+# Playwright
+/test-results/
