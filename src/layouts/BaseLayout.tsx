@@ -1,6 +1,6 @@
-import React from "react";
-import DragWindowRegion from "@/components/DragWindowRegion";
-import NavigationMenu from "@/components/template/NavigationMenu";
+import DragWindowRegion from '@/ui/components/DragWindowRegion';
+import NavigationMenu from '@/ui/templates/NavigationMenu';
+import React from 'react';
 
 export default function BaseLayout({
   children,
@@ -9,9 +9,9 @@ export default function BaseLayout({
 }) {
   return (
     <>
-      <DragWindowRegion title="electron-shadcn" />
+      <DragWindowRegion title='electron-shadcn' />
       <NavigationMenu />
-      <main className="h-screen pb-20 p-2">{children}</main>
+      <main className='h-screen pb-20 p-2'>{children}</main>
     </>
   );
 }

@@ -1,17 +1,9 @@
-import {
-  Button,
-  Card,
-  CardContent,
-  CardHeader,
-  CardTitle,
-  Input,
-  Label,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-  Textarea,
-} from '@ui';
+import { Button } from '@/ui/primitives/button';
+import { Card, CardContent, CardHeader, CardTitle } from '@/ui/primitives/card';
+import { Input } from '@/ui/primitives/input';
+import { Label } from '@/ui/primitives/label';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/primitives/tabs';
+import { Textarea } from '@/ui/primitives/textarea';
 import React from 'react';
 
 export default function CharacterInfoPage() {
