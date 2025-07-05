@@ -23,5 +23,11 @@
     "moduleResolution": "node",
     "resolveJsonModule": true
   },
-  "include": ["src/**/*", "./package.json", "./forge.config.ts"]
+  "include": [
+    "src/**/*",
+    "./package.json",
+    "./forge.config.ts",
+    "drizzle/seed.ts",
+    "drizzle/schema.ts"
+  ]
 }
