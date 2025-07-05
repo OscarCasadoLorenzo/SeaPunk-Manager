@@ -1394,6 +1394,102 @@ export default function SeaPunkGMTool() {
       defense: 10,
       visible: true,
     },
+    {
+      id: '2',
+      playerName: 'Maya',
+      characterName: 'Kael el Forjador',
+      archetype: 'Guerrero Tecnomante',
+      faction: 'Hijos del Acero',
+      race: 'Cyborg',
+      level: 5,
+      category: 'Campeón II',
+      attributes: {
+        fuerza: 18,
+        dinamismo: 10,
+        voluntad: 16,
+        suerte: 7,
+        inteligencia: 12,
+      },
+      domains: {
+        fisico: 15,
+        batalla: 20,
+        social: 6,
+        ambiental: 8,
+        ocultacion: 4,
+        conocimiento: 10,
+        tecnico: 15,
+        recursos: 12,
+        demoniaco: 2,
+        aura: 7,
+      },
+      combat: {
+        saludFisica: 120,
+        maxSaludFisica: 120,
+        resistenciaFisica: 100,
+        maxResistenciaFisica: 100,
+        saludMental: 80,
+        maxSaludMental: 100,
+        resistenciaMental: 60,
+        maxResistenciaMental: 80,
+        iniciativa: 8,
+        defensa: 18,
+        ataque: 20,
+        impacto: 22,
+        danoMaximo: 40,
+      },
+      narrative: {
+        descripcionFisica:
+          'Hombre robusto con brazos mecánicos, barba trenzada y tatuajes tribales que brillan con energía azul.',
+        perfilExterno:
+          'Porta una armadura pesada de metal forjado y un martillo de plasma. Sus ojos son implantes ópticos avanzados.',
+        perfilInterno:
+          'Leal y protector, valora la fuerza y el honor. Busca redimir errores del pasado.',
+        trasfondo:
+          'Ex-gladiador convertido en líder de los Hijos del Acero tras salvar a su clan en la guerra de las máquinas.',
+        especialidades:
+          'Combate cuerpo a cuerpo, forja de armas, manipulación de energía, liderazgo.',
+      },
+      puntosEpica: 25,
+      esencias: ['Corazón de Acero', 'Martillo de Plasma'],
+      inventory: [
+        {
+          id: '3',
+          name: 'Martillo de Plasma',
+          description:
+            'Arma pesada capaz de canalizar energía destructiva en cada golpe',
+          quantity: 1,
+          type: 'weapon',
+        },
+        {
+          id: '4',
+          name: 'Armadura Forjada',
+          description:
+            'Armadura personalizada con refuerzos energéticos y sistemas de soporte vital',
+          quantity: 1,
+          type: 'armor',
+        },
+      ],
+      effects: [
+        {
+          id: '2',
+          name: 'Furia de Acero',
+          duration: 2,
+          type: 'buff',
+          description: '+5 ataque durante 2 turnos',
+        },
+      ],
+      donesAura: ['Piel de Titanio'],
+      type: 'PC',
+      isNPC: false,
+      health: 120,
+      maxHealth: 120,
+      resistance: 100,
+      maxResistance: 100,
+      initiative: 8,
+      attack: 20,
+      defense: 18,
+      visible: true,
+    },
   ]);
 
   const [currentScene, setCurrentScene] = useState<Scene>({
