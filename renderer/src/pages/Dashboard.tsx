@@ -1,4 +1,5 @@
 import { LoadingSpinner } from '@/components/LoadingSpinner';
+import { UIExample } from '@/components/UIExample';
 import { useTasks } from '@/hooks/useTasks';
 import { useUsers } from '@/hooks/useUsers';
 import { AlertTriangle, CheckCircle, ClipboardList, Users } from 'lucide-react';
@@ -78,6 +79,7 @@ export const Dashboard: React.FC = () => {
         ))}
       </div>
 
+      <UIExample />
       <div className='grid grid-cols-1 lg:grid-cols-2 gap-6'>
         <div className='card'>
           <div className='card-header'>

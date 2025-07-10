@@ -22,7 +22,10 @@
       "@/hooks/*": ["hooks/*"],
       "@/services/*": ["services/*"],
       "@/types/*": ["types/*"],
-      "@/utils/*": ["utils/*"]
+      "@/utils/*": ["utils/*"],
+      "@/ui/*": ["ui/*"],
+      "@ui/*": ["ui/*"],
+      "@helpers/*": ["helpers/*"]
     }
   },
   "include": ["src"],
