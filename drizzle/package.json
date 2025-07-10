@@ -1,8 +1,0 @@
-{
-  "name": "drizzle",
-  "type": "module",
-  "main": "index.ts",
-  "exports": {
-    ".": "./index.ts"
-  }
-}

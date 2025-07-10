@@ -1,80 +1,100 @@
-# Node
+# Dependencies
 node_modules/
-.npm/
-
-# Build output
 dist/
 build/
-.vite/
-.vscode/
-.vscode-test/
-coverage/
-*.tsbuildinfo
-*.log
-*.tgz
-*.tmp
-*.cache
-.cache/
 
-# OS
-.DS_Store
-Thumbs.db
-
-# Env
+# Environment files
 .env
-.env.*
+.env.local
+.env.development.local
+.env.test.local
+.env.production.local
 
-# Editor
-.idea/
-*.swp
-*.swo
-*.code-workspace
-
-# Electron
-out/
-release/
-
-# Test
-playwright-report/
-
-# Misc
-*.local
-*.bak
-*.orig
-*.rej
-
-# Prisma
-prisma/dev.db
-prisma/dev.db-journal
-
-# Mac
-.AppleDouble
-.LSOverride
-Icon?
-
-# Others
+# Logs
+logs
+*.log
 npm-debug.log*
 yarn-debug.log*
 yarn-error.log*
-pnpm-debug.log*
 
-# VSCode
-.history/
+# Runtime data
+pids
+*.pid
+*.seed
+*.pid.lock
 
-# TypeScript
-*.tsbuildinfo
+# Coverage directory used by tools like istanbul
+coverage/
 
-# JetBrains
-.idea/
+# nyc test coverage
+.nyc_output
 
-# SvelteKit
-.svelte-kit/
+# Dependency directories
+node_modules/
+jspm_packages/
 
-# Next.js
-.next/
+# Optional npm cache directory
+.npm
 
-# Bun
-.bun/
+# Optional eslint cache
+.eslintcache
 
-# Playwright
-/test-results/
+# Microbundle cache
+.rpt2_cache/
+.rts2_cache_cjs/
+.rts2_cache_es/
+.rts2_cache_umd/
+
+# Optional REPL history
+.node_repl_history
+
+# Output of 'npm pack'
+*.tgz
+
+# Yarn Integrity file
+.yarn-integrity
+
+# dotenv environment variables file
+.env
+.env.test
+
+# parcel-bundler cache (https://parceljs.org/)
+.cache
+.parcel-cache
+
+# next.js build output
+.next
+
+# nuxt.js build output
+.nuxt
+
+# vuepress build output
+.vuepress/dist
+
+# Serverless directories
+.serverless/
+
+# FuseBox cache
+.fusebox/
+
+# DynamoDB Local files
+.dynamodb/
+
+# TernJS port file
+.tern-port
+
+# Stores VSCode versions used for testing VSCode extensions
+.vscode-test
+
+# Electron
+release/
+app/dist/
+app/build/
+
+# macOS
+.DS_Store
+
+# Windows
+Thumbs.db
+ehthumbs.db
+Desktop.ini
