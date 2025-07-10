@@ -7,10 +7,10 @@
   "license": "MIT",
   "homepage": "./",
   "scripts": {
-    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:electron\"",
+    "dev": "concurrently \"npm run dev:backend\" \"npm run dev:renderer\" \"npm run dev:electron\"",
     "dev:backend": "cd backend && npm run dev",
-    "dev:electron": "wait-on tcp:3001 && electron .",
     "dev:renderer": "cd renderer && npm run dev",
+    "dev:electron": "wait-on tcp:3001 && wait-on tcp:3000 && electron .",
     "build": "npm run build:backend && npm run build:renderer && npm run build:electron",
     "build:backend": "cd backend && npm run build",
     "build:renderer": "cd renderer && npm run build",

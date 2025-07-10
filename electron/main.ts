@@ -24,8 +24,8 @@ const createWindow = (): void => {
 
   // Load the app
   if (isDev) {
-    // In development, load the built renderer files
-    mainWindow.loadFile(path.join(__dirname, '../../renderer/dist/index.html'));
+    // In development, connect to Vite dev server
+    mainWindow.loadURL('http://localhost:3000');
     // Open DevTools in development
     mainWindow.webContents.openDevTools();
   } else {
