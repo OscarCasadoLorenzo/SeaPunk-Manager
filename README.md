@@ -24,7 +24,7 @@ A full-stack desktop application built with **Electron**, **React**, **Node.js**
 - **Tailwind CSS** - Utility-first CSS framework
 - **TanStack Query** - Data fetching and state management
 - **React Router** - Client-side routing
-- **Heroicons** - Beautiful SVG icons
+- **Lucide Icons** - Beautiful SVG icons
 - **Vite** - Fast build tool and development server
 
 ### Backend (API)

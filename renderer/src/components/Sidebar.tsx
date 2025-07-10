@@ -1,16 +1,11 @@
-import {
-  ClipboardDocumentListIcon,
-  HomeIcon,
-  PlusIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import { ClipboardList, Home, Plus, Users } from 'lucide-react';
 import React from 'react';
 import { Link, useLocation } from 'react-router-dom';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: HomeIcon },
-  { name: 'Users', href: '/users', icon: UserGroupIcon },
-  { name: 'Tasks', href: '/tasks', icon: ClipboardDocumentListIcon },
+  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Users', href: '/users', icon: Users },
+  { name: 'Tasks', href: '/tasks', icon: ClipboardList },
 ];
 
 export const Sidebar: React.FC = () => {
@@ -50,7 +45,7 @@ export const Sidebar: React.FC = () => {
           to='/tasks/new'
           className='flex items-center px-2 py-2 text-sm font-medium text-gray-300 rounded-md hover:bg-gray-700 hover:text-white transition-colors'
         >
-          <PlusIcon className='mr-3 h-5 w-5' />
+          <Plus className='mr-3 h-5 w-5' />
           New Task
         </Link>
       </div>

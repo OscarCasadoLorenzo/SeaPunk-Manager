@@ -1,12 +1,7 @@
 import { LoadingSpinner } from '@/components/LoadingSpinner';
 import { useTasks } from '@/hooks/useTasks';
 import { useUsers } from '@/hooks/useUsers';
-import {
-  CheckCircleIcon,
-  ClipboardDocumentListIcon,
-  ExclamationTriangleIcon,
-  UserGroupIcon,
-} from '@heroicons/react/24/outline';
+import { AlertTriangle, CheckCircle, ClipboardList, Users } from 'lucide-react';
 import React from 'react';
 
 export const Dashboard: React.FC = () => {
@@ -31,25 +26,25 @@ export const Dashboard: React.FC = () => {
     {
       name: 'Total Users',
       value: users?.length || 0,
-      icon: UserGroupIcon,
+      icon: Users,
       color: 'bg-blue-500',
     },
     {
       name: 'Total Tasks',
       value: totalTasks,
-      icon: ClipboardDocumentListIcon,
+      icon: ClipboardList,
       color: 'bg-green-500',
     },
     {
       name: 'Completed Tasks',
       value: completedTasks,
-      icon: CheckCircleIcon,
+      icon: CheckCircle,
       color: 'bg-emerald-500',
     },
     {
       name: 'Urgent Tasks',
       value: urgentTasks,
-      icon: ExclamationTriangleIcon,
+      icon: AlertTriangle,
       color: 'bg-red-500',
     },
   ];
