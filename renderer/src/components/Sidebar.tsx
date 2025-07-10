@@ -1,6 +1,6 @@
+import { Link, useLocation } from '@tanstack/react-router';
 import { ClipboardList, Home, Plus, Users } from 'lucide-react';
 import React from 'react';
-import { Link, useLocation } from 'react-router-dom';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },

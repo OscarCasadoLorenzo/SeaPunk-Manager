@@ -1,10 +1,8 @@
-import { Sidebar } from '@/components/Sidebar';
-import { Dashboard } from '@/pages/Dashboard';
 import { QueryClient, QueryClientProvider } from '@tanstack/react-query';
 import { ReactQueryDevtools } from '@tanstack/react-query-devtools';
-import { Toaster } from 'react-hot-toast';
-import { Route, BrowserRouter as Router, Routes } from 'react-router-dom';
+import { createRouter, RouterProvider } from '@tanstack/react-router';
 import './index.css';
+import { routeTree } from './routeTree.gen';
 
 // Create a client
 const queryClient = new QueryClient({
@@ -16,43 +14,20 @@ const queryClient = new QueryClient({
   },
 });
 
+// Create a new router instance
+const router = createRouter({ routeTree });
+
+// Register the router instance for type safety
+declare module '@tanstack/react-router' {
+  interface Register {
+    router: typeof router;
+  }
+}
+
 function App() {
   return (
     <QueryClientProvider client={queryClient}>
-      <Router>
-        <div className='flex h-screen bg-gray-100'>
-          <Sidebar />
-          <main className='flex-1 overflow-auto'>
-            <Routes>
-              <Route path='/' element={<Dashboard />} />
-              <Route
-                path='/users'
-                element={<div className='p-6'>Users page coming soon...</div>}
-              />
-              <Route
-                path='/tasks'
-                element={<div className='p-6'>Tasks page coming soon...</div>}
-              />
-              <Route
-                path='/tasks/new'
-                element={
-                  <div className='p-6'>New task page coming soon...</div>
-                }
-              />
-            </Routes>
-          </main>
-        </div>
-        <Toaster
-          position='top-right'
-          toastOptions={{
-            duration: 4000,
-            style: {
-              background: '#363636',
-              color: '#fff',
-            },
-          }}
-        />
-      </Router>
+      <RouterProvider router={router} />
       <ReactQueryDevtools initialIsOpen={false} />
     </QueryClientProvider>
   );
