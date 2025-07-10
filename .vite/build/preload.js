@@ -1,4 +1,10 @@
 "use strict";
+function exposeIpcContext() {
+  const { contextBridge, ipcRenderer } = window.require("electron");
+  contextBridge.exposeInMainWorld("electron", {
+    ipcRenderer
+  });
+}
 const THEME_MODE_CURRENT_CHANNEL = "theme-mode:current";
 const THEME_MODE_TOGGLE_CHANNEL = "theme-mode:toggle";
 const THEME_MODE_DARK_CHANNEL = "theme-mode:dark";
@@ -28,5 +34,6 @@ function exposeWindowContext() {
 function exposeContexts() {
   exposeWindowContext();
   exposeThemeContext();
+  exposeIpcContext();
 }
 exposeContexts();

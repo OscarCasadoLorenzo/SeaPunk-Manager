@@ -7,110 +7,123 @@ import {
   timestamp,
 } from 'drizzle-orm/pg-core';
 
-// Players table
-export const players = pgTable('players', {
-  id: serial('id').primaryKey(),
-  playerName: text('player_name').notNull(),
-});
-
 // Characters table
 export const characters = pgTable('characters', {
   id: serial('id').primaryKey(),
-  characterName: text('character_name').notNull(),
-  archetype: text('archetype'),
-  faction: text('faction'),
-  race: text('race'),
-  level: integer('level').notNull(),
-  category: text('category'),
-  epicPoints: integer('epic_points'),
-  type: text('type'),
-  isNPC: boolean('is_npc').notNull().default(false),
-  isVisible: boolean('is_visible').notNull().default(true),
-  playerId: integer('player_id').references(() => players.id),
+  name: text('name').notNull(),
+  description: text('description'),
+  level: integer('level').default(1),
   createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // Attributes table
 export const attributes = pgTable('attributes', {
+  id: serial('id').primaryKey(),
   characterId: integer('character_id').references(() => characters.id),
-  strength: integer('strength'),
-  agility: integer('agility'),
-  willpower: integer('willpower'),
-  luck: integer('luck'),
-  intelligence: integer('intelligence'),
+  strength: integer('strength').default(0),
+  dexterity: integer('dexterity').default(0),
+  intelligence: integer('intelligence').default(0),
+  constitution: integer('constitution').default(0),
+  wisdom: integer('wisdom').default(0),
+  charisma: integer('charisma').default(0),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Domains table
-export const domains = pgTable('domains', {
+// Aura Gifts table
+export const auraGift = pgTable('aura_gifts', {
+  id: serial('id').primaryKey(),
   characterId: integer('character_id').references(() => characters.id),
-  physical: integer('physical'),
-  combat: integer('combat'),
-  social: integer('social'),
-  environmental: integer('environmental'),
-  stealth: integer('stealth'),
-  knowledge: integer('knowledge'),
-  technical: integer('technical'),
-  resources: integer('resources'),
-  demonic: integer('demonic'),
-  aura: integer('aura'),
+  name: text('name').notNull(),
+  description: text('description'),
+  type: text('type'),
+  level: integer('level').default(1),
+  isActive: boolean('is_active').default(false),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // Combat Stats table
 export const combatStats = pgTable('combat_stats', {
+  id: serial('id').primaryKey(),
   characterId: integer('character_id').references(() => characters.id),
-  physicalHealth: integer('physical_health'),
-  maxPhysicalHealth: integer('max_physical_health'),
-  physicalResistance: integer('physical_resistance'),
-  maxPhysicalResistance: integer('max_physical_resistance'),
-  mentalHealth: integer('mental_health'),
-  maxMentalHealth: integer('max_mental_health'),
-  mentalResistance: integer('mental_resistance'),
-  maxMentalResistance: integer('max_mental_resistance'),
-  initiative: integer('initiative'),
-  defense: integer('defense'),
-  attack: integer('attack'),
-  impact: integer('impact'),
-  maxDamage: integer('max_damage'),
+  health: integer('health').default(100),
+  maxHealth: integer('max_health').default(100),
+  armor: integer('armor').default(0),
+  speed: integer('speed').default(5),
+  initiative: integer('initiative').default(0),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Narrative table
-export const narrative = pgTable('narrative', {
+// Domains table
+export const domains = pgTable('domains', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  description: text('description'),
+  type: text('type'),
+  level: integer('level').default(1),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Effects table
+export const effects = pgTable('effects', {
+  id: serial('id').primaryKey(),
   characterId: integer('character_id').references(() => characters.id),
-  physicalDescription: text('physical_description'),
-  externalProfile: text('external_profile'),
-  internalProfile: text('internal_profile'),
-  background: text('background'),
-  specialties: text('specialties'),
+  name: text('name').notNull(),
+  description: text('description'),
+  type: text('type'),
+  duration: integer('duration').default(0),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
+});
+
+// Essence table
+export const essence = pgTable('essence', {
+  id: serial('id').primaryKey(),
+  characterId: integer('character_id').references(() => characters.id),
+  current: integer('current').default(0),
+  maximum: integer('maximum').default(100),
+  type: text('type'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
 // Inventory table
 export const inventory = pgTable('inventory', {
   id: serial('id').primaryKey(),
   characterId: integer('character_id').references(() => characters.id),
-  name: text('name'),
+  itemName: text('item_name').notNull(),
   description: text('description'),
-  quantity: integer('quantity'),
+  quantity: integer('quantity').default(1),
   type: text('type'),
+  rarity: text('rarity'),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Effect table
-export const effect = pgTable('effect', {
+// Narrative table
+export const narrative = pgTable('narrative', {
   id: serial('id').primaryKey(),
   characterId: integer('character_id').references(() => characters.id),
-  name: text('name'),
-  duration: integer('duration'),
+  title: text('title').notNull(),
+  content: text('content'),
   type: text('type'),
-  description: text('description'),
+  isCompleted: boolean('is_completed').default(false),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });
 
-// Essence table
-export const essence = pgTable('essence', {
+// Players table
+export const players = pgTable('players', {
+  id: serial('id').primaryKey(),
+  name: text('name').notNull(),
+  email: text('email'),
   characterId: integer('character_id').references(() => characters.id),
-  name: text('name'),
-});
-
-// Aura Gift table
-export const auraGift = pgTable('aura_gift', {
-  characterId: integer('character_id').references(() => characters.id),
-  name: text('name'),
+  isActive: boolean('is_active').default(true),
+  createdAt: timestamp('created_at').defaultNow(),
+  updatedAt: timestamp('updated_at').defaultNow(),
 });

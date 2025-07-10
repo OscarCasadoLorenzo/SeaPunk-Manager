@@ -15,8 +15,9 @@
     "strict": true,
     "baseUrl": ".",
     "paths": {
+      "@drizzle/*": ["drizzle/*"],
+      "@drizzle": ["drizzle/index.ts"],
       "@/*": ["./src/*"],
-      "@/ui/*": ["./src/ui/*"],
       "@ui/*": ["src/ui/*"]
     },
     "outDir": "dist",
@@ -28,6 +29,7 @@
     "./package.json",
     "./forge.config.ts",
     "drizzle/seed.ts",
-    "drizzle/schema.ts"
+    "drizzle/schema.ts",
+    "drizzle"
   ]
 }

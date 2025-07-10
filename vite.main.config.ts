@@ -6,7 +6,13 @@ export default defineConfig({
   resolve: {
     alias: {
       '@': path.resolve(__dirname, './src'),
-      '@ui': path.resolve(__dirname, './src/ui/*'),
+      '@ui': path.resolve(__dirname, './src/ui'),
+      '@drizzle': path.resolve(__dirname, './drizzle'),
+    },
+  },
+  build: {
+    rollupOptions: {
+      external: ['pg-native'],
     },
   },
 });

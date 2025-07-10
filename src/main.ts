@@ -1,17 +1,27 @@
-import { app, BrowserWindow } from "electron";
-import registerListeners from "./helpers/ipc/listeners-register";
-// "electron-squirrel-startup" seems broken when packaging with vite
-//import started from "electron-squirrel-startup";
-import path from "path";
+import { app, BrowserWindow } from 'electron';
+import registerListeners from './helpers/ipc/listeners-register';
+// Register all backend IPC API handlers
+import './api/attributes';
+import './api/auragifts';
+import './api/characters';
+import './api/combatstats';
+import './api/domains';
+import './api/effect';
+import './api/essence';
+import './api/inventory';
+import './api/narrative';
+import './api/players';
+
 import {
   installExtension,
   REACT_DEVELOPER_TOOLS,
-} from "electron-devtools-installer";
+} from 'electron-devtools-installer';
+import path from 'path';
 
-const inDevelopment = process.env.NODE_ENV === "development";
+const inDevelopment = process.env.NODE_ENV === 'development';
 
 function createWindow() {
-  const preload = path.join(__dirname, "preload.js");
+  const preload = path.join(__dirname, 'preload.js');
   const mainWindow = new BrowserWindow({
     width: 800,
     height: 600,
@@ -23,7 +33,7 @@ function createWindow() {
 
       preload: preload,
     },
-    titleBarStyle: "hidden",
+    titleBarStyle: 'hidden',
   });
   registerListeners(mainWindow);
 
@@ -31,7 +41,7 @@ function createWindow() {
     mainWindow.loadURL(MAIN_WINDOW_VITE_DEV_SERVER_URL);
   } else {
     mainWindow.loadFile(
-      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`),
+      path.join(__dirname, `../renderer/${MAIN_WINDOW_VITE_NAME}/index.html`)
     );
   }
 }
@@ -41,22 +51,21 @@ async function installExtensions() {
     const result = await installExtension(REACT_DEVELOPER_TOOLS);
     console.log(`Extensions installed successfully: ${result.name}`);
   } catch {
-    console.error("Failed to install extensions");
+    console.error('Failed to install extensions');
   }
 }
 
 app.whenReady().then(createWindow).then(installExtensions);
 
 //osX only
-app.on("window-all-closed", () => {
-  if (process.platform !== "darwin") {
+app.on('window-all-closed', () => {
+  if (process.platform !== 'darwin') {
     app.quit();
   }
 });
 
-app.on("activate", () => {
+app.on('activate', () => {
   if (BrowserWindow.getAllWindows().length === 0) {
     createWindow();
   }
 });
-//osX only ends
