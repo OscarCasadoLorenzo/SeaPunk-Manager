@@ -16,7 +16,7 @@ import {
 } from '@/hooks';
 import { extractDefaultValues } from '@/utils/form-builder';
 import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
+import React, { useState } from 'react';
 import { useForm } from 'react-hook-form';
 import toast from 'react-hot-toast';
 import {
@@ -27,6 +27,7 @@ import {
 
 export const useCharacterDetailLogic = () => {
   const { selectedCharacterId } = useCharacterContext();
+  const [isEditing, setIsEditing] = useState(false);
 
   // Data hooks
   const { data: character, isLoading: characterLoading } =
@@ -213,10 +214,22 @@ export const useCharacterDetailLogic = () => {
       }
 
       toast.success('Character updated successfully!');
+      setIsEditing(false);
     } catch (error) {
       toast.error('Failed to update character');
       console.error('Error updating character:', error);
     }
+  };
+
+  // Cancel edit handler
+  const handleCancelEdit = () => {
+    form.reset();
+    setIsEditing(false);
+  };
+
+  // Edit mode handler
+  const handleStartEdit = () => {
+    setIsEditing(true);
   };
 
   // Loading state
@@ -243,6 +256,7 @@ export const useCharacterDetailLogic = () => {
   return {
     // State
     selectedCharacterId,
+    isEditing,
     characterLoading,
     isLoading,
 
@@ -265,6 +279,8 @@ export const useCharacterDetailLogic = () => {
 
     // Handlers
     handleSubmit,
+    handleCancelEdit,
+    handleStartEdit,
 
     // Form config
     characterFormConfig,
