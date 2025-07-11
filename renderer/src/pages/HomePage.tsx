@@ -1569,10 +1569,6 @@ export default function SeaPunkGMTool() {
     });
   };
 
-  const handleDeleteCharacter = (id: string) => {
-    setCharacters((prev) => prev.filter((c) => c.id !== id));
-  };
-
   // Función para calcular dados de daño según impacto
   const getDamageDiceFromImpact = (impactResult: number): number => {
     if (impactResult < 10) return 1;

@@ -117,7 +117,9 @@ export default function CharacterInfoPage() {
     resolver: zodResolver(characterFormSchema),
     defaultValues: getDefaultValues(),
     mode: 'onChange',
-  });
+    reValidateMode: 'onChange',
+    shouldFocusError: true,
+  }) as any; // Temporary type assertion to fix the generic type mismatch
 
   // Update form when data changes
   React.useEffect(() => {

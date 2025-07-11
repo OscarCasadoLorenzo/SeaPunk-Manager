@@ -150,11 +150,8 @@ export function extractDefaultValues(config: FormConfig): Record<string, any> {
 /**
  * Utility to create a form field configuration with proper typing
  */
-export function createField<T extends FieldConfig['type']>(
-  type: T,
-  config: Omit<Extract<FieldConfig, { type: T }>, 'type'>
-): FieldConfig {
-  return { type, ...config } as FieldConfig;
+export function createField(type: string, config: any): any {
+  return { type, ...config };
 }
 
 /**

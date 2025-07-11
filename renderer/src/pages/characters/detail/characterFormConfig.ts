@@ -14,99 +14,105 @@ export const characterFormSchema = z.object({
   faction: z.string().min(1, 'Faction is required'),
   race: z.string().min(1, 'Race is required'),
   category: z.string().min(1, 'Category is required'),
-  level: z
+  level: z.coerce
     .number()
     .min(1, 'Level must be at least 1')
     .max(20, 'Level cannot exceed 20'),
-  epicPoints: z.number().min(0, 'Epic points cannot be negative'),
+  epicPoints: z.coerce.number().min(0, 'Epic points cannot be negative'),
   physicalDescription: z.string().optional(),
 
   // Attributes
-  strength: z
+  strength: z.coerce
     .number()
     .min(1, 'Strength must be at least 1')
-    .max(10, 'Strength cannot exceed 10'),
-  agility: z
+    .max(100, 'Strength cannot exceed 100'),
+  agility: z.coerce
     .number()
     .min(1, 'Agility must be at least 1')
-    .max(10, 'Agility cannot exceed 10'),
-  willpower: z
+    .max(100, 'Agility cannot exceed 100'),
+  willpower: z.coerce
     .number()
     .min(1, 'Willpower must be at least 1')
-    .max(10, 'Willpower cannot exceed 10'),
-  luck: z
+    .max(100, 'Willpower cannot exceed 100'),
+  luck: z.coerce
     .number()
     .min(1, 'Luck must be at least 1')
-    .max(10, 'Luck cannot exceed 10'),
-  intelligence: z
+    .max(100, 'Luck cannot exceed 100'),
+  intelligence: z.coerce
     .number()
     .min(1, 'Intelligence must be at least 1')
-    .max(10, 'Intelligence cannot exceed 10'),
+    .max(100, 'Intelligence cannot exceed 100'),
 
   // Domains
-  physical: z
+  physical: z.coerce
     .number()
     .min(0, 'Physical domain cannot be negative')
-    .max(10, 'Physical domain cannot exceed 10'),
-  combat: z
+    .max(100, 'Physical domain cannot exceed 100'),
+  combat: z.coerce
     .number()
     .min(0, 'Combat domain cannot be negative')
-    .max(10, 'Combat domain cannot exceed 10'),
-  social: z
+    .max(100, 'Combat domain cannot exceed 100'),
+  social: z.coerce
     .number()
     .min(0, 'Social domain cannot be negative')
-    .max(10, 'Social domain cannot exceed 10'),
-  environmental: z
+    .max(100, 'Social domain cannot exceed 100'),
+  environmental: z.coerce
     .number()
     .min(0, 'Environmental domain cannot be negative')
-    .max(10, 'Environmental domain cannot exceed 10'),
-  stealth: z
+    .max(100, 'Environmental domain cannot exceed 100'),
+  stealth: z.coerce
     .number()
     .min(0, 'Stealth domain cannot be negative')
-    .max(10, 'Stealth domain cannot exceed 10'),
-  knowledge: z
+    .max(100, 'Stealth domain cannot exceed 100'),
+  knowledge: z.coerce
     .number()
     .min(0, 'Knowledge domain cannot be negative')
-    .max(10, 'Knowledge domain cannot exceed 10'),
-  technical: z
+    .max(100, 'Knowledge domain cannot exceed 100'),
+  technical: z.coerce
     .number()
     .min(0, 'Technical domain cannot be negative')
-    .max(10, 'Technical domain cannot exceed 10'),
-  resources: z
+    .max(100, 'Technical domain cannot exceed 100'),
+  resources: z.coerce
     .number()
     .min(0, 'Resources domain cannot be negative')
-    .max(10, 'Resources domain cannot exceed 10'),
-  demonic: z
+    .max(100, 'Resources domain cannot exceed 100'),
+  demonic: z.coerce
     .number()
     .min(0, 'Demonic domain cannot be negative')
-    .max(10, 'Demonic domain cannot exceed 10'),
-  aura: z
+    .max(100, 'Demonic domain cannot exceed 100'),
+  aura: z.coerce
     .number()
     .min(0, 'Aura domain cannot be negative')
-    .max(10, 'Aura domain cannot exceed 10'),
+    .max(100, 'Aura domain cannot exceed 100'),
 
   // Combat Stats
-  physicalHealth: z.number().min(1, 'Physical health must be at least 1'),
-  maxPhysicalHealth: z
+  physicalHealth: z.coerce
+    .number()
+    .min(1, 'Physical health must be at least 1'),
+  maxPhysicalHealth: z.coerce
     .number()
     .min(1, 'Max physical health must be at least 1'),
-  physicalResistance: z
+  physicalResistance: z.coerce
     .number()
     .min(0, 'Physical resistance cannot be negative'),
-  maxPhysicalResistance: z
+  maxPhysicalResistance: z.coerce
     .number()
     .min(0, 'Max physical resistance cannot be negative'),
-  mentalHealth: z.number().min(1, 'Mental health must be at least 1'),
-  maxMentalHealth: z.number().min(1, 'Max mental health must be at least 1'),
-  mentalResistance: z.number().min(0, 'Mental resistance cannot be negative'),
-  maxMentalResistance: z
+  mentalHealth: z.coerce.number().min(1, 'Mental health must be at least 1'),
+  maxMentalHealth: z.coerce
+    .number()
+    .min(1, 'Max mental health must be at least 1'),
+  mentalResistance: z.coerce
+    .number()
+    .min(0, 'Mental resistance cannot be negative'),
+  maxMentalResistance: z.coerce
     .number()
     .min(0, 'Max mental resistance cannot be negative'),
-  initiative: z.number().min(0, 'Initiative cannot be negative'),
-  defense: z.number().min(0, 'Defense cannot be negative'),
-  attack: z.number().min(0, 'Attack cannot be negative'),
-  impact: z.number().min(0, 'Impact cannot be negative'),
-  maxDamage: z.number().min(0, 'Max damage cannot be negative'),
+  initiative: z.coerce.number().min(0, 'Initiative cannot be negative'),
+  defense: z.coerce.number().min(0, 'Defense cannot be negative'),
+  attack: z.coerce.number().min(0, 'Attack cannot be negative'),
+  impact: z.coerce.number().min(0, 'Impact cannot be negative'),
+  maxDamage: z.coerce.number().min(0, 'Max damage cannot be negative'),
 
   // Narrative fields
   externalProfile: z.string().optional(),
@@ -189,7 +195,7 @@ export const characterFormConfig = createFormConfig({
     }),
     createSection({
       title: 'Atributos',
-      description: 'Valores de 1 a 10',
+      description: 'Valores de 1 a 100',
       columns: 3,
       fields: [
         createField('number', {
@@ -197,7 +203,7 @@ export const characterFormConfig = createFormConfig({
           label: 'Fuerza (FUE)',
           required: true,
           min: 1,
-          max: 10,
+          max: 100,
           defaultValue: 1,
         }),
         createField('number', {
@@ -205,7 +211,7 @@ export const characterFormConfig = createFormConfig({
           label: 'Agilidad (DIN)',
           required: true,
           min: 1,
-          max: 10,
+          max: 100,
           defaultValue: 1,
         }),
         createField('number', {
@@ -213,7 +219,7 @@ export const characterFormConfig = createFormConfig({
           label: 'Voluntad (VOL)',
           required: true,
           min: 1,
-          max: 10,
+          max: 100,
           defaultValue: 1,
         }),
         createField('number', {
@@ -221,7 +227,7 @@ export const characterFormConfig = createFormConfig({
           label: 'Suerte (SUR)',
           required: true,
           min: 1,
-          max: 10,
+          max: 100,
           defaultValue: 1,
         }),
         createField('number', {
@@ -229,84 +235,84 @@ export const characterFormConfig = createFormConfig({
           label: 'Inteligencia (INT)',
           required: true,
           min: 1,
-          max: 10,
+          max: 100,
           defaultValue: 1,
         }),
       ],
     }),
     createSection({
       title: 'Dominios',
-      description: 'Valores de 0 a 10',
+      description: 'Valores de 0 a 100',
       columns: 2,
       fields: [
         createField('number', {
           name: 'physical',
           label: 'Físico',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'combat',
           label: 'Batalla',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'social',
           label: 'Social',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'environmental',
           label: 'Ambiental',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'stealth',
           label: 'Sigilo',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'knowledge',
           label: 'Conocimiento',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'technical',
           label: 'Técnico',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'resources',
           label: 'Recursos',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'demonic',
           label: 'Demoníaco',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
         createField('number', {
           name: 'aura',
           label: 'Aura',
           min: 0,
-          max: 10,
+          max: 100,
           defaultValue: 0,
         }),
       ],
@@ -320,56 +326,56 @@ export const characterFormConfig = createFormConfig({
           label: 'Salud física actual',
           required: true,
           min: 0,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'maxPhysicalHealth',
           label: 'Salud física máxima',
           required: true,
           min: 1,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'physicalResistance',
           label: 'Resistencia física actual',
           required: true,
           min: 0,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'maxPhysicalResistance',
           label: 'Resistencia física máxima',
           required: true,
           min: 0,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'mentalHealth',
           label: 'Salud mental actual',
           required: true,
           min: 0,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'maxMentalHealth',
           label: 'Salud mental máxima',
           required: true,
           min: 1,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'mentalResistance',
           label: 'Resistencia mental actual',
           required: true,
           min: 0,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'maxMentalResistance',
           label: 'Resistencia mental máxima',
           required: true,
           min: 0,
-          defaultValue: 10,
+          defaultValue: 100,
         }),
         createField('number', {
           name: 'initiative',

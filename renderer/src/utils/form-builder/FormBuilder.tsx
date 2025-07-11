@@ -30,6 +30,19 @@ export const FormBuilder = <T extends FieldValues = FieldValues>({
     }
   };
 
+  // Debug form validation state
+  console.log('FormBuilder debug:', {
+    isLoading,
+    submitDisabled: config.submitButton?.disabled,
+    formIsValid: form.formState.isValid,
+    formErrors: form.formState.errors,
+    touchedFields: form.formState.touchedFields,
+    dirtyFields: form.formState.dirtyFields,
+    isValidating: form.formState.isValidating,
+    submitCount: form.formState.submitCount,
+  });
+
+  console.log();
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-6', config.className)}>
       {/* Form title and description */}

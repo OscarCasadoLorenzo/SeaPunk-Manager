@@ -1,5 +1,4 @@
 import { Link } from '@tanstack/react-router';
-import React from 'react';
 import { useTranslation } from 'react-i18next';
 import {
   NavigationMenu as NavigationMenuBase,
@@ -22,15 +21,9 @@ export default function NavigationMenu() {
             </NavigationMenuLink>
           </Link>
         </NavigationMenuItem>
+
         <NavigationMenuItem>
-          <Link to='/second-page'>
-            <NavigationMenuLink className={navigationMenuTriggerStyle()}>
-              {t('titleSecondPage')}
-            </NavigationMenuLink>
-          </Link>
-        </NavigationMenuItem>
-        <NavigationMenuItem>
-          <Link to='/character-info'>
+          <Link to='/characters'>
             <NavigationMenuLink className={navigationMenuTriggerStyle()}>
               {t('titleCharacterInfo')}
             </NavigationMenuLink>
