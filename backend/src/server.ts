@@ -4,6 +4,18 @@ import { config } from 'dotenv';
 import express from 'express';
 import rateLimit from 'express-rate-limit';
 import helmet from 'helmet';
+import attributeRoutes from './routes/attributes';
+import auraGiftRoutes from './routes/auraGifts';
+import characterAuraGiftRoutes from './routes/characterAuraGifts';
+import characterEssenceRoutes from './routes/characterEssences';
+import characterRoutes from './routes/characters';
+import combatStatsRoutes from './routes/combatStats';
+import domainRoutes from './routes/domains';
+import effectRoutes from './routes/effects';
+import essenceRoutes from './routes/essences';
+import inventoryRoutes from './routes/inventories';
+import narrativeRoutes from './routes/narratives';
+import playerRoutes from './routes/players';
 import taskRoutes from './routes/tasks';
 import userRoutes from './routes/users';
 
@@ -48,6 +60,18 @@ app.get('/api/health', (req, res) => {
 // API routes
 app.use('/api/users', userRoutes);
 app.use('/api/tasks', taskRoutes);
+app.use('/api/players', playerRoutes);
+app.use('/api/characters', characterRoutes);
+app.use('/api/attributes', attributeRoutes);
+app.use('/api/domains', domainRoutes);
+app.use('/api/combat-stats', combatStatsRoutes);
+app.use('/api/narratives', narrativeRoutes);
+app.use('/api/inventories', inventoryRoutes);
+app.use('/api/effects', effectRoutes);
+app.use('/api/essences', essenceRoutes);
+app.use('/api/aura-gifts', auraGiftRoutes);
+app.use('/api/character-essences', characterEssenceRoutes);
+app.use('/api/character-aura-gifts', characterAuraGiftRoutes);
 
 // Error handling middleware
 app.use(

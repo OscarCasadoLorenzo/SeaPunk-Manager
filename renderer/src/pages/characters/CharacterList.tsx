@@ -1,4 +1,6 @@
-import { useCharacters, useTasks } from '@/hooks';
+import { useCharacterContext } from '@/contexts/CharacterContext';
+import { useCharacters } from '@/hooks';
+import { Character } from '@/types';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/primitives/card';
 import { Skeleton } from '@/ui/primitives/skeleton';
 import {
@@ -12,17 +14,17 @@ import {
 import { useEffect } from 'react';
 
 export default function CharacterList() {
-  const { data: tasks } = useTasks();
   const { data, isLoading, isError } = useCharacters();
+  const { selectedCharacterId, setSelectedCharacterId } = useCharacterContext();
 
   useEffect(() => {
     console.log('CharacterList component mounted');
     console.log('Data:', data);
   }, [data]);
 
-  useEffect(() => {
-    console.log('Tasks:', tasks);
-  }, [tasks]);
+  const handleCharacterSelect = (characterId: string) => {
+    setSelectedCharacterId(characterId);
+  };
 
   return (
     <Card>
@@ -38,7 +40,6 @@ export default function CharacterList() {
           <Table>
             <TableHeader>
               <TableRow>
-                <TableHead>ID</TableHead>
                 <TableHead>Nombre</TableHead>
                 <TableHead>Arquetipo</TableHead>
                 <TableHead>Raza</TableHead>
@@ -48,19 +49,28 @@ export default function CharacterList() {
             </TableHeader>
             <TableBody>
               {data && data.length > 0 ? (
-                data.map((char: any) => (
-                  <TableRow key={char.id}>
-                    <TableCell>{char.id}</TableCell>
-                    <TableCell>{char.characterName}</TableCell>
+                data.map((char: Character) => (
+                  <TableRow
+                    key={char.id}
+                    className={`cursor-pointer hover:bg-muted/50 ${
+                      selectedCharacterId === char.id ? 'bg-muted' : ''
+                    }`}
+                    onClick={() => handleCharacterSelect(char.id)}
+                  >
+                    <TableCell className='font-medium'>
+                      {char.characterName}
+                    </TableCell>
                     <TableCell>{char.archetype}</TableCell>
                     <TableCell>{char.race}</TableCell>
                     <TableCell>{char.level}</TableCell>
-                    <TableCell>{char.playerId}</TableCell>
+                    <TableCell>
+                      {char.player?.playerName || char.playerId}
+                    </TableCell>
                   </TableRow>
                 ))
               ) : (
                 <TableRow>
-                  <TableCell colSpan={6} className='text-center'>
+                  <TableCell colSpan={5} className='text-center'>
                     No hay personajes.
                   </TableCell>
                 </TableRow>

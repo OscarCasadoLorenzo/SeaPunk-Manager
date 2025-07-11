@@ -39,7 +39,6 @@ import {
   Zap,
 } from 'lucide-react';
 import { useState } from 'react';
-import CharacterList from './characters/CharacterList';
 
 interface Character {
   id: string;
@@ -1759,7 +1758,6 @@ export default function SeaPunkGMTool() {
 
   return (
     <div className='min-h-screen bg-background text-foreground'>
-      <CharacterList />
       <div className='container mx-auto p-4'>
         {/* Header */}
         <div className='flex items-center justify-between mb-6'>
