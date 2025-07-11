@@ -39,6 +39,7 @@ import {
   Zap,
 } from 'lucide-react';
 import { useState } from 'react';
+import CharacterList from './characters/CharacterList';
 
 interface Character {
   id: string;
@@ -1139,8 +1140,8 @@ function CharacterSheet({
                                     effect.type === 'buff'
                                       ? 'default'
                                       : effect.type === 'debuff'
-                                      ? 'destructive'
-                                      : 'secondary'
+                                        ? 'destructive'
+                                        : 'secondary'
                                   }
                                 >
                                   <Clock className='w-3 h-3 mr-1' />
@@ -1274,8 +1275,8 @@ function PublicView({
                           effect.type === 'buff'
                             ? 'default'
                             : effect.type === 'debuff'
-                            ? 'destructive'
-                            : 'secondary'
+                              ? 'destructive'
+                              : 'secondary'
                         }
                         className='mr-2'
                       >
@@ -1758,6 +1759,7 @@ export default function SeaPunkGMTool() {
 
   return (
     <div className='min-h-screen bg-background text-foreground'>
+      <CharacterList />
       <div className='container mx-auto p-4'>
         {/* Header */}
         <div className='flex items-center justify-between mb-6'>
@@ -1875,8 +1877,8 @@ export default function SeaPunkGMTool() {
                                 character.type === 'PC'
                                   ? 'default'
                                   : character.type === 'NPC'
-                                  ? 'secondary'
-                                  : 'destructive'
+                                    ? 'secondary'
+                                    : 'destructive'
                               }
                             >
                               {character.type}
@@ -2006,8 +2008,8 @@ export default function SeaPunkGMTool() {
                                       effect.type === 'buff'
                                         ? 'default'
                                         : effect.type === 'debuff'
-                                        ? 'destructive'
-                                        : 'secondary'
+                                          ? 'destructive'
+                                          : 'secondary'
                                     }
                                   >
                                     <Clock className='w-3 h-3 mr-1' />
@@ -2350,8 +2352,8 @@ export default function SeaPunkGMTool() {
                                 roll === diceResult.sides
                                   ? 'bg-green-600 text-white'
                                   : roll === 1
-                                  ? 'bg-red-600 text-white'
-                                  : 'bg-white text-black'
+                                    ? 'bg-red-600 text-white'
+                                    : 'bg-white text-black'
                               }`}
                             >
                               {roll}

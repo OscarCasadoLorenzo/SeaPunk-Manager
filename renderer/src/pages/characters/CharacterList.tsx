@@ -1,4 +1,4 @@
-import { useCharacters } from '@/helpers/crud';
+import { useCharacters, useTasks } from '@/hooks';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/primitives/card';
 import { Skeleton } from '@/ui/primitives/skeleton';
 import {
@@ -9,15 +9,20 @@ import {
   TableHeader,
   TableRow,
 } from '@/ui/primitives/table';
-import React, { useEffect } from 'react';
+import { useEffect } from 'react';
 
 export default function CharacterList() {
+  const { data: tasks } = useTasks();
   const { data, isLoading, isError } = useCharacters();
 
   useEffect(() => {
     console.log('CharacterList component mounted');
     console.log('Data:', data);
   }, [data]);
+
+  useEffect(() => {
+    console.log('Tasks:', tasks);
+  }, [tasks]);
 
   return (
     <Card>
