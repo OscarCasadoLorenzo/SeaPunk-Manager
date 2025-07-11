@@ -33,7 +33,7 @@ router.get('/', async (req, res) => {
           },
         },
       },
-      orderBy: { createdAt: 'desc' },
+      orderBy: { characterName: 'asc' },
     });
 
     res.json(characters);

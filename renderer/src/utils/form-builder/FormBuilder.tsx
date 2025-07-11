@@ -31,16 +31,16 @@ export const FormBuilder = <T extends FieldValues = FieldValues>({
   };
 
   // Debug form validation state
-  console.log('FormBuilder debug:', {
-    isLoading,
-    submitDisabled: config.submitButton?.disabled,
-    formIsValid: form.formState.isValid,
-    formErrors: form.formState.errors,
-    touchedFields: form.formState.touchedFields,
-    dirtyFields: form.formState.dirtyFields,
-    isValidating: form.formState.isValidating,
-    submitCount: form.formState.submitCount,
-  });
+  // console.log('FormBuilder debug:', {
+  //   isLoading,
+  //   submitDisabled: config.submitButton?.disabled,
+  //   formIsValid: form.formState.isValid,
+  //   formErrors: form.formState.errors,
+  //   touchedFields: form.formState.touchedFields,
+  //   dirtyFields: form.formState.dirtyFields,
+  //   isValidating: form.formState.isValidating,
+  //   submitCount: form.formState.submitCount,
+  // });
 
   console.log();
   return (
@@ -116,7 +116,8 @@ export const FormBuilder = <T extends FieldValues = FieldValues>({
                 disabled={
                   isLoading ||
                   config.submitButton.disabled ||
-                  !form.formState.isValid
+                  !form.formState.isValid ||
+                  !form.formState.isDirty
                 }
               >
                 {isLoading || config.submitButton.loading
