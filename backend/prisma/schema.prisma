@@ -43,3 +43,179 @@ enum Priority {
   HIGH
   URGENT
 }
+
+model Player {
+  id         String      @id @default(cuid())
+  playerName String
+  createdAt  DateTime    @default(now())
+  updatedAt  DateTime    @updatedAt
+  characters Character[]
+
+  @@map("players")
+}
+
+model Character {
+  id            String        @id @default(cuid())
+  characterName String
+  archetype     String
+  faction       String
+  race          String
+  level         Int
+  category      String
+  epicPoints    Int
+  type          String
+  isNPC         Boolean       @default(false)
+  isVisible     Boolean       @default(true)
+  playerId      String
+  createdAt     DateTime      @default(now())
+  updatedAt     DateTime      @updatedAt
+  player        Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  attributes    Attribute?
+  domains       Domain?
+  combatStats   CombatStats?
+  narrative     Narrative?
+  inventories   Inventory[]
+  effects       Effect[]
+  essences      CharacterEssence[]
+  auraGifts     CharacterAuraGift[]
+
+  @@map("characters")
+}
+
+model Attribute {
+  id           String    @id @default(cuid())
+  characterId  String    @unique
+  strength     Int
+  agility      Int
+  willpower    Int
+  luck         Int
+  intelligence Int
+  character    Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("attributes")
+}
+
+model Domain {
+  id            String    @id @default(cuid())
+  characterId   String    @unique
+  physical      Int
+  combat        Int
+  social        Int
+  environmental Int
+  stealth       Int
+  knowledge     Int
+  technical     Int
+  resources     Int
+  demonic       Int
+  aura          Int
+  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("domains")
+}
+
+model CombatStats {
+  id                    String    @id @default(cuid())
+  characterId           String    @unique
+  physicalHealth        Int
+  maxPhysicalHealth     Int
+  physicalResistance    Int
+  maxPhysicalResistance Int
+  mentalHealth          Int
+  maxMentalHealth       Int
+  mentalResistance      Int
+  maxMentalResistance   Int
+  initiative            Int
+  defense               Int
+  attack                Int
+  impact                Int
+  maxDamage             Int
+  character             Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("combat_stats")
+}
+
+model Narrative {
+  id                  String    @id @default(cuid())
+  characterId         String    @unique
+  physicalDescription String?
+  externalProfile     String?
+  internalProfile     String?
+  background          String?
+  specialties         String?
+  character           Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("narratives")
+}
+
+model Inventory {
+  id          String    @id @default(cuid())
+  characterId String
+  name        String
+  description String?
+  quantity    Int       @default(1)
+  type        String
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("inventories")
+}
+
+model Effect {
+  id          String    @id @default(cuid())
+  characterId String
+  name        String
+  duration    Int
+  type        String
+  description String?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("effects")
+}
+
+model Essence {
+  id         String             @id @default(cuid())
+  name       String             @unique
+  createdAt  DateTime           @default(now())
+  updatedAt  DateTime           @updatedAt
+  characters CharacterEssence[]
+
+  @@map("essences")
+}
+
+model AuraGift {
+  id         String              @id @default(cuid())
+  name       String              @unique
+  createdAt  DateTime            @default(now())
+  updatedAt  DateTime            @updatedAt
+  characters CharacterAuraGift[]
+
+  @@map("aura_gifts")
+}
+
+// Many-to-many relationship tables
+model CharacterEssence {
+  id          String    @id @default(cuid())
+  characterId String
+  essenceId   String
+  createdAt   DateTime  @default(now())
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  essence     Essence   @relation(fields: [essenceId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, essenceId])
+  @@map("character_essences")
+}
+
+model CharacterAuraGift {
+  id          String    @id @default(cuid())
+  characterId String
+  auraGiftId  String
+  createdAt   DateTime  @default(now())
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  auraGift    AuraGift  @relation(fields: [auraGiftId], references: [id], onDelete: Cascade)
+
+  @@unique([characterId, auraGiftId])
+  @@map("character_aura_gifts")
+}
