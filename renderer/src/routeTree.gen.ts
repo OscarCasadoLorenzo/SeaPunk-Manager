@@ -13,7 +13,7 @@ import { Route as UsersRouteImport } from './routes/users'
 import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as CharactersRouteImport } from './routes/characters'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TasksNewRouteImport } from './routes/tas./routes/characters
+import { Route as TasksNewRouteImport } from './routes/tasks/new'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
