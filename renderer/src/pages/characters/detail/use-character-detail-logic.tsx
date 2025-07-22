@@ -4,6 +4,8 @@ import {
   useAuraGiftsByCharacter,
   useCharacterWithDetails,
   useCombatStats,
+  useCreateInventory,
+  useDeleteInventory,
   useDomain,
   useEffects,
   useInventories,
@@ -12,6 +14,7 @@ import {
   useUpdateCharacter,
   useUpdateCombatStats,
   useUpdateDomain,
+  useUpdateInventory,
   useUpdateNarrative,
 } from '@/hooks';
 import { extractDefaultValues } from '@/utils/form-builder';
@@ -22,6 +25,7 @@ import toast from 'react-hot-toast';
 import {
   characterFormConfig,
   characterFormSchema,
+  createCharacterFormConfig,
   type CharacterFormData,
 } from './characterFormConfig';
 
@@ -48,6 +52,9 @@ export const useCharacterDetailLogic = () => {
   const updateDomain = useUpdateDomain();
   const updateCombatStats = useUpdateCombatStats();
   const updateNarrative = useUpdateNarrative();
+  const createInventory = useCreateInventory();
+  const updateInventory = useUpdateInventory();
+  const deleteInventory = useDeleteInventory();
 
   // Extract current values for default form values
   const getDefaultValues = (): CharacterFormData => {
@@ -106,6 +113,37 @@ export const useCharacterDetailLogic = () => {
       internalProfile: narrative.internalProfile || '',
       background: narrative.background || '',
       specialties: narrative.specialties || '',
+
+      // Inventory array - initialize with existing inventory data
+      inventories:
+        inventories?.map((item) => ({
+          id: item.id,
+          name: item.name,
+          description: item.description || '',
+          quantity: item.quantity,
+          type: item.type as 'Objeto' | 'Consumible',
+        })) || [],
+
+      // New inventory item fields (always start empty)
+      newItemName: '',
+      newItemDescription: '',
+      newItemQuantity: 1,
+      newItemType: 'placeholder' as any,
+
+      // Empty inventory message
+      emptyInventoryMessage: 'No hay objetos en el inventario',
+
+      // Dynamic inventory fields - spread the values for each inventory item
+      ...(inventories?.reduce(
+        (acc, item) => {
+          acc[`inventory_${item.id}_name`] = item.name;
+          acc[`inventory_${item.id}_description`] = item.description || '';
+          acc[`inventory_${item.id}_quantity`] = item.quantity;
+          acc[`inventory_${item.id}_type`] = item.type;
+          return acc;
+        },
+        {} as Record<string, any>
+      ) || {}),
     };
   };
 
@@ -123,7 +161,15 @@ export const useCharacterDetailLogic = () => {
     if (character && attributes && domains && combatStats && narrative) {
       form.reset(getDefaultValues());
     }
-  }, [character, attributes, domains, combatStats, narrative, form]);
+  }, [
+    character,
+    attributes,
+    domains,
+    combatStats,
+    narrative,
+    inventories,
+    form,
+  ]);
 
   // Submit handler
   const handleSubmit = async (data: CharacterFormData) => {
@@ -213,7 +259,62 @@ export const useCharacterDetailLogic = () => {
         });
       }
 
-      toast.success('Character updated successfully!');
+      // Update existing inventory items
+      if (inventories && inventories.length > 0) {
+        for (const item of inventories) {
+          const nameKey = `inventory_${item.id}_name`;
+          const descriptionKey = `inventory_${item.id}_description`;
+          const quantityKey = `inventory_${item.id}_quantity`;
+          const typeKey = `inventory_${item.id}_type`;
+
+          // Check if any field has changed
+          if (
+            data[nameKey] !== item.name ||
+            data[descriptionKey] !== (item.description || '') ||
+            data[quantityKey] !== item.quantity ||
+            data[typeKey] !== item.type
+          ) {
+            await updateInventory.mutateAsync({
+              id: item.id,
+              data: {
+                name: data[nameKey],
+                description: data[descriptionKey] || '',
+                quantity: data[quantityKey],
+                type: data[typeKey],
+              },
+            });
+          }
+        }
+      }
+
+      // Create new inventory item if provided
+      if (
+        data.newItemName &&
+        data.newItemType &&
+        data.newItemType !== 'placeholder' &&
+        selectedCharacterId
+      ) {
+        await createInventory.mutateAsync({
+          characterId: selectedCharacterId,
+          name: data.newItemName,
+          description: data.newItemDescription || '',
+          quantity: data.newItemQuantity || 1,
+          type: data.newItemType,
+        });
+
+        // Clear the new item fields after successful creation
+        form.setValue('newItemName', '');
+        form.setValue('newItemDescription', '');
+        form.setValue('newItemQuantity', 1);
+        form.setValue('newItemType', 'placeholder' as any);
+
+        toast.success(
+          `Character updated and "${data.newItemName}" added to inventory!`
+        );
+      } else {
+        toast.success('Character updated successfully!');
+      }
+
       setIsEditing(false);
     } catch (error) {
       toast.error('Failed to update character');
@@ -232,13 +333,59 @@ export const useCharacterDetailLogic = () => {
     setIsEditing(true);
   };
 
+  // Inventory management functions
+  const handleUpdateInventoryItem = async (
+    itemId: string,
+    updates: {
+      name?: string;
+      description?: string;
+      quantity?: number;
+      type?: string;
+    }
+  ) => {
+    try {
+      await updateInventory.mutateAsync({
+        id: itemId,
+        data: updates,
+      });
+      toast.success('Inventory item updated successfully!');
+    } catch (error) {
+      toast.error('Failed to update inventory item');
+      console.error('Error updating inventory item:', error);
+    }
+  };
+
+  const handleDeleteInventoryItem = async (
+    itemId: string,
+    itemName: string
+  ) => {
+    try {
+      await deleteInventory.mutateAsync(itemId);
+      toast.success(`"${itemName}" removed from inventory!`);
+    } catch (error) {
+      toast.error('Failed to delete inventory item');
+      console.error('Error deleting inventory item:', error);
+    }
+  };
+
+  // Expose delete handler globally for custom delete buttons
+  React.useEffect(() => {
+    (window as any).__deleteInventoryHandler = handleDeleteInventoryItem;
+    return () => {
+      delete (window as any).__deleteInventoryHandler;
+    };
+  }, [handleDeleteInventoryItem]);
+
   // Loading state
   const isLoading =
     updateCharacter.isPending ||
     updateAttribute.isPending ||
     updateDomain.isPending ||
     updateCombatStats.isPending ||
-    updateNarrative.isPending;
+    updateNarrative.isPending ||
+    createInventory.isPending ||
+    updateInventory.isPending ||
+    deleteInventory.isPending;
 
   // Computed values for the view
   const effectsText = [
@@ -281,9 +428,13 @@ export const useCharacterDetailLogic = () => {
     handleSubmit,
     handleCancelEdit,
     handleStartEdit,
+    handleUpdateInventoryItem,
+    handleDeleteInventoryItem,
 
-    // Form config
-    characterFormConfig,
+    // Form config - generate dynamically based on inventory
+    characterFormConfig: React.useMemo(() => {
+      return createCharacterFormConfig(inventories || []);
+    }, [inventories]),
   };
 };
 

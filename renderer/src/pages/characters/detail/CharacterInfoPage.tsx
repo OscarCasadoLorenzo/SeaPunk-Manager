@@ -6,17 +6,12 @@ import { useCharacterDetailLogic } from './use-character-detail-logic';
 export default function CharacterInfoPage() {
   const {
     selectedCharacterId,
-    isEditing,
     characterLoading,
     isLoading,
     character,
-    narrative,
-    effectsText,
-    inventoryText,
     form,
     handleSubmit,
     handleCancelEdit,
-    handleStartEdit,
     characterFormConfig,
   } = useCharacterDetailLogic();
 
