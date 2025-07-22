@@ -13,6 +13,7 @@ export type {
   FormBuilderProps,
   FormConfig,
   FormSectionConfig,
+  FormTabConfig,
   NumberFieldConfig,
   RadioGroupFieldConfig,
   SelectFieldConfig,
@@ -25,6 +26,7 @@ export {
   createField,
   createFormConfig,
   createSection,
+  createTab,
   createValidationSchema,
   extractDefaultValues,
 } from './schema';

@@ -61,6 +61,12 @@ export interface FileFieldConfig extends BaseFieldConfig {
   multiple?: boolean;
 }
 
+export interface CustomFieldConfig extends BaseFieldConfig {
+  type: 'custom';
+  customComponent: string;
+  customProps?: Record<string, any>;
+}
+
 // Union type for all field configurations
 export type FieldConfig =
   | TextFieldConfig
@@ -70,7 +76,8 @@ export type FieldConfig =
   | CheckboxFieldConfig
   | RadioGroupFieldConfig
   | DateFieldConfig
-  | FileFieldConfig;
+  | FileFieldConfig
+  | CustomFieldConfig;
 
 // Form section configuration
 export interface FormSectionConfig {
@@ -81,11 +88,19 @@ export interface FormSectionConfig {
   columns?: 1 | 2 | 3 | 4;
 }
 
+// Tab configuration
+export interface FormTabConfig {
+  id: string;
+  label: string;
+  sections: FormSectionConfig[];
+}
+
 // Main form configuration
 export interface FormConfig {
   title?: string;
   description?: string;
-  sections: FormSectionConfig[];
+  sections?: FormSectionConfig[];
+  tabs?: FormTabConfig[];
   submitButton?: {
     text: string;
     className?: string;
@@ -118,10 +133,18 @@ export interface FieldProps<T extends FieldValues = FieldValues> {
 
 // Utility types
 export type FormData<T extends FormConfig> = {
-  [K in T['sections'][number]['fields'][number]['name']]: any;
+  [K in T['sections'] extends readonly any[]
+    ? T['sections'][number]['fields'][number]['name']
+    : T['tabs'] extends readonly any[]
+      ? T['tabs'][number]['sections'][number]['fields'][number]['name']
+      : never]: any;
 };
 
 // Validation schema builder utility
 export type ValidationSchema<T extends FormConfig> = z.ZodObject<{
-  [K in T['sections'][number]['fields'][number]['name']]: z.ZodType<any>;
+  [K in T['sections'] extends readonly any[]
+    ? T['sections'][number]['fields'][number]['name']
+    : T['tabs'] extends readonly any[]
+      ? T['tabs'][number]['sections'][number]['fields'][number]['name']
+      : never]: z.ZodType<any>;
 }>;

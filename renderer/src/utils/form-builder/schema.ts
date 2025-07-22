@@ -1,5 +1,10 @@
 import { z } from 'zod';
-import { FieldConfig, FormConfig, FormSectionConfig } from './types';
+import {
+  FieldConfig,
+  FormConfig,
+  FormSectionConfig,
+  FormTabConfig,
+} from './types';
 
 /**
  * Creates a Zod validation schema from a form configuration
@@ -7,7 +12,15 @@ import { FieldConfig, FormConfig, FormSectionConfig } from './types';
 export function createValidationSchema(config: FormConfig) {
   const schemaShape: Record<string, z.ZodType<any>> = {};
 
-  config.sections.forEach((section) => {
+  // Handle both sections and tabs
+  const allSections = config.sections || [];
+  if (config.tabs) {
+    config.tabs.forEach((tab) => {
+      allSections.push(...tab.sections);
+    });
+  }
+
+  allSections.forEach((section) => {
     section.fields.forEach((field) => {
       if (field.validation) {
         schemaShape[field.name] = field.validation;
@@ -116,7 +129,15 @@ function createDefaultValidation(field: FieldConfig): z.ZodType<any> {
 export function extractDefaultValues(config: FormConfig): Record<string, any> {
   const defaultValues: Record<string, any> = {};
 
-  config.sections.forEach((section) => {
+  // Handle both sections and tabs
+  const allSections = config.sections || [];
+  if (config.tabs) {
+    config.tabs.forEach((tab) => {
+      allSections.push(...tab.sections);
+    });
+  }
+
+  allSections.forEach((section) => {
     section.fields.forEach((field) => {
       if (field.defaultValue !== undefined) {
         defaultValues[field.name] = field.defaultValue;
@@ -168,6 +189,17 @@ export function createSection(config: {
     columns: 1,
     ...config,
   } as FormSectionConfig;
+}
+
+/**
+ * Utility to create a form tab
+ */
+export function createTab(config: {
+  id: string;
+  label: string;
+  sections: FormSectionConfig[];
+}): FormTabConfig {
+  return config;
 }
 
 /**
