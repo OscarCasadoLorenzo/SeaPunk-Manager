@@ -1,6 +1,6 @@
 import { CharacterProvider } from '@/contexts/CharacterContext';
 import CharacterList from '@/pages/characters/CharacterList';
-import CharacterInfoPage from '@/pages/characters/detail/CharacterInfoPage';
+import { RefactoredCharacterInfoPage } from '@/pages/characters/detail';
 import { createFileRoute } from '@tanstack/react-router';
 
 export const Route = createFileRoute('/characters')({
@@ -15,7 +15,7 @@ function RouteComponent() {
           <CharacterList />
         </div>
         <div className='flex-1 h-full'>
-          <CharacterInfoPage />
+          <RefactoredCharacterInfoPage />
         </div>
       </div>
     </CharacterProvider>
