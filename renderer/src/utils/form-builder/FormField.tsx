@@ -1,4 +1,5 @@
 import { cn } from '@/ui/lib/utils';
+import { Button } from '@/ui/primitives/button';
 import { Checkbox } from '@/ui/primitives/checkbox';
 import { Input } from '@/ui/primitives/input';
 import { Label } from '@/ui/primitives/label';
@@ -11,8 +12,10 @@ import {
   SelectValue,
 } from '@/ui/primitives/select';
 import { Textarea } from '@/ui/primitives/textarea';
+import { Trash2 } from 'lucide-react';
 import React from 'react';
 import { Controller, FieldValues } from 'react-hook-form';
+import toast from 'react-hot-toast';
 import { FieldConfig, FieldProps } from './types';
 
 // Error message component
@@ -384,6 +387,52 @@ const FileFieldComponent: React.FC<FieldProps> = ({
   );
 };
 
+// Custom field component for handling special field types
+const CustomFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
+  const fieldConfig = config as Extract<FieldConfig, { type: 'custom' }>;
+
+  const handleDeleteClick = () => {
+    if (
+      fieldConfig.customComponent === 'deleteButton' &&
+      fieldConfig.customProps
+    ) {
+      const { itemId, itemName } = fieldConfig.customProps;
+
+      if (
+        window.confirm(`¿Estás seguro de que quieres eliminar "${itemName}"?`)
+      ) {
+        // Get the delete handler from the form context or global context
+        const deleteHandler = (window as any).__deleteInventoryHandler;
+        if (deleteHandler) {
+          deleteHandler(itemId, itemName);
+        } else {
+          toast.error('No se pudo eliminar el objeto. Inténtalo de nuevo.');
+        }
+      }
+    }
+  };
+
+  if (fieldConfig.customComponent === 'deleteButton') {
+    return (
+      <div className={cn('space-y-2', className)}>
+        <Label>{fieldConfig.label}</Label>
+        <Button
+          type='button'
+          variant={fieldConfig.customProps?.variant || 'destructive'}
+          size={fieldConfig.customProps?.size || 'sm'}
+          onClick={handleDeleteClick}
+          className='w-full'
+        >
+          <Trash2 className='h-4 w-4 mr-2' />
+          Eliminar
+        </Button>
+      </div>
+    );
+  }
+
+  return null;
+};
+
 // Main field component that renders the appropriate field type
 export const FormField: React.FC<FieldProps<FieldValues>> = ({
   config,
@@ -457,6 +506,14 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
     case 'file':
       return (
         <FileFieldComponent
+          config={config}
+          form={form}
+          className={combinedClassName}
+        />
+      );
+    case 'custom':
+      return (
+        <CustomFieldComponent
           config={config}
           form={form}
           className={combinedClassName}

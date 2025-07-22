@@ -2,6 +2,7 @@ import { cn } from '@/ui/lib/utils';
 import { Button } from '@/ui/primitives/button';
 import { Card, CardContent, CardHeader, CardTitle } from '@/ui/primitives/card';
 import { Separator } from '@/ui/primitives/separator';
+import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/primitives/tabs';
 import { FieldValues } from 'react-hook-form';
 import { FormField } from './FormField';
 import { FormBuilderProps } from './types';
@@ -30,19 +31,37 @@ export const FormBuilder = <T extends FieldValues = FieldValues>({
     }
   };
 
-  // Debug form validation state
-  // console.log('FormBuilder debug:', {
-  //   isLoading,
-  //   submitDisabled: config.submitButton?.disabled,
-  //   formIsValid: form.formState.isValid,
-  //   formErrors: form.formState.errors,
-  //   touchedFields: form.formState.touchedFields,
-  //   dirtyFields: form.formState.dirtyFields,
-  //   isValidating: form.formState.isValidating,
-  //   submitCount: form.formState.submitCount,
-  // });
+  const renderSections = (sections: typeof config.sections) => {
+    if (!sections) return null;
 
-  console.log();
+    return sections.map((section, sectionIndex) => (
+      <Card key={sectionIndex} className={section.className}>
+        {(section.title || section.description) && (
+          <CardHeader>
+            {section.title && <CardTitle>{section.title}</CardTitle>}
+            {section.description && (
+              <p className='text-sm text-muted-foreground'>
+                {section.description}
+              </p>
+            )}
+          </CardHeader>
+        )}
+
+        <CardContent>
+          <div className={cn('grid gap-4', getGridClassName(section.columns))}>
+            {section.fields.map((field, fieldIndex) => (
+              <FormField
+                key={`${sectionIndex}-${fieldIndex}-${field.name}`}
+                config={field}
+                form={form as any}
+              />
+            ))}
+          </div>
+        </CardContent>
+      </Card>
+    ));
+  };
+
   return (
     <form onSubmit={handleSubmit} className={cn('space-y-6', config.className)}>
       {/* Form title and description */}
@@ -59,35 +78,34 @@ export const FormBuilder = <T extends FieldValues = FieldValues>({
         </div>
       )}
 
-      {/* Form sections */}
-      {config.sections.map((section, sectionIndex) => (
-        <Card key={sectionIndex} className={section.className}>
-          {(section.title || section.description) && (
-            <CardHeader>
-              {section.title && <CardTitle>{section.title}</CardTitle>}
-              {section.description && (
-                <p className='text-sm text-muted-foreground'>
-                  {section.description}
-                </p>
-              )}
-            </CardHeader>
-          )}
-
-          <CardContent>
-            <div
-              className={cn('grid gap-4', getGridClassName(section.columns))}
-            >
-              {section.fields.map((field, fieldIndex) => (
-                <FormField
-                  key={`${sectionIndex}-${fieldIndex}-${field.name}`}
-                  config={field}
-                  form={form as any}
-                />
-              ))}
-            </div>
-          </CardContent>
-        </Card>
-      ))}
+      {/* Form content - either tabs or sections */}
+      {config.tabs ? (
+        <Tabs defaultValue={config.tabs[0]?.id} className='w-full'>
+          <TabsList
+            className={cn(
+              'grid w-full',
+              config.tabs.length === 2 && 'grid-cols-2',
+              config.tabs.length === 3 && 'grid-cols-1 sm:grid-cols-3',
+              config.tabs.length === 4 && 'grid-cols-2 sm:grid-cols-4',
+              config.tabs.length > 4 &&
+                'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
+            )}
+          >
+            {config.tabs.map((tab) => (
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+          {config.tabs.map((tab) => (
+            <TabsContent key={tab.id} value={tab.id} className='space-y-6'>
+              {renderSections(tab.sections)}
+            </TabsContent>
+          ))}
+        </Tabs>
+      ) : (
+        renderSections(config.sections)
+      )}
 
       {/* Custom children content */}
       {children}
