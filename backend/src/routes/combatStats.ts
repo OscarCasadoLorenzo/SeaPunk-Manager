@@ -217,6 +217,98 @@ router.put('/:id', async (req, res) => {
   }
 });
 
+// PATCH /api/combat-stats/character/:characterId/health - Modify character health
+router.patch('/character/:characterId/health', async (req, res) => {
+  try {
+    const { characterId } = req.params;
+    const {
+      physicalHealthChange = 0,
+      mentalHealthChange = 0,
+      setPhysicalHealth,
+      setMentalHealth,
+    } = req.body;
+
+    // First get current combat stats
+    const currentStats = await prisma.combatStats.findUnique({
+      where: { characterId },
+    });
+
+    if (!currentStats) {
+      return res
+        .status(404)
+        .json({ error: 'Combat stats not found for this character' });
+    }
+
+    // Calculate new health values
+    let newPhysicalHealth = currentStats.physicalHealth;
+    let newMentalHealth = currentStats.mentalHealth;
+
+    // If setting absolute values
+    if (setPhysicalHealth !== undefined) {
+      newPhysicalHealth = Math.max(
+        0,
+        Math.min(setPhysicalHealth, currentStats.maxPhysicalHealth)
+      );
+    } else {
+      // Apply relative changes
+      newPhysicalHealth = Math.max(
+        0,
+        Math.min(
+          currentStats.physicalHealth + physicalHealthChange,
+          currentStats.maxPhysicalHealth
+        )
+      );
+    }
+
+    if (setMentalHealth !== undefined) {
+      newMentalHealth = Math.max(
+        0,
+        Math.min(setMentalHealth, currentStats.maxMentalHealth)
+      );
+    } else {
+      // Apply relative changes
+      newMentalHealth = Math.max(
+        0,
+        Math.min(
+          currentStats.mentalHealth + mentalHealthChange,
+          currentStats.maxMentalHealth
+        )
+      );
+    }
+
+    // Update the combat stats
+    const updatedStats = await prisma.combatStats.update({
+      where: { characterId },
+      data: {
+        physicalHealth: newPhysicalHealth,
+        mentalHealth: newMentalHealth,
+      },
+      include: {
+        character: {
+          select: {
+            id: true,
+            characterName: true,
+          },
+        },
+      },
+    });
+
+    res.json({
+      ...updatedStats,
+      changes: {
+        physicalHealthChange: newPhysicalHealth - currentStats.physicalHealth,
+        mentalHealthChange: newMentalHealth - currentStats.mentalHealth,
+      },
+    });
+  } catch (error: any) {
+    console.error('Error modifying character health:', error);
+    if (error.code === 'P2025') {
+      return res.status(404).json({ error: 'Combat stats not found' });
+    }
+    res.status(500).json({ error: 'Failed to modify character health' });
+  }
+});
+
 // DELETE /api/combat-stats/:id - Delete combat stats
 router.delete('/:id', async (req, res) => {
   try {

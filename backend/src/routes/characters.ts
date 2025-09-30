@@ -24,6 +24,22 @@ router.get('/', async (req, res) => {
             playerName: true,
           },
         },
+        combatStats: true,
+        attributes: true,
+        domains: true,
+        narrative: true,
+        inventories: true,
+        effects: true,
+        essences: {
+          include: {
+            essence: true,
+          },
+        },
+        auraGifts: {
+          include: {
+            auraGift: true,
+          },
+        },
         _count: {
           select: {
             inventories: true,

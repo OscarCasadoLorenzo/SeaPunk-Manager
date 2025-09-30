@@ -15,11 +15,6 @@ router.get('/', async (req, res) => {
         name: true,
         createdAt: true,
         updatedAt: true,
-        _count: {
-          select: {
-            tasks: true,
-          },
-        },
       },
     });
     res.json(users);
@@ -41,9 +36,6 @@ router.get('/:id', async (req, res) => {
         name: true,
         createdAt: true,
         updatedAt: true,
-        tasks: {
-          orderBy: { createdAt: 'desc' },
-        },
       },
     });
 
@@ -166,7 +158,7 @@ router.delete('/:id', async (req, res) => {
       return res.status(404).json({ error: 'User not found' });
     }
 
-    // Delete user (tasks will be deleted due to cascade)
+    // Delete user
     await prisma.user.delete({
       where: { id },
     });

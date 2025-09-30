@@ -57,4 +57,69 @@ export const combatStatsService = {
     );
     return response.data;
   },
+
+  // Health modification functions
+  async modifyCharacterHealth(
+    characterId: string,
+    options: {
+      physicalHealthChange?: number;
+      mentalHealthChange?: number;
+      setPhysicalHealth?: number;
+      setMentalHealth?: number;
+    }
+  ): Promise<CombatStats> {
+    const response = await api.patch<CombatStats>(
+      `/combat-stats/character/${characterId}/health`,
+      options
+    );
+    return response.data;
+  },
+
+  // Convenience functions for common health operations
+  async healPhysicalHealth(
+    characterId: string,
+    amount: number = 1
+  ): Promise<CombatStats> {
+    return this.modifyCharacterHealth(characterId, {
+      physicalHealthChange: amount,
+    });
+  },
+
+  async damagePhysicalHealth(
+    characterId: string,
+    amount: number = 1
+  ): Promise<CombatStats> {
+    return this.modifyCharacterHealth(characterId, {
+      physicalHealthChange: -amount,
+    });
+  },
+
+  async healMentalHealth(
+    characterId: string,
+    amount: number = 1
+  ): Promise<CombatStats> {
+    return this.modifyCharacterHealth(characterId, {
+      mentalHealthChange: amount,
+    });
+  },
+
+  async damageMentalHealth(
+    characterId: string,
+    amount: number = 1
+  ): Promise<CombatStats> {
+    return this.modifyCharacterHealth(characterId, {
+      mentalHealthChange: -amount,
+    });
+  },
+
+  async healBothHealth(
+    characterId: string,
+    physicalAmount: number = 1,
+    mentalAmount: number = 1
+  ): Promise<CombatStats> {
+    return this.modifyCharacterHealth(characterId, {
+      physicalHealthChange: physicalAmount,
+      mentalHealthChange: mentalAmount,
+    });
+  },
 };

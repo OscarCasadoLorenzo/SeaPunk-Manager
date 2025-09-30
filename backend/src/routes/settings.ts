@@ -34,7 +34,6 @@ router.get('/stats', async (req, res) => {
     const stats = {
       characters: await prisma.character.count(),
       players: await prisma.player.count(),
-      tasks: await prisma.task.count(),
       users: await prisma.user.count(),
     };
     res.json(stats);
@@ -60,7 +59,6 @@ router.get('/backup/export', async (req, res) => {
       },
       data: {
         users: await prisma.user.findMany(),
-        tasks: await prisma.task.findMany(),
         players: await prisma.player.findMany(),
         characters: await prisma.character.findMany(),
         attributes: await prisma.attribute.findMany(),
@@ -128,7 +126,6 @@ router.post('/backup/reset', async (req, res) => {
       await tx.auraGift.deleteMany();
       await tx.essence.deleteMany();
       await tx.player.deleteMany();
-      await tx.task.deleteMany();
       await tx.user.deleteMany();
     });
 
@@ -184,11 +181,9 @@ router.post(
           hasData: !!backupData.data,
           hasMetadata: !!backupData.metadata,
         });
-        return res
-          .status(400)
-          .json({
-            error: 'Formato de backup inválido - debe contener metadata y data',
-          });
+        return res.status(400).json({
+          error: 'Formato de backup inválido - debe contener metadata y data',
+        });
       }
 
       // Validate metadata
@@ -213,10 +208,6 @@ router.post(
         // Import independent tables first
         if (data.users?.length > 0) {
           await tx.user.createMany({ data: data.users, skipDuplicates: true });
-        }
-
-        if (data.tasks?.length > 0) {
-          await tx.task.createMany({ data: data.tasks, skipDuplicates: true });
         }
 
         if (data.players?.length > 0) {
@@ -313,7 +304,6 @@ router.post(
       // Calculate import statistics
       const importStats = {
         users: data.users?.length || 0,
-        tasks: data.tasks?.length || 0,
         players: data.players?.length || 0,
         characters: data.characters?.length || 0,
         attributes: data.attributes?.length || 0,

@@ -257,21 +257,6 @@ npm run lint -- --fix
 - `PUT /api/users/:id` - Update user
 - `DELETE /api/users/:id` - Delete user
 
-### Tasks API
-
-- `GET /api/tasks` - Get all tasks (with optional filters)
-- `GET /api/tasks/:id` - Get task by ID
-- `POST /api/tasks` - Create new task
-- `PUT /api/tasks/:id` - Update task
-- `DELETE /api/tasks/:id` - Delete task
-
-### Query Parameters
-
-```bash
-# Filter tasks
-GET /api/tasks?userId=123&completed=false&priority=HIGH
-```
-
 ## 🔧 Configuration
 
 ### Environment Variables
@@ -288,7 +273,6 @@ GET /api/tasks?userId=123&completed=false&priority=HIGH
 The application uses the following main entities:
 
 - **Users**: User accounts with authentication
-- **Tasks**: Task management with priorities and due dates
 
 ## 🚨 Troubleshooting
 

@@ -2,42 +2,12 @@
 
 import { CharacterList } from '@/components/CharacterList';
 import { useCharacterData } from '@/hooks/useCharacterData';
-import { Badge } from '@/ui/primitives/badge';
-import { Sparkles } from 'lucide-react';
 
 export default function HomePage() {
   const { characters, isLoading, error } = useCharacterData();
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
-      {/* Sidebar */}
-      <div
-        style={{
-          width: '300px',
-          backgroundColor: '#1a1a1a',
-          borderRight: '1px solid #333',
-          padding: '20px',
-          overflowY: 'auto',
-        }}
-      >
-        <div style={{ marginBottom: '30px' }}>
-          <h1
-            style={{
-              fontSize: '24px',
-              fontWeight: 'bold',
-              marginBottom: '10px',
-              display: 'flex',
-              alignItems: 'center',
-              gap: '8px',
-            }}
-          >
-            <Sparkles size={24} />
-            SeaPunk Manager
-          </h1>
-          <Badge variant='secondary'>Gestión Simplificada</Badge>
-        </div>
-      </div>
-
       {/* Main Content */}
       <div style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
         <div style={{ marginBottom: '20px' }}>
