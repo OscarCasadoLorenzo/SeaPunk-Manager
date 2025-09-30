@@ -50,12 +50,27 @@ export const useNarrativeForm = () => {
     shouldFocusError: true,
   });
 
-  // Update form when data changes
+  // Reset form when character changes (immediate reset to prevent showing old data)
   React.useEffect(() => {
-    if (narrative) {
-      form.reset(getDefaultValues());
+    if (selectedCharacterId) {
+      // Immediately reset to default empty values when character changes
+      form.reset({
+        physicalDescription: '',
+        externalProfile: '',
+        internalProfile: '',
+        background: '',
+        specialties: '',
+      });
     }
-  }, [narrative, form]);
+  }, [selectedCharacterId]);
+
+  // Update form with actual narrative data when it loads
+  React.useEffect(() => {
+    if (narrative && selectedCharacterId) {
+      const defaultValues = getDefaultValues();
+      form.reset(defaultValues);
+    }
+  }, [narrative?.id, selectedCharacterId]);
 
   // Submit handler
   const handleSubmit = async (data: NarrativeFormData) => {
