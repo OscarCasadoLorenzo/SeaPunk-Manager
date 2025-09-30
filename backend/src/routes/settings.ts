@@ -48,12 +48,15 @@ router.get('/stats', async (req, res) => {
 // Export complete database backup as JSON
 router.get('/backup/export', async (req, res) => {
   try {
+    console.log('Starting database export...');
+
     // Export all data from all models
     const backup = {
       metadata: {
         exportedAt: new Date().toISOString(),
         version: '1.0.0',
         source: 'SeaPunk Manager',
+        description: 'Complete database backup for SeaPunk Manager',
       },
       data: {
         users: await prisma.user.findMany(),
@@ -76,9 +79,16 @@ router.get('/backup/export', async (req, res) => {
     const timestamp = new Date().toISOString().split('T')[0];
     const filename = `seapunk-backup-${timestamp}.json`;
 
-    res.setHeader('Content-Type', 'application/json');
+    // Set proper headers for JSON download
+    res.setHeader('Content-Type', 'application/json; charset=utf-8');
     res.setHeader('Content-Disposition', `attachment; filename="${filename}"`);
-    res.json(backup);
+    res.setHeader('Cache-Control', 'no-cache');
+
+    // Send formatted JSON with proper indentation
+    const jsonString = JSON.stringify(backup, null, 2);
+
+    console.log(`Export completed. File size: ${jsonString.length} characters`);
+    res.send(jsonString);
   } catch (error) {
     console.error('Error exporting database:', error);
     res.status(500).json({ error: 'Error al exportar la base de datos' });
@@ -143,21 +153,60 @@ router.post(
   upload.single('backup'),
   async (req: MulterRequest, res) => {
     try {
+      console.log('Starting database import...');
+
       if (!req.file) {
         return res
           .status(400)
           .json({ error: 'No se proporcionó archivo de backup' });
       }
 
+      console.log(
+        `Import file received: ${req.file.originalname}, size: ${req.file.size} bytes`
+      );
+
       const fs = require('fs');
-      const backupData = JSON.parse(fs.readFileSync(req.file.path, 'utf-8'));
+      const fileContent = fs.readFileSync(req.file.path, 'utf-8');
+
+      let backupData;
+      try {
+        backupData = JSON.parse(fileContent);
+      } catch (parseError) {
+        console.error('JSON parse error:', parseError);
+        return res
+          .status(400)
+          .json({ error: 'El archivo no contiene JSON válido' });
+      }
 
       // Validate backup structure
       if (!backupData.data || !backupData.metadata) {
-        return res.status(400).json({ error: 'Formato de backup inválido' });
+        console.error('Invalid backup structure:', {
+          hasData: !!backupData.data,
+          hasMetadata: !!backupData.metadata,
+        });
+        return res
+          .status(400)
+          .json({
+            error: 'Formato de backup inválido - debe contener metadata y data',
+          });
       }
 
+      // Validate metadata
+      if (
+        !backupData.metadata.source ||
+        backupData.metadata.source !== 'SeaPunk Manager'
+      ) {
+        console.warn(
+          'Backup source validation warning:',
+          backupData.metadata.source
+        );
+      }
+
+      console.log('Backup metadata:', backupData.metadata);
+
       const { data } = backupData;
+      const dataKeys = Object.keys(data);
+      console.log('Data tables to import:', dataKeys);
 
       // Import data in the correct order
       await prisma.$transaction(async (tx) => {
@@ -261,11 +310,32 @@ router.post(
       // Clean up uploaded file
       fs.unlinkSync(req.file.path);
 
+      // Calculate import statistics
+      const importStats = {
+        users: data.users?.length || 0,
+        tasks: data.tasks?.length || 0,
+        players: data.players?.length || 0,
+        characters: data.characters?.length || 0,
+        attributes: data.attributes?.length || 0,
+        domains: data.domains?.length || 0,
+        combatStats: data.combatStats?.length || 0,
+        narratives: data.narratives?.length || 0,
+        inventories: data.inventories?.length || 0,
+        effects: data.effects?.length || 0,
+        essences: data.essences?.length || 0,
+        auraGifts: data.auraGifts?.length || 0,
+        characterEssences: data.characterEssences?.length || 0,
+        characterAuraGifts: data.characterAuraGifts?.length || 0,
+      };
+
+      console.log('Import completed successfully:', importStats);
+
       res.json({
         success: true,
         message: 'Backup importado exitosamente',
         importedAt: new Date().toISOString(),
         metadata: backupData.metadata,
+        importStats,
       });
     } catch (error) {
       console.error('Error importing backup:', error);
