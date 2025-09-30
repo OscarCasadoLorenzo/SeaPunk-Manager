@@ -44,24 +44,72 @@ function SettingsPage() {
   const handleExportBackup = async () => {
     setIsLoading(true);
     try {
-      const response = await fetch('/api/settings/backup/export');
-      if (response.ok) {
-        const blob = await response.blob();
-        const url = window.URL.createObjectURL(blob);
-        const a = document.createElement('a');
-        a.href = url;
-        a.download = `seapunk-backup-${new Date().toISOString().split('T')[0]}.json`;
-        document.body.appendChild(a);
-        a.click();
-        document.body.removeChild(a);
-        window.URL.revokeObjectURL(url);
-        toast.success('Backup exportado exitosamente');
-      } else {
-        throw new Error('Error al exportar backup');
+      console.log('Iniciando exportación de backup...');
+
+      const response = await fetch('/api/settings/backup/export', {
+        method: 'GET',
+        headers: {
+          Accept: 'application/json',
+        },
+      });
+
+      if (!response.ok) {
+        const errorData = await response.json().catch(() => ({}));
+        throw new Error(
+          errorData.error || `HTTP ${response.status}: ${response.statusText}`
+        );
       }
+
+      // Verificar que es JSON válido
+      const contentType = response.headers.get('content-type');
+      if (!contentType || !contentType.includes('application/json')) {
+        throw new Error('El servidor no devolvió un archivo JSON válido');
+      }
+
+      // Obtener el contenido como texto primero para validar
+      const textContent = await response.text();
+
+      try {
+        // Validar que es JSON válido
+        const jsonData = JSON.parse(textContent);
+        console.log('Backup JSON validado correctamente:', {
+          metadata: jsonData.metadata,
+          dataKeys: Object.keys(jsonData.data || {}),
+        });
+      } catch (parseError) {
+        console.error('Error parsing JSON:', parseError);
+        throw new Error('El archivo exportado no es JSON válido');
+      }
+
+      // Crear el blob con el contenido JSON
+      const blob = new Blob([textContent], {
+        type: 'application/json;charset=utf-8',
+      });
+
+      const url = window.URL.createObjectURL(blob);
+      const timestamp = new Date().toISOString().split('T')[0];
+      const filename = `seapunk-backup-${timestamp}.json`;
+
+      // Crear el enlace de descarga
+      const a = document.createElement('a');
+      a.href = url;
+      a.download = filename;
+      a.style.display = 'none';
+
+      document.body.appendChild(a);
+      a.click();
+      document.body.removeChild(a);
+
+      // Limpiar la URL del objeto
+      window.URL.revokeObjectURL(url);
+
+      console.log(`Backup exportado exitosamente: ${filename}`);
+      toast.success(`Backup exportado exitosamente: ${filename}`);
     } catch (error) {
       console.error('Export error:', error);
-      toast.error('Error al exportar el backup');
+      const errorMessage =
+        error instanceof Error ? error.message : 'Error desconocido';
+      toast.error(`Error al exportar el backup: ${errorMessage}`);
     } finally {
       setIsLoading(false);
     }
