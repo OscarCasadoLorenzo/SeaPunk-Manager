@@ -18,10 +18,7 @@ export {
   createNarrativeFormConfig,
   narrativeFormConfig,
 } from './configs/narrativeFormConfig';
-export {
-  createStatsFormConfig,
-  statsFormConfig,
-} from './configs/statsFormConfig';
+export { statsFormConfig } from './configs/statsFormConfig';
 
 // Hooks
 export { useInventoryForm } from './hooks/useInventoryForm';

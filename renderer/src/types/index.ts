@@ -256,6 +256,7 @@ export interface UpdateCharacterRequest {
   type?: string;
   isNPC?: boolean;
   isVisible?: boolean;
+  playerId?: string;
 }
 
 export interface CreateAttributeRequest {
