@@ -117,28 +117,98 @@ router.post('/', async (req, res) => {
       });
     }
 
-    const character = await prisma.character.create({
-      data: {
-        characterName,
-        archetype,
-        faction,
-        race,
-        level,
-        category,
-        epicPoints,
-        type,
-        isNPC,
-        isVisible,
-        playerId,
-      },
-      include: {
-        player: {
-          select: {
-            id: true,
-            playerName: true,
+    // Use transaction to create character with all related records
+    const character = await prisma.$transaction(async (tx) => {
+      // Create the character first
+      const newCharacter = await tx.character.create({
+        data: {
+          characterName,
+          archetype,
+          faction,
+          race,
+          level,
+          category,
+          epicPoints,
+          type,
+          isNPC,
+          isVisible,
+          playerId,
+        },
+      });
+
+      // Create default attributes
+      await tx.attribute.create({
+        data: {
+          characterId: newCharacter.id,
+          strength: 1,
+          agility: 1,
+          willpower: 1,
+          luck: 1,
+          intelligence: 1,
+        },
+      });
+
+      // Create default domains
+      await tx.domain.create({
+        data: {
+          characterId: newCharacter.id,
+          physical: 0,
+          combat: 0,
+          social: 0,
+          environmental: 0,
+          stealth: 0,
+          knowledge: 0,
+          technical: 0,
+          resources: 0,
+          demonic: 0,
+          aura: 0,
+        },
+      });
+
+      // Create default combat stats
+      await tx.combatStats.create({
+        data: {
+          characterId: newCharacter.id,
+          physicalHealth: 10,
+          maxPhysicalHealth: 10,
+          physicalResistance: 5,
+          maxPhysicalResistance: 5,
+          mentalHealth: 10,
+          maxMentalHealth: 10,
+          mentalResistance: 5,
+          maxMentalResistance: 5,
+          initiative: 0,
+          defense: 0,
+          attack: 0,
+          impact: 0,
+          maxDamage: 0,
+        },
+      });
+
+      // Create default narrative (optional fields can be null)
+      await tx.narrative.create({
+        data: {
+          characterId: newCharacter.id,
+          physicalDescription: null,
+          externalProfile: null,
+          internalProfile: null,
+          background: null,
+          specialties: null,
+        },
+      });
+
+      // Return character with player info
+      return await tx.character.findUnique({
+        where: { id: newCharacter.id },
+        include: {
+          player: {
+            select: {
+              id: true,
+              playerName: true,
+            },
           },
         },
-      },
+      });
     });
 
     res.status(201).json(character);
