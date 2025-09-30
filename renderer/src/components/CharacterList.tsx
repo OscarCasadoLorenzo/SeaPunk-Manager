@@ -81,15 +81,20 @@ export function CharacterList({
                 <div className='flex items-center gap-2'>
                   <Heart className='w-4 h-4 text-red-400' />
                   <span className='text-sm'>
-                    Salud: {character.health}/{character.maxHealth}
+                    Salud Física: {character.combat.saludFisica}/
+                    {character.combat.maxSaludFisica}
                   </span>
                 </div>
-                <div className='w-full progress-bar'>
+                <div className='w-full bg-gray-700 rounded-full h-2'>
                   <div
-                    className='progress-fill progress-health'
+                    className='bg-red-500 h-2 rounded-full transition-all duration-300'
                     style={{
                       width: `${
-                        (character.health / character.maxHealth) * 100
+                        character.combat.maxSaludFisica > 0
+                          ? (character.combat.saludFisica /
+                              character.combat.maxSaludFisica) *
+                            100
+                          : 0
                       }%`,
                     }}
                   />
@@ -97,18 +102,22 @@ export function CharacterList({
               </div>
               <div className='space-y-2'>
                 <div className='flex items-center gap-2'>
-                  <Shield className='w-4 h-4 text-blue-400' />
+                  <Zap className='w-4 h-4 text-purple-400' />
                   <span className='text-sm'>
-                    Resistencia: {character.resistance}/
-                    {character.maxResistance}
+                    Salud Mental: {character.combat.saludMental}/
+                    {character.combat.maxSaludMental}
                   </span>
                 </div>
-                <div className='w-full progress-bar'>
+                <div className='w-full bg-gray-700 rounded-full h-2'>
                   <div
-                    className='progress-fill progress-resistance'
+                    className='bg-purple-500 h-2 rounded-full transition-all duration-300'
                     style={{
                       width: `${
-                        (character.resistance / character.maxResistance) * 100
+                        character.combat.maxSaludMental > 0
+                          ? (character.combat.saludMental /
+                              character.combat.maxSaludMental) *
+                            100
+                          : 0
                       }%`,
                     }}
                   />
