@@ -16,6 +16,7 @@ import essenceRoutes from './routes/essences';
 import inventoryRoutes from './routes/inventories';
 import narrativeRoutes from './routes/narratives';
 import playerRoutes from './routes/players';
+import settingsRoutes from './routes/settings';
 import taskRoutes from './routes/tasks';
 import userRoutes from './routes/users';
 
@@ -72,6 +73,7 @@ app.use('/api/essences', essenceRoutes);
 app.use('/api/aura-gifts', auraGiftRoutes);
 app.use('/api/character-essences', characterEssenceRoutes);
 app.use('/api/character-aura-gifts', characterAuraGiftRoutes);
+app.use('/api/settings', settingsRoutes);
 
 // Error handling middleware
 app.use(

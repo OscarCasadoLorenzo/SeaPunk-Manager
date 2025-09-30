@@ -11,6 +11,8 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as TasksRouteImport } from './routes/tasks'
+import { Route as SettingsRouteImport } from './routes/settings'
+import { Route as DiceRouteImport } from './routes/dice'
 import { Route as CharactersRouteImport } from './routes/characters'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as TasksNewRouteImport } from './routes/tasks/new'
@@ -23,6 +25,16 @@ const UsersRoute = UsersRouteImport.update({
 const TasksRoute = TasksRouteImport.update({
   id: '/tasks',
   path: '/tasks',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const SettingsRoute = SettingsRouteImport.update({
+  id: '/settings',
+  path: '/settings',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const DiceRoute = DiceRouteImport.update({
+  id: '/dice',
+  path: '/dice',
   getParentRoute: () => rootRouteImport,
 } as any)
 const CharactersRoute = CharactersRouteImport.update({
@@ -44,6 +56,8 @@ const TasksNewRoute = TasksNewRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
+  '/dice': typeof DiceRoute
+  '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRouteWithChildren
   '/users': typeof UsersRoute
   '/tasks/new': typeof TasksNewRoute
@@ -51,6 +65,8 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
+  '/dice': typeof DiceRoute
+  '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRouteWithChildren
   '/users': typeof UsersRoute
   '/tasks/new': typeof TasksNewRoute
@@ -59,21 +75,47 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
+  '/dice': typeof DiceRoute
+  '/settings': typeof SettingsRoute
   '/tasks': typeof TasksRouteWithChildren
   '/users': typeof UsersRoute
   '/tasks/new': typeof TasksNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/characters' | '/tasks' | '/users' | '/tasks/new'
+  fullPaths:
+    | '/'
+    | '/characters'
+    | '/dice'
+    | '/settings'
+    | '/tasks'
+    | '/users'
+    | '/tasks/new'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/characters' | '/tasks' | '/users' | '/tasks/new'
-  id: '__root__' | '/' | '/characters' | '/tasks' | '/users' | '/tasks/new'
+  to:
+    | '/'
+    | '/characters'
+    | '/dice'
+    | '/settings'
+    | '/tasks'
+    | '/users'
+    | '/tasks/new'
+  id:
+    | '__root__'
+    | '/'
+    | '/characters'
+    | '/dice'
+    | '/settings'
+    | '/tasks'
+    | '/users'
+    | '/tasks/new'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CharactersRoute: typeof CharactersRoute
+  DiceRoute: typeof DiceRoute
+  SettingsRoute: typeof SettingsRoute
   TasksRoute: typeof TasksRouteWithChildren
   UsersRoute: typeof UsersRoute
 }
@@ -92,6 +134,20 @@ declare module '@tanstack/react-router' {
       path: '/tasks'
       fullPath: '/tasks'
       preLoaderRoute: typeof TasksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/settings': {
+      id: '/settings'
+      path: '/settings'
+      fullPath: '/settings'
+      preLoaderRoute: typeof SettingsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/dice': {
+      id: '/dice'
+      path: '/dice'
+      fullPath: '/dice'
+      preLoaderRoute: typeof DiceRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/characters': {
@@ -131,6 +187,8 @@ const TasksRouteWithChildren = TasksRoute._addFileChildren(TasksRouteChildren)
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CharactersRoute: CharactersRoute,
+  DiceRoute: DiceRoute,
+  SettingsRoute: SettingsRoute,
   TasksRoute: TasksRouteWithChildren,
   UsersRoute: UsersRoute,
 }

@@ -68,10 +68,27 @@ export const useInventoryForm = () => {
     shouldFocusError: true,
   });
 
-  // Update form when data changes
+  // Reset form when character changes (immediate reset to prevent showing old data)
   React.useEffect(() => {
-    form.reset(getDefaultValues());
-  }, [inventories, form]);
+    if (selectedCharacterId) {
+      // Immediately reset to default empty values when character changes
+      form.reset({
+        newItemName: '',
+        newItemDescription: '',
+        newItemQuantity: 1,
+        newItemType: 'placeholder' as any,
+        emptyInventoryMessage: 'No hay objetos en el inventario',
+      });
+    }
+  }, [selectedCharacterId]);
+
+  // Update form with actual inventory data when it loads
+  React.useEffect(() => {
+    if (inventories && selectedCharacterId) {
+      const defaultValues = getDefaultValues();
+      form.reset(defaultValues);
+    }
+  }, [inventories, selectedCharacterId]);
 
   // Submit handler
   const handleSubmit = async (data: InventoryFormData) => {

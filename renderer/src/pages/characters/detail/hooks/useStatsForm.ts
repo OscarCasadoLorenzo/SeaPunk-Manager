@@ -137,12 +137,64 @@ export const useStatsForm = () => {
     shouldFocusError: true,
   });
 
-  // Update form when data changes
+  // Reset form when character changes (immediate reset to prevent showing old data)
   React.useEffect(() => {
-    if (character && attributes && domains && combatStats) {
-      form.reset(getDefaultValues());
+    if (selectedCharacterId) {
+      // Immediately reset to default empty values when character changes
+      form.reset({
+        playerName: '',
+        characterName: '',
+        archetype: '',
+        faction: '',
+        race: '',
+        category: '',
+        level: 1,
+        epicPoints: 0,
+        strength: 1,
+        agility: 1,
+        willpower: 1,
+        luck: 1,
+        intelligence: 1,
+        physical: 0,
+        combat: 0,
+        social: 0,
+        environmental: 0,
+        stealth: 0,
+        knowledge: 0,
+        technical: 0,
+        resources: 0,
+        demonic: 0,
+        aura: 0,
+        physicalHealth: 100,
+        maxPhysicalHealth: 100,
+        physicalResistance: 100,
+        maxPhysicalResistance: 100,
+        mentalHealth: 100,
+        maxMentalHealth: 100,
+        mentalResistance: 100,
+        maxMentalResistance: 100,
+        initiative: 0,
+        defense: 0,
+        attack: 0,
+        impact: 0,
+        maxDamage: 0,
+      });
     }
-  }, [character, attributes, domains, combatStats, form]);
+  }, [selectedCharacterId]);
+
+  // Update form with actual data when it loads
+  React.useEffect(() => {
+    if (
+      character &&
+      attributes &&
+      domains &&
+      combatStats &&
+      selectedCharacterId
+    ) {
+      const defaultValues = getDefaultValues();
+      form.reset(defaultValues);
+    }
+  }, [character?.id, attributes?.id, domains?.id, combatStats?.id]);
 
   // Submit handler
   const handleSubmit = async (data: StatsFormData) => {
