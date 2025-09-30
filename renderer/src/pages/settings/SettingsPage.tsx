@@ -214,12 +214,6 @@ function SettingsPage() {
                 <div className='text-sm text-muted-foreground'>Jugadores</div>
               </div>
               <div className='text-center'>
-                <div className='text-2xl font-bold text-purple-600'>
-                  {backupStats.tasks}
-                </div>
-                <div className='text-sm text-muted-foreground'>Tareas</div>
-              </div>
-              <div className='text-center'>
                 <div className='text-2xl font-bold text-orange-600'>
                   {backupStats.users}
                 </div>
