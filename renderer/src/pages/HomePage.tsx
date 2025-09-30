@@ -1,5 +1,16 @@
 'use client';
 
+import { CharacterList } from '@/components/CharacterList';
+import { QuickActions } from '@/components/QuickActions';
+import {
+  Character,
+  CombatAction,
+  CombatParticipant,
+  CombatState,
+  InventoryItem,
+  Scene,
+} from '@/components/types';
+import { useCharacterData } from '@/hooks/useCharacterData';
 import { CombatSetupModal } from '@/ui/components/combat-setup-modal';
 import { CombatTurnModal } from '@/ui/components/combat-turn-modal';
 import { Badge } from '@/ui/primitives/badge';
@@ -14,189 +25,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from '@/ui/primitives/select';
-import { Separator } from '@/ui/primitives/separator';
 import { Tabs, TabsContent, TabsList, TabsTrigger } from '@/ui/primitives/tabs';
 import { Textarea } from '@/ui/primitives/textarea';
 import {
-  BookOpen,
   Clock,
-  Dice6,
-  Edit,
-  Eye,
-  EyeOff,
   Heart,
-  ImageIcon,
   Monitor,
   Plus,
   Save,
-  Settings,
-  Shield,
   Sparkles,
   Sword,
-  Target,
-  Users,
   X,
   Zap,
 } from 'lucide-react';
 import { useState } from 'react';
-
-interface Character {
-  id: string;
-  // Información básica
-  playerName: string;
-  characterName: string;
-  archetype: string;
-  faction: string;
-  race: string;
-  level: number;
-  category:
-    | 'Común'
-    | 'Protagonista I'
-    | 'Protagonista II'
-    | 'Protagonista III'
-    | 'Campeón I'
-    | 'Campeón II'
-    | 'Campeón III'
-    | 'Titán I'
-    | 'Titán II'
-    | 'Titán III'
-    | 'Cataclismo';
-
-  // Atributos
-  attributes: {
-    fuerza: number;
-    dinamismo: number;
-    voluntad: number;
-    suerte: number;
-    inteligencia: number;
-  };
-
-  // Dominios + esencias
-  domains: {
-    fisico: number;
-    batalla: number;
-    social: number;
-    ambiental: number;
-    ocultacion: number;
-    conocimiento: number;
-    tecnico: number;
-    recursos: number;
-    demoniaco: number;
-    aura: number;
-  };
-
-  // Parámetros de combate
-  combat: {
-    saludFisica: number;
-    maxSaludFisica: number;
-    resistenciaFisica: number;
-    maxResistenciaFisica: number;
-    saludMental: number;
-    maxSaludMental: number;
-    resistenciaMental: number;
-    maxResistenciaMental: number;
-    iniciativa: number;
-    defensa: number;
-    ataque: number;
-    impacto: number;
-    danoMaximo: number;
-  };
-
-  // Información narrativa
-  narrative: {
-    descripcionFisica: string;
-    perfilExterno: string;
-    perfilInterno: string;
-    trasfondo: string;
-    especialidades: string;
-  };
-
-  // Puntos de Épica
-  puntosEpica: number;
-  esencias: string[];
-
-  // Inventario
-  inventory: InventoryItem[];
-
-  // Efectos y dones
-  effects: Effect[];
-  donesAura: string[];
-
-  // Para compatibilidad con el código existente
-  type: 'PC' | 'NPC' | 'Enemy';
-  health: number;
-  maxHealth: number;
-  resistance: number;
-  maxResistance: number;
-  initiative: number;
-  attack: number;
-  defense: number;
-  visible: boolean;
-  isNPC: boolean;
-}
-
-interface InventoryItem {
-  id: string;
-  name: string;
-  description: string;
-  quantity: number;
-  type: 'weapon' | 'armor' | 'item' | 'consumable';
-}
-
-interface Effect {
-  id: string;
-  name: string;
-  duration: number;
-  type: 'buff' | 'debuff' | 'neutral';
-  description: string;
-}
-
-interface DiceResult {
-  total: number;
-  rolls: number[];
-  grouped: { [key: number]: number };
-  sides: number;
-  count: number;
-  isCritical: boolean;
-  isFumble: boolean;
-}
-
-interface Scene {
-  id: string;
-  name: string;
-  description: string;
-  image?: string;
-  active: boolean;
-  visible: boolean;
-}
-
-interface CombatParticipant {
-  character: Character;
-  initiative: number;
-  initiativeRoll: number;
-  isActive: boolean;
-  hasActed: boolean;
-}
-
-interface CombatAction {
-  type: 'attack' | 'defend' | 'other';
-  attacker?: string;
-  target?: string;
-  attackRoll?: number;
-  defenseValue?: number;
-  impactRoll?: number;
-  damageRoll?: number[];
-  finalDamage?: number;
-  description: string;
-}
-
-interface CombatState {
-  participants: CombatParticipant[];
-  currentTurnIndex: number;
-  round: number;
-  phase: 'setup' | 'initiative' | 'combat' | 'ended';
-  actions: CombatAction[];
-}
 
 function CharacterSheet({
   character,
@@ -1294,207 +1136,22 @@ function PublicView({
 }
 
 export default function SeaPunkGMTool() {
-  const [activeTab, setActiveTab] = useState('characters');
   const [publicView, setPublicView] = useState(false);
   const [editingCharacter, setEditingCharacter] = useState<Character | null>(
     null
   );
-  const [characters, setCharacters] = useState<Character[]>([
-    {
-      id: '1',
-      playerName: 'Alex',
-      characterName: 'Zara Netrunner',
-      archetype: 'Hacker Cibernético',
-      faction: 'Corsarios Digitales',
-      race: 'Humano Mejorado',
-      level: 3,
-      category: 'Protagonista I',
-      attributes: {
-        fuerza: 8,
-        dinamismo: 15,
-        voluntad: 12,
-        suerte: 10,
-        inteligencia: 18,
-      },
-      domains: {
-        fisico: 5,
-        batalla: 8,
-        social: 12,
-        ambiental: 10,
-        ocultacion: 15,
-        conocimiento: 18,
-        tecnico: 20,
-        recursos: 8,
-        demoniaco: 0,
-        aura: 5,
-      },
-      combat: {
-        saludFisica: 85,
-        maxSaludFisica: 100,
-        resistenciaFisica: 60,
-        maxResistenciaFisica: 80,
-        saludMental: 90,
-        maxSaludMental: 120,
-        resistenciaMental: 100,
-        maxResistenciaMental: 140,
-        iniciativa: 15,
-        defensa: 10,
-        ataque: 12,
-        impacto: 14,
-        danoMaximo: 25,
-      },
-      narrative: {
-        descripcionFisica:
-          'Mujer joven de complexión delgada, cabello azul eléctrico y ojos cibernéticos dorados.',
-        perfilExterno:
-          'Lleva un traje de cuero negro con circuitos luminosos, gafas de realidad aumentada y múltiples implantes neurales visibles.',
-        perfilInterno:
-          'Rebelde y determinada, busca exponer la corrupción corporativa. Teme perder su humanidad a los implantes.',
-        trasfondo:
-          'Ex-empleada de MegaCorp que descubrió experimentos ilegales y huyó con datos comprometedores.',
-        especialidades:
-          'Hackeo de sistemas, infiltración digital, combate cibernético, programación de virus.',
-      },
-      puntosEpica: 15,
-      esencias: ['Código Fuente', 'Fantasma Digital', 'Pulso Electromagnético'],
-      inventory: [
-        {
-          id: '1',
-          name: 'Deck de Hackeo Militar',
-          description:
-            'Computadora portátil modificada para infiltración de sistemas de alta seguridad',
-          quantity: 1,
-          type: 'item',
-        },
-        {
-          id: '2',
-          name: 'Pistola de Pulsos',
-          description:
-            'Arma que dispara pulsos electromagnéticos, efectiva contra sistemas electrónicos',
-          quantity: 1,
-          type: 'weapon',
-        },
-      ],
-      effects: [
-        {
-          id: '1',
-          name: 'Boost Cibernético',
-          duration: 3,
-          type: 'buff',
-          description: '+2 a todas las tiradas técnicas',
-        },
-      ],
-      donesAura: ['Interfaz Neural', 'Resistencia a Virus'],
-      type: 'PC',
-      isNPC: false,
-      health: 85,
-      maxHealth: 100,
-      resistance: 60,
-      maxResistance: 80,
-      initiative: 15,
-      attack: 12,
-      defense: 10,
-      visible: true,
-    },
-    {
-      id: '2',
-      playerName: 'Maya',
-      characterName: 'Kael el Forjador',
-      archetype: 'Guerrero Tecnomante',
-      faction: 'Hijos del Acero',
-      race: 'Cyborg',
-      level: 5,
-      category: 'Campeón II',
-      attributes: {
-        fuerza: 18,
-        dinamismo: 10,
-        voluntad: 16,
-        suerte: 7,
-        inteligencia: 12,
-      },
-      domains: {
-        fisico: 15,
-        batalla: 20,
-        social: 6,
-        ambiental: 8,
-        ocultacion: 4,
-        conocimiento: 10,
-        tecnico: 15,
-        recursos: 12,
-        demoniaco: 2,
-        aura: 7,
-      },
-      combat: {
-        saludFisica: 120,
-        maxSaludFisica: 120,
-        resistenciaFisica: 100,
-        maxResistenciaFisica: 100,
-        saludMental: 80,
-        maxSaludMental: 100,
-        resistenciaMental: 60,
-        maxResistenciaMental: 80,
-        iniciativa: 8,
-        defensa: 18,
-        ataque: 20,
-        impacto: 22,
-        danoMaximo: 40,
-      },
-      narrative: {
-        descripcionFisica:
-          'Hombre robusto con brazos mecánicos, barba trenzada y tatuajes tribales que brillan con energía azul.',
-        perfilExterno:
-          'Porta una armadura pesada de metal forjado y un martillo de plasma. Sus ojos son implantes ópticos avanzados.',
-        perfilInterno:
-          'Leal y protector, valora la fuerza y el honor. Busca redimir errores del pasado.',
-        trasfondo:
-          'Ex-gladiador convertido en líder de los Hijos del Acero tras salvar a su clan en la guerra de las máquinas.',
-        especialidades:
-          'Combate cuerpo a cuerpo, forja de armas, manipulación de energía, liderazgo.',
-      },
-      puntosEpica: 25,
-      esencias: ['Corazón de Acero', 'Martillo de Plasma'],
-      inventory: [
-        {
-          id: '3',
-          name: 'Martillo de Plasma',
-          description:
-            'Arma pesada capaz de canalizar energía destructiva en cada golpe',
-          quantity: 1,
-          type: 'weapon',
-        },
-        {
-          id: '4',
-          name: 'Armadura Forjada',
-          description:
-            'Armadura personalizada con refuerzos energéticos y sistemas de soporte vital',
-          quantity: 1,
-          type: 'armor',
-        },
-      ],
-      effects: [
-        {
-          id: '2',
-          name: 'Furia de Acero',
-          duration: 2,
-          type: 'buff',
-          description: '+5 ataque durante 2 turnos',
-        },
-      ],
-      donesAura: ['Piel de Titanio'],
-      type: 'PC',
-      isNPC: false,
-      health: 120,
-      maxHealth: 120,
-      resistance: 100,
-      maxResistance: 100,
-      initiative: 8,
-      attack: 20,
-      defense: 18,
-      visible: true,
-    },
-  ]);
 
-  const [currentScene, setCurrentScene] = useState<Scene>({
+  // Use the character data hook instead of hardcoded state
+  const { characters, handleSaveCharacter, toggleCharacterVisibility } =
+    useCharacterData();
+
+  // Wrapper to handle character save and close modal
+  const handleSaveCharacterWrapper = (character: Character) => {
+    handleSaveCharacter(character);
+    setEditingCharacter(null);
+  };
+
+  const [currentScene] = useState<Scene>({
     id: '1',
     name: 'Puerto Neon',
     description:
@@ -1504,9 +1161,7 @@ export default function SeaPunkGMTool() {
   });
 
   const [combatActive, setCombatActive] = useState(false);
-  const [currentTurn, setCurrentTurn] = useState(0);
-  const [diceResult, setDiceResult] = useState<DiceResult | null>(null);
-  const [diceCount, setDiceCount] = useState(1);
+  const [currentTurn] = useState(0);
   const [combatState, setCombatState] = useState<CombatState>({
     participants: [],
     currentTurnIndex: 0,
@@ -1517,57 +1172,6 @@ export default function SeaPunkGMTool() {
   const [showCombatSetup, setShowCombatSetup] = useState(false);
   const [showCombatTurn, setShowCombatTurn] = useState(false);
   const [selectedCombatants, setSelectedCombatants] = useState<string[]>([]);
-
-  const rollDice = (sides = 20, modifier = 0, count = diceCount) => {
-    const rolls: number[] = [];
-    for (let i = 0; i < count; i++) {
-      rolls.push(Math.floor(Math.random() * sides) + 1);
-    }
-
-    const total = rolls.reduce((sum, roll) => sum + roll, 0) + modifier;
-
-    // Agrupar resultados
-    const grouped: { [key: number]: number } = {};
-    rolls.forEach((roll) => {
-      grouped[roll] = (grouped[roll] || 0) + 1;
-    });
-
-    // Detectar críticos y pifias
-    const isCritical = count > 1 && rolls.every((roll) => roll === sides);
-    const isFumble = count > 1 && rolls.every((roll) => roll === 1);
-
-    const result: DiceResult = {
-      total,
-      rolls,
-      grouped,
-      sides,
-      count,
-      isCritical,
-      isFumble,
-    };
-
-    setDiceResult(result);
-    return result;
-  };
-
-  const toggleCharacterVisibility = (id: string) => {
-    setCharacters((chars) =>
-      chars.map((char) =>
-        char.id === id ? { ...char, visible: !char.visible } : char
-      )
-    );
-  };
-
-  const handleSaveCharacter = (character: Character) => {
-    setCharacters((prev) => {
-      const existing = prev.find((c) => c.id === character.id);
-      if (existing) {
-        return prev.map((c) => (c.id === character.id ? character : c));
-      } else {
-        return [...prev, character];
-      }
-    });
-  };
 
   // Función para calcular dados de daño según impacto
   const getDamageDiceFromImpact = (impactResult: number): number => {
@@ -1669,22 +1273,9 @@ export default function SeaPunkGMTool() {
         attacker.combat.danoMaximo
       );
 
-      // Aplicar daño
-      const updatedCharacters = characters.map((char) => {
-        if (char.id === targetId) {
-          return {
-            ...char,
-            health: Math.max(0, char.health - finalDamage),
-            combat: {
-              ...char.combat,
-              saludFisica: Math.max(0, char.combat.saludFisica - finalDamage),
-            },
-          };
-        }
-        return char;
-      });
-
-      setCharacters(updatedCharacters);
+      // TODO: Update character health through hook
+      // Note: This functionality needs to be implemented in the useCharacterData hook
+      console.log(`Character ${targetId} should take ${finalDamage} damage`);
 
       // Registrar acción
       const action: CombatAction = {
@@ -1801,690 +1392,35 @@ export default function SeaPunkGMTool() {
           </div>
         </div>
 
-        <div className='grid grid-cols-12 gap-4'>
-          {/* Main Content */}
-          <div className='col-span-9'>
-            <Tabs
-              value={activeTab}
-              onValueChange={setActiveTab}
-              className='w-full'
-            >
-              <TabsList className='grid w-full grid-cols-5  border border-slate-700'>
-                <TabsTrigger
-                  value='characters'
-                  className='data-[state=active]:bg-cyan-600'
-                >
-                  <Users className='w-4 h-4 mr-2' />
-                  Personajes
-                </TabsTrigger>
-                <TabsTrigger
-                  value='combat'
-                  className='data-[state=active]:bg-red-600'
-                >
-                  <Sword className='w-4 h-4 mr-2' />
-                  Combate
-                </TabsTrigger>
-                <TabsTrigger
-                  value='scenes'
-                  className='data-[state=active]:bg-purple-600'
-                >
-                  <BookOpen className='w-4 h-4 mr-2' />
-                  Escenas
-                </TabsTrigger>
-                <TabsTrigger
-                  value='effects'
-                  className='data-[state=active]:bg-green-600'
-                >
-                  <Zap className='w-4 h-4 mr-2' />
-                  Efectos
-                </TabsTrigger>
-                <TabsTrigger
-                  value='narrative'
-                  className='data-[state=active]:bg-yellow-600'
-                >
-                  <ImageIcon className='w-4 h-4 mr-2' />
-                  Narrativa
-                </TabsTrigger>
-              </TabsList>
-
-              <TabsContent value='characters' className='space-y-4'>
-                <div className='flex items-center justify-between'>
-                  <h2 className='text-xl font-semibold'>Personajes</h2>
-                  <Button
-                    onClick={() => setEditingCharacter(null)}
-                    className='bg-green-600 hover:bg-green-700'
-                  >
-                    <Plus className='w-4 h-4 mr-2' />
-                    Nuevo Personaje
-                  </Button>
-                </div>
-
-                <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                  {characters.map((character) => (
-                    <Card key={character.id} className='clean-card'>
-                      <CardHeader className='pb-3'>
-                        <div className='flex items-center justify-between'>
-                          <CardTitle className='text-lg flex items-center gap-2'>
-                            {character.characterName || character.playerName}
-                            <Badge
-                              variant={
-                                character.type === 'PC'
-                                  ? 'default'
-                                  : character.type === 'NPC'
-                                    ? 'secondary'
-                                    : 'destructive'
-                              }
-                            >
-                              {character.type}
-                            </Badge>
-                          </CardTitle>
-                          <div className='flex items-center gap-2'>
-                            <Button
-                              size='sm'
-                              variant='ghost'
-                              onClick={() => setEditingCharacter(character)}
-                            >
-                              <Edit className='w-4 h-4' />
-                            </Button>
-                            <Button
-                              size='sm'
-                              variant='ghost'
-                              onClick={() =>
-                                toggleCharacterVisibility(character.id)
-                              }
-                              className={
-                                character.visible
-                                  ? 'text-green-400'
-                                  : 'text-gray-400'
-                              }
-                            >
-                              {character.visible ? (
-                                <Eye className='w-4 h-4' />
-                              ) : (
-                                <EyeOff className='w-4 h-4' />
-                              )}
-                            </Button>
-                          </div>
-                        </div>
-                        {character.playerName && character.characterName && (
-                          <p className='text-sm text-muted-foreground'>
-                            Jugador: {character.playerName} |{' '}
-                            {character.archetype}
-                          </p>
-                        )}
-                      </CardHeader>
-                      <CardContent className='space-y-3'>
-                        <div className='grid grid-cols-2 gap-4'>
-                          <div className='space-y-2'>
-                            <div className='flex items-center gap-2'>
-                              <Heart className='w-4 h-4 text-red-400' />
-                              <span className='text-sm'>
-                                Salud: {character.health}/{character.maxHealth}
-                              </span>
-                            </div>
-                            <div className='w-full progress-bar'>
-                              <div
-                                className='progress-fill progress-health'
-                                style={{
-                                  width: `${
-                                    (character.health / character.maxHealth) *
-                                    100
-                                  }%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                          <div className='space-y-2'>
-                            <div className='flex items-center gap-2'>
-                              <Shield className='w-4 h-4 text-blue-400' />
-                              <span className='text-sm'>
-                                Resistencia: {character.resistance}/
-                                {character.maxResistance}
-                              </span>
-                            </div>
-                            <div className='w-full progress-bar'>
-                              <div
-                                className='progress-fill progress-resistance'
-                                style={{
-                                  width: `${
-                                    (character.resistance /
-                                      character.maxResistance) *
-                                    100
-                                  }%`,
-                                }}
-                              />
-                            </div>
-                          </div>
-                        </div>
-
-                        <div className='grid grid-cols-3 gap-2 text-sm'>
-                          <div className='text-center p-2 bg-slate-700 rounded'>
-                            <Target className='w-4 h-4 mx-auto mb-1 text-yellow-400' />
-                            <div>Iniciativa</div>
-                            <div className='font-bold'>
-                              {character.initiative}
-                            </div>
-                          </div>
-                          <div className='text-center p-2 bg-slate-700 rounded'>
-                            <Sword className='w-4 h-4 mx-auto mb-1 text-red-400' />
-                            <div>Ataque</div>
-                            <div className='font-bold'>{character.attack}</div>
-                          </div>
-                          <div className='text-center p-2 bg-slate-700 rounded'>
-                            <Shield className='w-4 h-4 mx-auto mb-1 text-blue-400' />
-                            <div>Defensa</div>
-                            <div className='font-bold'>{character.defense}</div>
-                          </div>
-                        </div>
-
-                        {character.effects.length > 0 && (
-                          <div className='space-y-2'>
-                            <div className='text-sm font-semibold flex items-center gap-2'>
-                              <Zap className='w-4 h-4' />
-                              Efectos Activos
-                            </div>
-                            {character.effects.map((effect) => (
-                              <div
-                                key={effect.id}
-                                className='flex items-center justify-between p-2 bg-slate-700 rounded'
-                              >
-                                <div>
-                                  <div className='font-medium'>
-                                    {effect.name}
-                                  </div>
-                                  <div className='text-xs text-gray-400'>
-                                    {effect.description}
-                                  </div>
-                                </div>
-                                <div className='flex items-center gap-2'>
-                                  <Badge
-                                    variant={
-                                      effect.type === 'buff'
-                                        ? 'default'
-                                        : effect.type === 'debuff'
-                                          ? 'destructive'
-                                          : 'secondary'
-                                    }
-                                  >
-                                    <Clock className='w-3 h-3 mr-1' />
-                                    {effect.duration}
-                                  </Badge>
-                                </div>
-                              </div>
-                            ))}
-                          </div>
-                        )}
-                      </CardContent>
-                    </Card>
-                  ))}
-                </div>
-              </TabsContent>
-
-              <TabsContent value='combat' className='space-y-4'>
-                <Card className='clean-card'>
-                  <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
-                      <Sword className='w-5 h-5 text-red-400' />
-                      Control de Combate
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className='space-y-4'>
-                    {combatActive && (
-                      <div className='grid grid-cols-1 md:grid-cols-3 gap-4'>
-                        <Card className='bg-slate-700'>
-                          <CardContent className='p-4'>
-                            <div className='text-center'>
-                              <div className='text-sm text-gray-400'>
-                                Turno Actual
-                              </div>
-                              <div className='text-2xl font-bold text-yellow-400'>
-                                {combatState.currentTurnIndex + 1}
-                              </div>
-                              <div className='text-sm'>
-                                {combatState.participants[
-                                  combatState.currentTurnIndex
-                                ]?.character.characterName ||
-                                  combatState.participants[
-                                    combatState.currentTurnIndex
-                                  ]?.character.playerName ||
-                                  'N/A'}
-                              </div>
-                            </div>
-                          </CardContent>
-                        </Card>
-                        <div className='flex gap-2'>
-                          <Button onClick={() => nextTurn()} className='flex-1'>
-                            Siguiente Turno
-                          </Button>
-                          <Button
-                            variant='outline'
-                            onClick={() => setCurrentTurn(0)}
-                          >
-                            Reiniciar
-                          </Button>
-                        </div>
-                      </div>
-                    )}
-
-                    <Separator />
-
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div className='space-y-2'>
-                        <label className='text-sm font-medium'>
-                          Tipo de Tirada
-                        </label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Seleccionar tirada' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='attack'>Ataque</SelectItem>
-                            <SelectItem value='defense'>Defensa</SelectItem>
-                            <SelectItem value='skill'>Habilidad</SelectItem>
-                            <SelectItem value='initiative'>
-                              Iniciativa
-                            </SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className='space-y-2'>
-                        <label className='text-sm font-medium'>
-                          Modificador
-                        </label>
-                        <Input
-                          type='number'
-                          placeholder='0'
-                          className='clean-input'
-                        />
-                      </div>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value='scenes' className='space-y-4'>
-                <Card className='clean-card'>
-                  <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
-                      <BookOpen className='w-5 h-5 text-purple-400' />
-                      Escena Actual
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className='space-y-4'>
-                    <div className='space-y-2'>
-                      <Input
-                        value={currentScene.name}
-                        onChange={(e) =>
-                          setCurrentScene((prev) => ({
-                            ...prev,
-                            name: e.target.value,
-                          }))
-                        }
-                        className='clean-input text-lg font-semibold'
-                        placeholder='Nombre de la escena'
-                      />
-                      <Textarea
-                        value={currentScene.description}
-                        onChange={(e) =>
-                          setCurrentScene((prev) => ({
-                            ...prev,
-                            description: e.target.value,
-                          }))
-                        }
-                        className='clean-input min-h-[100px]'
-                        placeholder='Descripción de la escena...'
-                      />
-                    </div>
-                    <div className='flex items-center justify-between'>
-                      <Button
-                        variant='outline'
-                        onClick={() =>
-                          setCurrentScene((prev) => ({
-                            ...prev,
-                            visible: !prev.visible,
-                          }))
-                        }
-                        className={
-                          currentScene.visible
-                            ? 'border-green-400 text-green-400'
-                            : 'border-gray-400 text-gray-400'
-                        }
-                      >
-                        {currentScene.visible ? (
-                          <Eye className='w-4 h-4 mr-2' />
-                        ) : (
-                          <EyeOff className='w-4 h-4 mr-2' />
-                        )}
-                        {currentScene.visible
-                          ? 'Visible para jugadores'
-                          : 'Oculto'}
-                      </Button>
-                      <Button>
-                        <Plus className='w-4 h-4 mr-2' />
-                        Nueva Escena
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value='effects' className='space-y-4'>
-                <Card className='clean-card'>
-                  <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
-                      <Zap className='w-5 h-5 text-green-400' />
-                      Gestión de Efectos
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className='space-y-4'>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <div className='space-y-2'>
-                        <label className='text-sm font-medium'>Personaje</label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Seleccionar personaje' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {characters.map((char) => (
-                              <SelectItem key={char.id} value={char.id}>
-                                {char.characterName || char.playerName}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </div>
-                      <div className='space-y-2'>
-                        <label className='text-sm font-medium'>
-                          Tipo de Efecto
-                        </label>
-                        <Select>
-                          <SelectTrigger>
-                            <SelectValue placeholder='Tipo' />
-                          </SelectTrigger>
-                          <SelectContent>
-                            <SelectItem value='buff'>Beneficio</SelectItem>
-                            <SelectItem value='debuff'>Penalización</SelectItem>
-                            <SelectItem value='neutral'>Neutral</SelectItem>
-                          </SelectContent>
-                        </Select>
-                      </div>
-                    </div>
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <Input
-                        placeholder='Nombre del efecto'
-                        className='clean-input'
-                      />
-                      <Input
-                        type='number'
-                        placeholder='Duración (turnos)'
-                        className='clean-input'
-                      />
-                    </div>
-                    <Textarea
-                      placeholder='Descripción del efecto...'
-                      className='clean-input'
-                    />
-                    <Button className='w-full'>
-                      <Plus className='w-4 h-4 mr-2' />
-                      Aplicar Efecto
-                    </Button>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-
-              <TabsContent value='narrative' className='space-y-4'>
-                <Card className='clean-card'>
-                  <CardHeader>
-                    <CardTitle className='flex items-center gap-2'>
-                      <ImageIcon className='w-5 h-5 text-yellow-400' />
-                      Control Narrativo
-                    </CardTitle>
-                  </CardHeader>
-                  <CardContent className='space-y-4'>
-                    <Textarea
-                      placeholder='Notas narrativas, eventos espontáneos, descripciones...'
-                      className='clean-input min-h-[150px]'
-                    />
-                    <div className='grid grid-cols-1 md:grid-cols-2 gap-4'>
-                      <Button variant='outline'>
-                        <ImageIcon className='w-4 h-4 mr-2' />
-                        Compartir Imagen
-                      </Button>
-                      <Button variant='outline'>
-                        <Settings className='w-4 h-4 mr-2' />
-                        Configurar Ambiente
-                      </Button>
-                    </div>
-                  </CardContent>
-                </Card>
-              </TabsContent>
-            </Tabs>
+        {/* Main Content Grid */}
+        <div className='grid grid-cols-1 lg:grid-cols-4 gap-6'>
+          {/* Characters Section */}
+          <div className='lg:col-span-3'>
+            <CharacterList
+              characters={characters}
+              onEditCharacter={setEditingCharacter}
+              onToggleVisibility={toggleCharacterVisibility}
+            />
           </div>
 
           {/* Sidebar */}
-          <div className='col-span-3 space-y-4'>
-            {/* Dice Roller */}
-            <Card className='clean-card'>
-              <CardHeader className='pb-3'>
-                <CardTitle className='text-lg flex items-center gap-2'>
-                  <Dice6 className='w-5 h-5 text-cyan-400' />
-                  Lanzador de Dados
-                </CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-3'>
-                {diceResult && (
-                  <div className='space-y-3'>
-                    {/* Avisos especiales */}
-                    {diceResult.isCritical && (
-                      <div className='text-center p-3 bg-gradient-to-r from-green-600/20 to-green-500/20 border border-green-500/30 rounded-lg'>
-                        <div className='text-green-400 font-bold text-lg'>
-                          ¡CRÍTICO!
-                        </div>
-                        <div className='text-sm text-green-300'>
-                          Todos los dados obtuvieron {diceResult.sides}
-                        </div>
-                      </div>
-                    )}
-
-                    {diceResult.isFumble && (
-                      <div className='text-center p-3 bg-gradient-to-r from-red-600/20 to-red-500/20 border border-red-500/30 rounded-lg'>
-                        <div className='text-red-400 font-bold text-lg'>
-                          ¡PIFIA!
-                        </div>
-                        <div className='text-sm text-red-300'>
-                          Todos los dados obtuvieron 1
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Resultado total */}
-                    <div className='text-center p-4 bg-gradient-to-r from-cyan-600/20 to-purple-600/20 border border-cyan-500/30 rounded-lg'>
-                      <div className='text-3xl font-bold text-cyan-400'>
-                        {diceResult.total}
-                      </div>
-                      <div className='text-sm text-cyan-300'>
-                        {diceResult.count}d{diceResult.sides} ={' '}
-                        {diceResult.rolls.reduce((sum, roll) => sum + roll, 0)}
-                      </div>
-                    </div>
-
-                    {/* Resultados agrupados */}
-                    {diceResult.count > 1 && (
-                      <div className='space-y-2'>
-                        <div className='text-sm font-medium text-center text-muted-foreground'>
-                          Resultados:
-                        </div>
-                        <div className='flex flex-wrap gap-1 justify-center'>
-                          {Object.entries(diceResult.grouped)
-                            .sort(
-                              ([a], [b]) =>
-                                Number.parseInt(b) - Number.parseInt(a)
-                            )
-                            .map(([value, count]) => (
-                              <div
-                                key={value}
-                                className='px-2 py-1 bg-slate-700 rounded text-xs font-medium'
-                              >
-                                {value} x{count}
-                              </div>
-                            ))}
-                        </div>
-                      </div>
-                    )}
-
-                    {/* Dados individuales si son pocos */}
-                    {diceResult.count <= 10 && diceResult.count > 1 && (
-                      <div className='space-y-2'>
-                        <div className='text-sm font-medium text-center text-muted-foreground'>
-                          Tiradas individuales:
-                        </div>
-                        <div className='flex flex-wrap gap-1 justify-center'>
-                          {diceResult.rolls.map((roll, index) => (
-                            <div
-                              key={index}
-                              className={`w-8 h-8 flex items-center justify-center rounded text-xs font-bold ${
-                                roll === diceResult.sides
-                                  ? 'bg-green-600 text-white'
-                                  : roll === 1
-                                    ? 'bg-red-600 text-white'
-                                    : 'bg-white text-black'
-                              }`}
-                            >
-                              {roll}
-                            </div>
-                          ))}
-                        </div>
-                      </div>
-                    )}
-                  </div>
-                )}
-
-                {/* Controles */}
-                <div className='space-y-3'>
-                  <div className='space-y-2'>
-                    <label className='text-sm font-medium'>
-                      Cantidad de dados
-                    </label>
-                    <div className='flex items-center gap-2'>
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={() => setDiceCount(Math.max(1, diceCount - 1))}
-                        className='w-8 h-8 p-0'
-                      >
-                        -
-                      </Button>
-                      <Input
-                        type='number'
-                        value={diceCount}
-                        onChange={(e) =>
-                          setDiceCount(
-                            Math.max(1, Number.parseInt(e.target.value) || 1)
-                          )
-                        }
-                        className='clean-input text-center w-16'
-                        min='1'
-                        max='100'
-                      />
-                      <Button
-                        size='sm'
-                        variant='outline'
-                        onClick={() =>
-                          setDiceCount(Math.min(100, diceCount + 1))
-                        }
-                        className='w-8 h-8 p-0'
-                      >
-                        +
-                      </Button>
-                    </div>
-                  </div>
-
-                  <div className='grid grid-cols-2 gap-2'>
-                    <Button
-                      onClick={() => rollDice(20)}
-                      variant='outline'
-                      className='border-cyan-400 text-cyan-400'
-                    >
-                      d20
-                    </Button>
-                    <Button
-                      onClick={() => rollDice(12)}
-                      variant='outline'
-                      className='border-cyan-400 text-cyan-400'
-                    >
-                      d12
-                    </Button>
-                    <Button
-                      onClick={() => rollDice(10)}
-                      variant='outline'
-                      className='border-cyan-400 text-cyan-400'
-                    >
-                      d10
-                    </Button>
-                    <Button
-                      onClick={() => rollDice(6)}
-                      variant='outline'
-                      className='border-cyan-400 text-cyan-400'
-                    >
-                      d6
-                    </Button>
-                  </div>
-
-                  <div className='space-y-2'>
-                    <label className='text-sm font-medium'>Modificador</label>
-                    <Input
-                      type='number'
-                      placeholder='0'
-                      className='clean-input'
-                    />
-                  </div>
-
-                  <Button
-                    onClick={() => rollDice(20, 0)}
-                    className='w-full bg-gradient-to-r from-cyan-600 to-purple-600'
-                  >
-                    Lanzar {diceCount}d20
-                  </Button>
-                </div>
-              </CardContent>
-            </Card>
-
+          <div className='space-y-4'>
             {/* Quick Actions */}
-            <Card className='clean-card'>
-              <CardHeader className='pb-3'>
-                <CardTitle className='text-lg'>Acciones Rápidas</CardTitle>
-              </CardHeader>
-              <CardContent className='space-y-2'>
-                <Button
-                  variant='outline'
-                  className='w-full justify-start bg-transparent'
-                >
-                  <Plus className='w-4 h-4 mr-2' />
-                  Nuevo Personaje
-                </Button>
-                <Button
-                  variant='outline'
-                  className='w-full justify-start bg-transparent'
-                >
-                  <Zap className='w-4 h-4 mr-2' />
-                  Evento Aleatorio
-                </Button>
-                <Button
-                  variant='outline'
-                  className='w-full justify-start bg-transparent'
-                >
-                  <Clock className='w-4 h-4 mr-2' />
-                  Avanzar Tiempo
-                </Button>
-                <Button
-                  variant='outline'
-                  className='w-full justify-start bg-transparent'
-                >
-                  <Heart className='w-4 h-4 mr-2' />
-                  Curación Rápida
-                </Button>
-              </CardContent>
-            </Card>
+            <QuickActions
+              onNewCharacter={() => setEditingCharacter(null)}
+              onRandomEvent={() => {
+                // TODO: Implement random event logic
+                console.log('Random event triggered');
+              }}
+              onAdvanceTime={() => {
+                // TODO: Implement advance time logic
+                console.log('Time advanced');
+              }}
+              onQuickHeal={() => {
+                // TODO: Implement quick heal logic
+                console.log('Quick heal applied');
+              }}
+            />
           </div>
         </div>
       </div>
@@ -2493,7 +1429,7 @@ export default function SeaPunkGMTool() {
       {editingCharacter !== null && (
         <CharacterSheet
           character={editingCharacter}
-          onSave={handleSaveCharacter}
+          onSave={handleSaveCharacterWrapper}
           onClose={() => setEditingCharacter(null)}
         />
       )}

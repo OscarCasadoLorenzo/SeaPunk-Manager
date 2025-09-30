@@ -1,0 +1,196 @@
+import { Character } from '@/components/types';
+
+export const mockCharacters: Character[] = [
+  {
+    id: '1',
+    playerName: 'Alex',
+    characterName: 'Zara Netrunner',
+    archetype: 'Hacker Cibernético',
+    faction: 'Corsarios Digitales',
+    race: 'Humano Mejorado',
+    level: 3,
+    category: 'Protagonista I',
+    attributes: {
+      fuerza: 8,
+      dinamismo: 15,
+      voluntad: 12,
+      suerte: 10,
+      inteligencia: 18,
+    },
+    domains: {
+      fisico: 5,
+      batalla: 8,
+      social: 12,
+      ambiental: 10,
+      ocultacion: 15,
+      conocimiento: 18,
+      tecnico: 20,
+      recursos: 8,
+      demoniaco: 0,
+      aura: 5,
+    },
+    combat: {
+      saludFisica: 85,
+      maxSaludFisica: 100,
+      resistenciaFisica: 60,
+      maxResistenciaFisica: 80,
+      saludMental: 90,
+      maxSaludMental: 120,
+      resistenciaMental: 100,
+      maxResistenciaMental: 140,
+      iniciativa: 15,
+      defensa: 10,
+      ataque: 12,
+      impacto: 14,
+      danoMaximo: 25,
+    },
+    narrative: {
+      descripcionFisica:
+        'Mujer joven de complexión delgada, cabello azul eléctrico y ojos cibernéticos dorados.',
+      perfilExterno:
+        'Lleva un traje de cuero negro con circuitos luminosos, gafas de realidad aumentada y múltiples implantes neurales visibles.',
+      perfilInterno:
+        'Rebelde y determinada, busca exponer la corrupción corporativa. Teme perder su humanidad a los implantes.',
+      trasfondo:
+        'Ex-empleada de MegaCorp que descubrió experimentos ilegales y huyó con datos comprometedores.',
+      especialidades:
+        'Hackeo de sistemas, infiltración digital, combate cibernético, programación de virus.',
+    },
+    puntosEpica: 15,
+    esencias: ['Código Fuente', 'Fantasma Digital', 'Pulso Electromagnético'],
+    inventory: [
+      {
+        id: '1',
+        name: 'Deck de Hackeo Militar',
+        description:
+          'Computadora portátil modificada para infiltración de sistemas de alta seguridad',
+        quantity: 1,
+        type: 'item',
+      },
+      {
+        id: '2',
+        name: 'Pistola de Pulsos',
+        description:
+          'Arma que dispara pulsos electromagnéticos, efectiva contra sistemas electrónicos',
+        quantity: 1,
+        type: 'weapon',
+      },
+    ],
+    effects: [
+      {
+        id: '1',
+        name: 'Boost Cibernético',
+        duration: 3,
+        type: 'buff',
+        description: '+2 a todas las tiradas técnicas',
+      },
+    ],
+    donesAura: ['Interfaz Neural', 'Resistencia a Virus'],
+    type: 'PC',
+    isNPC: false,
+    health: 85,
+    maxHealth: 100,
+    resistance: 60,
+    maxResistance: 80,
+    initiative: 15,
+    attack: 12,
+    defense: 10,
+    visible: true,
+  },
+  {
+    id: '2',
+    playerName: 'Maya',
+    characterName: 'Kael el Forjador',
+    archetype: 'Guerrero Tecnomante',
+    faction: 'Hijos del Acero',
+    race: 'Cyborg',
+    level: 5,
+    category: 'Campeón II',
+    attributes: {
+      fuerza: 18,
+      dinamismo: 10,
+      voluntad: 16,
+      suerte: 7,
+      inteligencia: 12,
+    },
+    domains: {
+      fisico: 15,
+      batalla: 20,
+      social: 6,
+      ambiental: 8,
+      ocultacion: 4,
+      conocimiento: 10,
+      tecnico: 15,
+      recursos: 12,
+      demoniaco: 2,
+      aura: 7,
+    },
+    combat: {
+      saludFisica: 120,
+      maxSaludFisica: 120,
+      resistenciaFisica: 100,
+      maxResistenciaFisica: 100,
+      saludMental: 80,
+      maxSaludMental: 100,
+      resistenciaMental: 60,
+      maxResistenciaMental: 80,
+      iniciativa: 8,
+      defensa: 18,
+      ataque: 20,
+      impacto: 22,
+      danoMaximo: 40,
+    },
+    narrative: {
+      descripcionFisica:
+        'Hombre robusto con brazos mecánicos, barba trenzada y tatuajes tribales que brillan con energía azul.',
+      perfilExterno:
+        'Porta una armadura pesada de metal forjado y un martillo de plasma. Sus ojos son implantes ópticos avanzados.',
+      perfilInterno:
+        'Leal y protector, valora la fuerza y el honor. Busca redimir errores del pasado.',
+      trasfondo:
+        'Ex-gladiador convertido en líder de los Hijos del Acero tras salvar a su clan en la guerra de las máquinas.',
+      especialidades:
+        'Combate cuerpo a cuerpo, forja de armas, manipulación de energía, liderazgo.',
+    },
+    puntosEpica: 25,
+    esencias: ['Corazón de Acero', 'Martillo de Plasma'],
+    inventory: [
+      {
+        id: '3',
+        name: 'Martillo de Plasma',
+        description:
+          'Arma pesada capaz de canalizar energía destructiva en cada golpe',
+        quantity: 1,
+        type: 'weapon',
+      },
+      {
+        id: '4',
+        name: 'Armadura Forjada',
+        description:
+          'Armadura personalizada con refuerzos energéticos y sistemas de soporte vital',
+        quantity: 1,
+        type: 'armor',
+      },
+    ],
+    effects: [
+      {
+        id: '2',
+        name: 'Furia de Acero',
+        duration: 2,
+        type: 'buff',
+        description: '+5 ataque durante 2 turnos',
+      },
+    ],
+    donesAura: ['Piel de Titanio'],
+    type: 'PC',
+    isNPC: false,
+    health: 120,
+    maxHealth: 120,
+    resistance: 100,
+    maxResistance: 100,
+    initiative: 8,
+    attack: 20,
+    defense: 18,
+    visible: true,
+  },
+];
