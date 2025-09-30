@@ -1,10 +1,12 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { Home, Plus, Users } from 'lucide-react';
+import { Dice6, Home, Plus, Settings, Users } from 'lucide-react';
 import React from 'react';
 
 const navigation = [
   { name: 'Dashboard', href: '/', icon: Home },
   { name: 'Characters', href: '/characters', icon: Users },
+  { name: 'Dice Roller', href: '/dice', icon: Dice6 },
+  { name: 'Settings', href: '/settings', icon: Settings },
 ];
 
 export const Sidebar: React.FC = () => {
