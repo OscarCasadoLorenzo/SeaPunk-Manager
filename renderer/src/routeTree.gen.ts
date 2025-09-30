@@ -10,21 +10,14 @@
 
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
-import { Route as TasksRouteImport } from './routes/tasks'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as DiceRouteImport } from './routes/dice'
 import { Route as CharactersRouteImport } from './routes/characters'
 import { Route as IndexRouteImport } from './routes/index'
-import { Route as TasksNewRouteImport } from './routes/tasks/new'
 
 const UsersRoute = UsersRouteImport.update({
   id: '/users',
   path: '/users',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const TasksRoute = TasksRouteImport.update({
-  id: '/tasks',
-  path: '/tasks',
   getParentRoute: () => rootRouteImport,
 } as any)
 const SettingsRoute = SettingsRouteImport.update({
@@ -47,29 +40,20 @@ const IndexRoute = IndexRouteImport.update({
   path: '/',
   getParentRoute: () => rootRouteImport,
 } as any)
-const TasksNewRoute = TasksNewRouteImport.update({
-  id: '/new',
-  path: '/new',
-  getParentRoute: () => TasksRoute,
-} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
   '/dice': typeof DiceRoute
   '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRouteWithChildren
   '/users': typeof UsersRoute
-  '/tasks/new': typeof TasksNewRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
   '/dice': typeof DiceRoute
   '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRouteWithChildren
   '/users': typeof UsersRoute
-  '/tasks/new': typeof TasksNewRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
@@ -77,38 +61,14 @@ export interface FileRoutesById {
   '/characters': typeof CharactersRoute
   '/dice': typeof DiceRoute
   '/settings': typeof SettingsRoute
-  '/tasks': typeof TasksRouteWithChildren
   '/users': typeof UsersRoute
-  '/tasks/new': typeof TasksNewRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths:
-    | '/'
-    | '/characters'
-    | '/dice'
-    | '/settings'
-    | '/tasks'
-    | '/users'
-    | '/tasks/new'
+  fullPaths: '/' | '/characters' | '/dice' | '/settings' | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to:
-    | '/'
-    | '/characters'
-    | '/dice'
-    | '/settings'
-    | '/tasks'
-    | '/users'
-    | '/tasks/new'
-  id:
-    | '__root__'
-    | '/'
-    | '/characters'
-    | '/dice'
-    | '/settings'
-    | '/tasks'
-    | '/users'
-    | '/tasks/new'
+  to: '/' | '/characters' | '/dice' | '/settings' | '/users'
+  id: '__root__' | '/' | '/characters' | '/dice' | '/settings' | '/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
@@ -116,7 +76,6 @@ export interface RootRouteChildren {
   CharactersRoute: typeof CharactersRoute
   DiceRoute: typeof DiceRoute
   SettingsRoute: typeof SettingsRoute
-  TasksRoute: typeof TasksRouteWithChildren
   UsersRoute: typeof UsersRoute
 }
 
@@ -127,13 +86,6 @@ declare module '@tanstack/react-router' {
       path: '/users'
       fullPath: '/users'
       preLoaderRoute: typeof UsersRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tasks': {
-      id: '/tasks'
-      path: '/tasks'
-      fullPath: '/tasks'
-      preLoaderRoute: typeof TasksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/settings': {
@@ -164,32 +116,14 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof IndexRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tasks/new': {
-      id: '/tasks/new'
-      path: '/new'
-      fullPath: '/tasks/new'
-      preLoaderRoute: typeof TasksNewRouteImport
-      parentRoute: typeof TasksRoute
-    }
   }
 }
-
-interface TasksRouteChildren {
-  TasksNewRoute: typeof TasksNewRoute
-}
-
-const TasksRouteChildren: TasksRouteChildren = {
-  TasksNewRoute: TasksNewRoute,
-}
-
-const TasksRouteWithChildren = TasksRoute._addFileChildren(TasksRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CharactersRoute: CharactersRoute,
   DiceRoute: DiceRoute,
   SettingsRoute: SettingsRoute,
-  TasksRoute: TasksRouteWithChildren,
   UsersRoute: UsersRoute,
 }
 export const routeTree = rootRouteImport

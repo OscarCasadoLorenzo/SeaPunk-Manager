@@ -1,5 +1,3 @@
-// User and Task hooks (existing)
-export * from './useTasks';
 export * from './useUsers';
 
 // Character-related hooks

@@ -1,8 +1,8 @@
 // API Base
 export { api } from './api';
 
-// User and Task services (existing)
-export { taskService } from './tasks';
+// User services
+
 export { userService } from './users';
 
 // Character-related services

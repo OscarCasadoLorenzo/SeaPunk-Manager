@@ -17,7 +17,6 @@ import inventoryRoutes from './routes/inventories';
 import narrativeRoutes from './routes/narratives';
 import playerRoutes from './routes/players';
 import settingsRoutes from './routes/settings';
-import taskRoutes from './routes/tasks';
 import userRoutes from './routes/users';
 
 // Load environment variables
@@ -60,7 +59,6 @@ app.get('/api/health', (req, res) => {
 
 // API routes
 app.use('/api/users', userRoutes);
-app.use('/api/tasks', taskRoutes);
 app.use('/api/players', playerRoutes);
 app.use('/api/characters', characterRoutes);
 app.use('/api/attributes', attributeRoutes);

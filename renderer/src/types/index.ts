@@ -4,23 +4,6 @@ export interface User {
   name: string;
   createdAt: string;
   updatedAt: string;
-  tasks?: Task[];
-  _count?: {
-    tasks: number;
-  };
-}
-
-export interface Task {
-  id: string;
-  title: string;
-  description: string | null;
-  completed: boolean;
-  priority: Priority;
-  dueDate: string | null;
-  createdAt: string;
-  updatedAt: string;
-  userId: string;
-  user?: User;
 }
 
 export enum Priority {
@@ -39,22 +22,6 @@ export interface CreateUserRequest {
 export interface UpdateUserRequest {
   email?: string;
   name?: string;
-}
-
-export interface CreateTaskRequest {
-  title: string;
-  description?: string;
-  priority?: Priority;
-  dueDate?: string;
-  userId: string;
-}
-
-export interface UpdateTaskRequest {
-  title?: string;
-  description?: string;
-  completed?: boolean;
-  priority?: Priority;
-  dueDate?: string;
 }
 
 // Character-related types
