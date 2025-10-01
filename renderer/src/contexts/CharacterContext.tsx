@@ -1,4 +1,10 @@
-import React, { createContext, ReactNode, useContext, useState } from 'react';
+import React, {
+  createContext,
+  ReactNode,
+  useContext,
+  useEffect,
+  useState,
+} from 'react';
 
 interface CharacterContextType {
   selectedCharacterId: string | null;
@@ -21,14 +27,23 @@ export const useCharacterContext = () => {
 
 interface CharacterProviderProps {
   children: ReactNode;
+  initialCharacterId?: string;
 }
 
 export const CharacterProvider: React.FC<CharacterProviderProps> = ({
   children,
+  initialCharacterId,
 }) => {
   const [selectedCharacterId, setSelectedCharacterId] = useState<string | null>(
-    null
+    initialCharacterId || null
   );
+
+  // Update selected character when initialCharacterId changes
+  useEffect(() => {
+    if (initialCharacterId) {
+      setSelectedCharacterId(initialCharacterId);
+    }
+  }, [initialCharacterId]);
 
   return (
     <CharacterContext.Provider

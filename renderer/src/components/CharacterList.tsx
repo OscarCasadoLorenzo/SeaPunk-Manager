@@ -213,17 +213,17 @@ export function CharacterList({
             </div>
 
             <div className='grid grid-cols-3 gap-2 text-sm'>
-              <div className='text-center p-2 bg-slate-700 rounded'>
+              <div className='text-center p-2 border border-slate-700 rounded'>
                 <Target className='w-4 h-4 mx-auto mb-1 text-yellow-400' />
                 <div>Iniciativa</div>
                 <div className='font-bold'>{character.initiative}</div>
               </div>
-              <div className='text-center p-2 bg-slate-700 rounded'>
+              <div className='text-center p-2 border border-slate-700 rounded'>
                 <Sword className='w-4 h-4 mx-auto mb-1 text-red-400' />
                 <div>Ataque</div>
                 <div className='font-bold'>{character.attack}</div>
               </div>
-              <div className='text-center p-2 bg-slate-700 rounded'>
+              <div className='text-center p-2 border border-slate-700 rounded'>
                 <Shield className='w-4 h-4 mx-auto mb-1 text-blue-400' />
                 <div>Defensa</div>
                 <div className='font-bold'>{character.defense}</div>

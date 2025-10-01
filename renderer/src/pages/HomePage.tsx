@@ -1,10 +1,21 @@
 'use client';
 
 import { CharacterList } from '@/components/CharacterList';
+import { Character } from '@/components/types';
 import { useCharacterData } from '@/hooks/useCharacterData';
+import { useNavigate } from '@tanstack/react-router';
 
 export default function HomePage() {
   const { characters, isLoading, error } = useCharacterData();
+  const navigate = useNavigate();
+
+  const handleEditCharacter = (character: Character) => {
+    // Navigate to characters page where the character detail will be shown
+    navigate({
+      to: '/characters',
+      search: { characterId: character.id },
+    });
+  };
 
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
@@ -48,7 +59,7 @@ export default function HomePage() {
         {!isLoading && !error && (
           <CharacterList
             characters={characters}
-            onEditCharacter={() => {}} // Sin funcionalidad por ahora
+            onEditCharacter={handleEditCharacter}
             onToggleVisibility={() => {}} // Sin funcionalidad por ahora
           />
         )}

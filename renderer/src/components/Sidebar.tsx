@@ -1,9 +1,9 @@
 import { Link, useLocation } from '@tanstack/react-router';
-import { Dice6, Home, Settings, Users } from 'lucide-react';
+import { Dice6, Settings, Sword, Users } from 'lucide-react';
 import React from 'react';
 
 const navigation = [
-  { name: 'Dashboard', href: '/', icon: Home },
+  { name: 'Arena', href: '/', icon: Sword },
   { name: 'Characters', href: '/characters', icon: Users },
   { name: 'Dice Roller', href: '/dice', icon: Dice6 },
   { name: 'Settings', href: '/settings', icon: Settings },
