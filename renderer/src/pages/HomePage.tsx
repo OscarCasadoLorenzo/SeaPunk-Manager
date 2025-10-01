@@ -17,23 +17,56 @@ export default function HomePage() {
     });
   };
 
+  const navigateToCombat = () => {
+    navigate({ to: '/combat' });
+  };
+
   return (
     <div style={{ display: 'flex', height: '100vh' }}>
       {/* Main Content */}
       <div style={{ flex: 1, padding: '20px', overflowY: 'auto' }}>
         <div style={{ marginBottom: '20px' }}>
-          <h2
+          <div
             style={{
-              fontSize: '28px',
-              fontWeight: 'bold',
-              marginBottom: '8px',
+              display: 'flex',
+              justifyContent: 'space-between',
+              alignItems: 'center',
+              marginBottom: '16px',
             }}
           >
-            Lista de Personajes
-          </h2>
-          <p style={{ color: '#888', fontSize: '16px' }}>
-            Gestiona todos tus personajes de forma sencilla
-          </p>
+            <div>
+              <h2
+                style={{
+                  fontSize: '28px',
+                  fontWeight: 'bold',
+                  marginBottom: '8px',
+                }}
+              >
+                Lista de Personajes en combate
+              </h2>
+              <p style={{ color: '#888', fontSize: '16px' }}>
+                Gestiona todos tus personajes de forma sencilla
+              </p>
+            </div>
+            <button
+              onClick={navigateToCombat}
+              style={{
+                backgroundColor: '#ef4444',
+                color: 'white',
+                padding: '12px 24px',
+                borderRadius: '8px',
+                border: 'none',
+                fontSize: '16px',
+                fontWeight: 'bold',
+                cursor: 'pointer',
+                display: 'flex',
+                alignItems: 'center',
+                gap: '8px',
+              }}
+            >
+              ⚔️ Sistema de Combate
+            </button>
+          </div>
         </div>
 
         {isLoading && (

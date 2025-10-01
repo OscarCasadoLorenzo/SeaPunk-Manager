@@ -12,6 +12,7 @@ import { Route as rootRouteImport } from './routes/__root'
 import { Route as UsersRouteImport } from './routes/users'
 import { Route as SettingsRouteImport } from './routes/settings'
 import { Route as DiceRouteImport } from './routes/dice'
+import { Route as CombatRouteImport } from './routes/combat'
 import { Route as CharactersRouteImport } from './routes/characters'
 import { Route as IndexRouteImport } from './routes/index'
 
@@ -30,6 +31,11 @@ const DiceRoute = DiceRouteImport.update({
   path: '/dice',
   getParentRoute: () => rootRouteImport,
 } as any)
+const CombatRoute = CombatRouteImport.update({
+  id: '/combat',
+  path: '/combat',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const CharactersRoute = CharactersRouteImport.update({
   id: '/characters',
   path: '/characters',
@@ -44,6 +50,7 @@ const IndexRoute = IndexRouteImport.update({
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
+  '/combat': typeof CombatRoute
   '/dice': typeof DiceRoute
   '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
@@ -51,6 +58,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
+  '/combat': typeof CombatRoute
   '/dice': typeof DiceRoute
   '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
@@ -59,21 +67,30 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/characters': typeof CharactersRoute
+  '/combat': typeof CombatRoute
   '/dice': typeof DiceRoute
   '/settings': typeof SettingsRoute
   '/users': typeof UsersRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/characters' | '/dice' | '/settings' | '/users'
+  fullPaths: '/' | '/characters' | '/combat' | '/dice' | '/settings' | '/users'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/characters' | '/dice' | '/settings' | '/users'
-  id: '__root__' | '/' | '/characters' | '/dice' | '/settings' | '/users'
+  to: '/' | '/characters' | '/combat' | '/dice' | '/settings' | '/users'
+  id:
+    | '__root__'
+    | '/'
+    | '/characters'
+    | '/combat'
+    | '/dice'
+    | '/settings'
+    | '/users'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   CharactersRoute: typeof CharactersRoute
+  CombatRoute: typeof CombatRoute
   DiceRoute: typeof DiceRoute
   SettingsRoute: typeof SettingsRoute
   UsersRoute: typeof UsersRoute
@@ -102,6 +119,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof DiceRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/combat': {
+      id: '/combat'
+      path: '/combat'
+      fullPath: '/combat'
+      preLoaderRoute: typeof CombatRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/characters': {
       id: '/characters'
       path: '/characters'
@@ -122,6 +146,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   CharactersRoute: CharactersRoute,
+  CombatRoute: CombatRoute,
   DiceRoute: DiceRoute,
   SettingsRoute: SettingsRoute,
   UsersRoute: UsersRoute,
