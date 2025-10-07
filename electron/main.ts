@@ -25,7 +25,7 @@ const createWindow = (): void => {
   // Load the app
   if (isDev) {
     // In development, connect to Vite dev server
-    mainWindow.loadURL('http://localhost:3000');
+    mainWindow.loadURL('http://127.0.0.1:3000');
     // Open DevTools in development
     mainWindow.webContents.openDevTools();
   } else {

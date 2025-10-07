@@ -122,7 +122,7 @@ GRANT ALL PRIVILEGES ON DATABASE seapunk_db TO seapunk_user;
 cp .env.example .env
 
 # Edit the .env file with your database credentials
-DATABASE_URL="postgresql://username:password@localhost:5432/seapunk_db"
+DATABASE_URL="postgresql://username:password@127.0.0.1:5432/seapunk_db"
 PORT=3001
 NODE_ENV=development
 ELECTRON_IS_DEV=true
@@ -155,7 +155,7 @@ npm run dev
 
 This command will:
 
-1. Start the backend API server on `http://localhost:3001`
+1. Start the backend API server on `http://127.0.0.1:3001`
 2. Start the Electron app with hot reload
 
 ### Individual Development Commands

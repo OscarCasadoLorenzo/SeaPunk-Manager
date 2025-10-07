@@ -35,7 +35,7 @@ app.use(
     origin:
       process.env.NODE_ENV === 'production'
         ? ['file://', 'app://'] // Allow Electron origins
-        : ['http://localhost:3000', 'http://127.0.0.1:3000'], // Allow development origins
+        : ['http://127.0.0.1:3000', 'http://127.0.0.1:3000'], // Allow development origins
     credentials: true,
   })
 );
@@ -113,7 +113,7 @@ process.on('SIGINT', async () => {
 // Start server
 app.listen(PORT, () => {
   console.log(`🚀 Server running on port ${PORT}`);
-  console.log(`📊 Health check: http://localhost:${PORT}/api/health`);
+  console.log(`📊 Health check: http://127.0.0.1:${PORT}/api/health`);
 });
 
 export default app;
