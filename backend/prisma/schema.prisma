@@ -1,6 +1,3 @@
-// This is your Prisma schema file,
-// learn more about it in the docs: https://pris.ly/d/prisma-schema
-
 generator client {
   provider = "prisma-client-js"
 }
@@ -21,8 +18,6 @@ model User {
   @@map("users")
 }
 
-
-
 model Player {
   id         String      @id @default(cuid())
   playerName String
@@ -34,29 +29,36 @@ model Player {
 }
 
 model Character {
-  id            String        @id @default(cuid())
-  characterName String
-  archetype     String
-  faction       String
-  race          String
-  level         Int
-  category      String
-  epicPoints    Int
-  type          String
-  isNPC         Boolean       @default(false)
-  isVisible     Boolean       @default(true)
-  playerId      String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  player        Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  attributes    Attribute?
-  domains       Domain?
-  combatStats   CombatStats?
-  narrative     Narrative?
-  inventories   Inventory[]
-  effects       Effect[]
-  essences      CharacterEssence[]
-  auraGifts     CharacterAuraGift[]
+  id                       String              @id @default(cuid())
+  characterName            String
+  archetype                String
+  faction                  String
+  race                     String
+  level                    Int
+  category                 String
+  epicPoints               Int
+  type                     String
+  isNPC                    Boolean             @default(false)
+  isVisible                Boolean             @default(true)
+  playerId                 String
+  createdAt                DateTime            @default(now())
+  updatedAt                DateTime            @updatedAt
+  attackDomain             String?
+  bcat                     Int                 @default(0)
+  defenseDomain            String?
+  impactDomain             String?
+  mentalResistanceDomain   String?
+  physicalResistanceDomain String?
+  powerLevel               Int                 @default(0)
+  attributes               Attribute?
+  auraGifts                CharacterAuraGift[]
+  essences                 CharacterEssence[]
+  player                   Player              @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  combatStats              CombatStats?
+  domains                  Domain?
+  effects                  Effect[]
+  inventories              Inventory[]
+  narrative                Narrative?
 
   @@map("characters")
 }
@@ -126,16 +128,24 @@ model Narrative {
   @@map("narratives")
 }
 
+enum InventoryType {
+  WEAPON
+  ARMOR
+  CONSUMABLE
+  QUEST
+  OTHER
+}
+
 model Inventory {
-  id          String    @id @default(cuid())
+  id          String       @id @default(cuid())
   characterId String
   name        String
   description String?
-  quantity    Int       @default(1)
-  type        String
-  createdAt   DateTime  @default(now())
-  updatedAt   DateTime  @updatedAt
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  quantity    Int         @default(1)
+  type        InventoryType
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  character   Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("inventories")
 }
@@ -174,7 +184,6 @@ model AuraGift {
   @@map("aura_gifts")
 }
 
-// Many-to-many relationship tables
 model CharacterEssence {
   id          String    @id @default(cuid())
   characterId String
@@ -191,9 +200,10 @@ model CharacterAuraGift {
   id          String    @id @default(cuid())
   characterId String
   auraGiftId  String
+  level       Int       @default(1)
   createdAt   DateTime  @default(now())
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   auraGift    AuraGift  @relation(fields: [auraGiftId], references: [id], onDelete: Cascade)
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, auraGiftId])
   @@map("character_aura_gifts")
