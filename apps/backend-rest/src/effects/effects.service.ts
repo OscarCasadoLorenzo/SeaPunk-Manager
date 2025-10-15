@@ -78,8 +78,11 @@ export class EffectsService {
     const { characterId, ...data } = createEffectDto;
     return this.prisma.effect.create({
       data: {
-        characterId,
-        ...data,
+        character: { connect: { id: characterId } },
+        name: data.name,
+        description: data.description,
+        duration: data.duration,
+        type: data.type || 'BUFF',
       },
       include: {
         character: {
