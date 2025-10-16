@@ -1,19 +1,15 @@
-import type { Character } from '@seapunk/types';
-import { useQuery } from '@tanstack/react-query';
-import { LoadingSpinner } from './loading-spinner';
+'use client';
 
-async function getCharacters() {
-  const res = await fetch('http://localhost:3001/characters');
-  if (!res.ok) throw new Error('Failed to fetch characters');
-  return res.json() as Promise<Character[]>;
-}
+import { useApiQuery } from '@/hooks/use-api-query';
+import { type Character } from '@seapunk/types';
+import { LoadingSpinner } from './loading-spinner';
 
 export function CharacterList() {
   const {
     data: characters,
     isLoading,
     error,
-  } = useQuery(['characters'], getCharacters);
+  } = useApiQuery<Character[]>('/characters');
 
   if (isLoading) return <LoadingSpinner />;
   if (error) return <div>Failed to load characters</div>;
@@ -26,16 +22,16 @@ export function CharacterList() {
           key={character.id}
           className='rounded-lg border bg-card p-4 text-card-foreground shadow-sm'
         >
-          <h3 className='text-lg font-semibold'>{character.name}</h3>
+          <h3 className='text-lg font-semibold'>{character.characterName}</h3>
           <p className='text-sm text-muted-foreground'>
-            Level {character.level}
+            Level {character.level} {character.archetype}
           </p>
           <div className='mt-4'>
             <div className='flex items-center justify-between'>
-              <span>HP</span>
-              <span>
-                {character.health.current}/{character.health.max}
+              <span className='text-sm text-muted-foreground'>
+                {character.faction}
               </span>
+              <span className='text-sm'>{character.race}</span>
             </div>
           </div>
         </div>
