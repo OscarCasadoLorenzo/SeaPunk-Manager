@@ -47,7 +47,31 @@ export class CharactersService {
         ...characterData,
         attributes: attributes ? { create: attributes } : undefined,
         domains: domains ? { create: domains } : undefined,
-        combatStats: combatStats ? { create: combatStats } : undefined,
+        combatStats: combatStats
+          ? {
+              create: {
+                physicalHealth: combatStats.physicalHealth,
+                maxPhysicalHealth: combatStats.maxPhysicalHealth,
+                physicalResistance: combatStats.physicalResistance,
+                maxPhysicalResistance: combatStats.maxPhysicalResistance,
+                mentalHealth: combatStats.mentalHealth,
+                maxMentalHealth: combatStats.maxMentalHealth,
+                mentalResistance: combatStats.mentalResistance,
+                maxMentalResistance: combatStats.maxMentalResistance,
+                auraHealth: combatStats.auraHealth,
+                maxAuraHealth: combatStats.maxAuraHealth,
+                auraResistance: combatStats.auraResistance,
+                maxAuraResistance: combatStats.maxAuraResistance,
+                initiative: combatStats.initiative,
+                armorClass: combatStats.armorClass,
+                conditions: combatStats.conditions,
+                defense: combatStats.defense,
+                attack: combatStats.attack,
+                impact: combatStats.impact,
+                maxDamage: combatStats.maxDamage,
+              },
+            }
+          : undefined,
       },
       include: {
         attributes: true,
