@@ -122,7 +122,7 @@ export class AuraGiftsService {
       data: {
         character: { connect: { id: characterId } },
         auraGift: { connect: { id: auraGiftId } },
-        level: level || 1,
+        level: level,
       },
       include: {
         character: {
