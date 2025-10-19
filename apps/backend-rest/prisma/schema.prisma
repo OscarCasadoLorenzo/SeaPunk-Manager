@@ -103,11 +103,17 @@ model CombatStats {
   maxMentalHealth       Int
   mentalResistance      Int
   maxMentalResistance   Int
+  auraHealth           Int       @default(0)
+  maxAuraHealth        Int       @default(0)
+  auraResistance       Int       @default(0)
+  maxAuraResistance    Int       @default(0)
   initiative            Int
-  defense               Int
-  attack                Int
-  impact                Int
-  maxDamage             Int
+  armorClass           Int       @default(10)
+  conditions           String[]  @default([])
+  defense              Int       @default(10)
+  attack               Int       @default(0)
+  impact               Int       @default(0)
+  maxDamage            Int       @default(0)
   character             Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("combat_stats")
@@ -187,6 +193,7 @@ model CharacterEssence {
   id          String    @id @default(cuid())
   characterId String
   essenceId   String
+  level       Int       @default(1)
   createdAt   DateTime  @default(now())
   character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
   essence     Essence   @relation(fields: [essenceId], references: [id], onDelete: Cascade)
@@ -199,9 +206,10 @@ model CharacterAuraGift {
   id          String    @id @default(cuid())
   characterId String
   auraGiftId  String
-  createdAt   DateTime  @default(now())
+  level       Int      @default(1)
+  createdAt   DateTime @default(now())
   character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  auraGift    AuraGift  @relation(fields: [auraGiftId], references: [id], onDelete: Cascade)
+  auraGift    AuraGift @relation(fields: [auraGiftId], references: [id], onDelete: Cascade)
 
   @@unique([characterId, auraGiftId])
   @@map("character_aura_gifts")
