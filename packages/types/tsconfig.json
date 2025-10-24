@@ -1,0 +1,11 @@
+{
+  "extends": "@seapunk/tsconfig/base.json",
+  "include": ["src"],
+  "exclude": ["node_modules"],
+  "compilerOptions": {
+    "outDir": "dist",
+    "declarationDir": "dist",
+    "declaration": true,
+    "rootDir": "src"
+  }
+}
