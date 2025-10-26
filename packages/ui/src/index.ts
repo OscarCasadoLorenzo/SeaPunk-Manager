@@ -1,3 +1,6 @@
+// Components
+export * from './components/ToggleTheme';
+
 // Primitive components
 export * from './primitives/accordion';
 export * from './primitives/alert';
@@ -49,7 +52,6 @@ export * from './primitives/tooltip';
 // Custom components
 export * from './components/combat-setup-modal';
 export * from './components/combat-turn-modal';
-export * from './components/DragWindowRegion';
 export * from './components/ToggleTheme';
 
 // Hooks
