@@ -1,0 +1,11 @@
+{
+  "extends": ["@seapunk/config/eslint"],
+  "parserOptions": {
+    "project": "./tsconfig.json"
+  },
+  "rules": {
+    "@typescript-eslint/no-explicit-any": "warn",
+    "react/prop-types": "off",
+    "react/display-name": "off"
+  }
+}

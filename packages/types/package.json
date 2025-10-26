@@ -1,0 +1,17 @@
+{
+  "name": "@seapunk/types",
+  "version": "0.0.0",
+  "private": true,
+  "main": "./dist/index.js",
+  "types": "./dist/index.d.ts",
+  "scripts": {
+    "build": "tsc",
+    "clean": "rm -rf dist",
+    "dev": "tsc -w",
+    "lint": "eslint \"src/**/*.ts*\""
+  },
+  "devDependencies": {
+    "@seapunk/config": "workspace:*",
+    "typescript": "^5.2.2"
+  }
+}

@@ -1,3 +1,18 @@
+-- CreateEnum
+CREATE TYPE "InventoryType" AS ENUM ('WEAPON', 'ARMOR', 'CONSUMABLE', 'QUEST', 'OTHER');
+
+-- CreateTable
+CREATE TABLE "users" (
+    "id" TEXT NOT NULL,
+    "email" TEXT NOT NULL,
+    "name" TEXT NOT NULL,
+    "password" TEXT NOT NULL,
+    "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    "updatedAt" TIMESTAMP(3) NOT NULL,
+
+    CONSTRAINT "users_pkey" PRIMARY KEY ("id")
+);
+
 -- CreateTable
 CREATE TABLE "players" (
     "id" TEXT NOT NULL,
@@ -24,6 +39,13 @@ CREATE TABLE "characters" (
     "playerId" TEXT NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
+    "attackDomain" TEXT,
+    "bcat" INTEGER NOT NULL DEFAULT 0,
+    "defenseDomain" TEXT,
+    "impactDomain" TEXT,
+    "mentalResistanceDomain" TEXT,
+    "physicalResistanceDomain" TEXT,
+    "powerLevel" INTEGER NOT NULL DEFAULT 0,
 
     CONSTRAINT "characters_pkey" PRIMARY KEY ("id")
 );
@@ -100,7 +122,7 @@ CREATE TABLE "inventories" (
     "name" TEXT NOT NULL,
     "description" TEXT,
     "quantity" INTEGER NOT NULL DEFAULT 1,
-    "type" TEXT NOT NULL,
+    "type" "InventoryType" NOT NULL,
     "createdAt" TIMESTAMP(3) NOT NULL DEFAULT CURRENT_TIMESTAMP,
     "updatedAt" TIMESTAMP(3) NOT NULL,
 
@@ -162,6 +184,9 @@ CREATE TABLE "character_aura_gifts" (
 );
 
 -- CreateIndex
+CREATE UNIQUE INDEX "users_email_key" ON "users"("email");
+
+-- CreateIndex
 CREATE UNIQUE INDEX "attributes_characterId_key" ON "attributes"("characterId");
 
 -- CreateIndex
@@ -213,7 +238,7 @@ ALTER TABLE "character_essences" ADD CONSTRAINT "character_essences_characterId_
 ALTER TABLE "character_essences" ADD CONSTRAINT "character_essences_essenceId_fkey" FOREIGN KEY ("essenceId") REFERENCES "essences"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "character_aura_gifts" ADD CONSTRAINT "character_aura_gifts_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "characters"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "character_aura_gifts" ADD CONSTRAINT "character_aura_gifts_auraGiftId_fkey" FOREIGN KEY ("auraGiftId") REFERENCES "aura_gifts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
 
 -- AddForeignKey
-ALTER TABLE "character_aura_gifts" ADD CONSTRAINT "character_aura_gifts_auraGiftId_fkey" FOREIGN KEY ("auraGiftId") REFERENCES "aura_gifts"("id") ON DELETE CASCADE ON UPDATE CASCADE;
+ALTER TABLE "character_aura_gifts" ADD CONSTRAINT "character_aura_gifts_characterId_fkey" FOREIGN KEY ("characterId") REFERENCES "characters"("id") ON DELETE CASCADE ON UPDATE CASCADE;

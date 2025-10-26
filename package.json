@@ -1,11 +1,16 @@
 {
   "name": "seapunk-manager",
   "version": "1.0.0",
+  "private": true,
   "description": "Full-stack desktop application built with Electron, React, Node.js, and PostgreSQL",
   "main": "dist/electron/main.js",
   "author": "Your Name",
   "license": "MIT",
   "homepage": "./",
+  "workspaces": [
+    "apps/*",
+    "packages/*"
+  ],
   "scripts": {
     "dev": "concurrently \"npm run dev:backend\" \"npm run dev:renderer\" \"npm run dev:electron\"",
     "dev:backend": "cd backend && npm run dev",
