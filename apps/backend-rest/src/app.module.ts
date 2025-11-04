@@ -9,6 +9,7 @@ import { EffectsModule } from './effects/effects.module';
 import { EssencesModule } from './essences/essences.module';
 import { PlayersModule } from './players/players.module';
 import { PrismaModule } from './prisma/prisma.module';
+import { SettingsModule } from './settings/settings.module';
 
 @Module({
   imports: [
@@ -24,6 +25,7 @@ import { PrismaModule } from './prisma/prisma.module';
     DomainsModule,
     EffectsModule,
     EssencesModule,
+    SettingsModule,
   ],
 })
 export class AppModule {}
