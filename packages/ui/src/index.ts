@@ -44,7 +44,7 @@ export * from './primitives/toggle-group';
 export * from './primitives/tooltip';
 
 // Hooks
-export * from './hooks/use-mobile';
+export * from './primitives/use-mobile';
 
 // Utilities
 export * from './lib/utils';
