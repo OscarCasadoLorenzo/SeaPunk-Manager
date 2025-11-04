@@ -17,7 +17,6 @@ import {
 import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
-import { InventoryType } from './enums/inventory-type.enum';
 import { InventoriesService } from './inventories.service';
 
 @ApiTags('inventories')
@@ -56,7 +55,7 @@ export class InventoriesController {
   })
   findByCharacterIdAndType(
     @Param('characterId') characterId: string,
-    @Param('type') type: InventoryType
+    @Param('type') type: string
   ) {
     return this.inventoriesService.findByCharacterIdAndType(characterId, type);
   }

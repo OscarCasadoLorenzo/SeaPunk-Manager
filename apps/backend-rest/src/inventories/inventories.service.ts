@@ -2,7 +2,6 @@ import { Injectable } from '@nestjs/common';
 import { PrismaService } from '../prisma/prisma.service';
 import { CreateInventoryDto } from './dto/create-inventory.dto';
 import { UpdateInventoryDto } from './dto/update-inventory.dto';
-import { InventoryType } from './enums/inventory-type.enum';
 
 @Injectable()
 export class InventoriesService {
@@ -21,7 +20,7 @@ export class InventoriesService {
     }));
   }
 
-  async findByCharacterIdAndType(characterId: string, type: InventoryType) {
+  async findByCharacterIdAndType(characterId: string, type: string) {
     const items = await this.prisma.inventory.findMany({
       where: {
         characterId,

@@ -34,29 +34,37 @@ model Player {
 }
 
 model Character {
-  id            String        @id @default(cuid())
-  characterName String
-  archetype     String
-  faction       String
-  race          String
-  level         Int
-  category      String
-  epicPoints    Int
-  type          String
-  isNPC         Boolean       @default(false)
-  isVisible     Boolean       @default(true)
-  playerId      String
-  createdAt     DateTime      @default(now())
-  updatedAt     DateTime      @updatedAt
-  player        Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
-  attributes    Attribute?
-  domains       Domain?
-  combatStats   CombatStats?
-  narrative     Narrative?
-  inventories   Inventory[]
-  effects       Effect[]
-  essences      CharacterEssence[]
-  auraGifts     CharacterAuraGift[]
+  id                        String        @id @default(cuid())
+  characterName             String
+  archetype                 String
+  faction                   String
+  race                      String
+  level                     Int
+  category                  String
+  epicPoints                Int
+  type                      String
+  isNPC                     Boolean       @default(false)
+  isVisible                 Boolean       @default(true)
+  playerId                  String
+  // Legacy fields from old schema (restored for backward compatibility)
+  bcat                      Int           @default(0)
+  powerLevel                Int           @default(0)
+  physicalResistanceDomain  String?
+  mentalResistanceDomain    String?
+  defenseDomain             String?
+  attackDomain              String?
+  impactDomain              String?
+  createdAt                 DateTime      @default(now())
+  updatedAt                 DateTime      @updatedAt
+  player                    Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  attributes                Attribute?
+  domains                   Domain?
+  combatStats               CombatStats?
+  narrative                 Narrative?
+  inventories               Inventory[]
+  effects                   Effect[]
+  essences                  CharacterEssence[]
+  auraGifts                 CharacterAuraGift[]
 
   @@map("characters")
 }
@@ -141,15 +149,15 @@ enum InventoryType {
 }
 
 model Inventory {
-  id          String       @id @default(cuid())
+  id          String    @id @default(cuid())
   characterId String
   name        String
   description String?
-  quantity    Int         @default(1)
-  type        InventoryType
-  createdAt   DateTime    @default(now())
-  updatedAt   DateTime    @updatedAt
-  character   Character   @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  quantity    Int       @default(1)
+  type        String    // Changed from InventoryType enum to String for flexibility
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("inventories")
 }

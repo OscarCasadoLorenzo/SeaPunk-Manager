@@ -1,6 +1,5 @@
 import { ApiProperty } from '@nestjs/swagger';
-import { IsEnum, IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
-import { InventoryType } from '../enums/inventory-type.enum';
+import { IsInt, IsNotEmpty, IsString, Min } from 'class-validator';
 
 export class CreateInventoryDto {
   @ApiProperty({ description: 'Character ID' })
@@ -24,10 +23,10 @@ export class CreateInventoryDto {
   quantity: number;
 
   @ApiProperty({
-    description: 'Type of the item',
-    enum: InventoryType,
-    enumName: 'InventoryType',
+    description:
+      'Type of the item (e.g., "Weapon", "Armor", "Consumable", etc.)',
+    example: 'Consumible',
   })
-  @IsEnum(InventoryType)
-  type: InventoryType;
+  @IsString()
+  type: string;
 }
