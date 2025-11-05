@@ -6,22 +6,13 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateEffectDto } from './dto/create-effect.dto';
 import { UpdateEffectDto } from './dto/update-effect.dto';
 import { EffectsService } from './effects.service';
 
 @ApiTags('effects')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('effects')
 export class EffectsController {
   constructor(private readonly effectsService: EffectsService) {}

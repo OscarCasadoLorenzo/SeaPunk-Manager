@@ -6,22 +6,13 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreatePlayerDto } from './dto/create-player.dto';
 import { UpdatePlayerDto } from './dto/update-player.dto';
 import { PlayersService } from './players.service';
 
 @ApiTags('players')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('players')
 export class PlayersController {
   constructor(private readonly playersService: PlayersService) {}

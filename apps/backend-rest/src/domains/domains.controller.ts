@@ -6,22 +6,12 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiOperation, ApiResponse } from '@nestjs/swagger';
 import { DomainsService } from './domains.service';
 import { CreateDomainDto } from './dto/create-domain.dto';
 import { UpdateDomainDto } from './dto/update-domain.dto';
 
-@ApiTags('domains')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('domains')
 export class DomainsController {
   constructor(private readonly domainsService: DomainsService) {}

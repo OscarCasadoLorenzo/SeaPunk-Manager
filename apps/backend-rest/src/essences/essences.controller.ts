@@ -7,23 +7,14 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { CreateCharacterEssenceDto } from './dto/create-character-essence.dto';
 import { CreateEssenceDto } from './dto/create-essence.dto';
 import { UpdateEssenceDto } from './dto/update-essence.dto';
 import { EssencesService } from './essences.service';
 
 @ApiTags('essences')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('essences')
 export class EssencesController {
   constructor(private readonly essencesService: EssencesService) {}

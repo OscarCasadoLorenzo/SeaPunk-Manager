@@ -7,23 +7,14 @@ import {
   Patch,
   Post,
   Query,
-  UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AuraGiftsService } from './aura-gifts.service';
 import { CreateAuraGiftDto } from './dto/create-aura-gift.dto';
 import { CreateCharacterAuraGiftDto } from './dto/create-character-aura-gift.dto';
 import { UpdateAuraGiftDto } from './dto/update-aura-gift.dto';
 
 @ApiTags('aura-gifts')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('aura-gifts')
 export class AuraGiftsController {
   constructor(private readonly auraGiftsService: AuraGiftsService) {}

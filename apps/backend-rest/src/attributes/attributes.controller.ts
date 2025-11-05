@@ -6,22 +6,13 @@ import {
   Param,
   Patch,
   Post,
-  UseGuards,
 } from '@nestjs/common';
-import {
-  ApiBearerAuth,
-  ApiOperation,
-  ApiResponse,
-  ApiTags,
-} from '@nestjs/swagger';
-import { JwtAuthGuard } from '../auth/guards/jwt-auth.guard';
+import { ApiOperation, ApiResponse, ApiTags } from '@nestjs/swagger';
 import { AttributesService } from './attributes.service';
 import { CreateAttributeDto } from './dto/create-attribute.dto';
 import { UpdateAttributeDto } from './dto/update-attribute.dto';
 
 @ApiTags('attributes')
-@ApiBearerAuth()
-@UseGuards(JwtAuthGuard)
 @Controller('attributes')
 export class AttributesController {
   constructor(private readonly attributesService: AttributesService) {}
