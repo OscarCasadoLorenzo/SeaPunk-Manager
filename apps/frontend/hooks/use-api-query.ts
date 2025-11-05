@@ -1,18 +1,15 @@
 import { fetchApi } from '@/lib/api';
-import {
-  useMutation,
-  useQuery,
-} from '@tanstack/react-query';
+import { useMutation, useQuery } from '@tanstack/react-query';
 
-export function useApiQuery(
+export function useApiQuery<TData = unknown>(
   endpoint: string,
   config: any = {}
 ) {
   const { params, headers, ...queryOptions } = config;
 
-  return useQuery({
+  return useQuery<TData>({
     queryKey: [endpoint, params],
-    queryFn: () => fetchApi(endpoint, { headers }),
+    queryFn: () => fetchApi<TData>(endpoint, { headers }),
     ...queryOptions,
   });
 }

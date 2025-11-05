@@ -1,4 +1,5 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
+import { Character } from '@/types';
 import { useQueryClient } from '@tanstack/react-query';
 
 export const useCharacters = (params?: {
@@ -8,17 +9,17 @@ export const useCharacters = (params?: {
   archetype?: string;
   faction?: string;
 }) => {
-  return useApiQuery('/characters', { params });
+  return useApiQuery<Character[]>('/characters', { params });
 };
 
 export const useCharacter = (id: string) => {
-  return useApiQuery(`/characters/${id}`, {
+  return useApiQuery<Character>(`/characters/${id}`, {
     enabled: !!id,
   });
 };
 
 export const useCharacterWithDetails = (id: string) => {
-  return useApiQuery(`/characters/${id}/details`, {
+  return useApiQuery(`/characters/${id}`, {
     enabled: !!id,
   });
 };
@@ -48,19 +49,15 @@ export const useCreateCharacter = () => {
 export const useUpdateCharacter = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation(
-    '/characters',
-    'put',
-    {
-      onSuccess: (updatedCharacter: any, { id }: any) => {
-        queryClient.invalidateQueries({ queryKey: ['/characters'] });
-        queryClient.invalidateQueries({ queryKey: ['/characters', id] });
-        queryClient.invalidateQueries({
-          queryKey: ['/characters/player', updatedCharacter.playerId],
-        });
-      },
-    }
-  );
+  return useApiMutation('/characters', 'put', {
+    onSuccess: (updatedCharacter: any, { id }: any) => {
+      queryClient.invalidateQueries({ queryKey: ['/characters'] });
+      queryClient.invalidateQueries({ queryKey: ['/characters', id] });
+      queryClient.invalidateQueries({
+        queryKey: ['/characters/player', updatedCharacter.playerId],
+      });
+    },
+  });
 };
 
 export const useDeleteCharacter = () => {
