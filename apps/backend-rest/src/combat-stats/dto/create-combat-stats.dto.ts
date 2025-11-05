@@ -1,5 +1,4 @@
 export class CreateCombatStatsDto {
-  characterId?: string;
   physicalHealth: number;
   maxPhysicalHealth: number;
   physicalResistance: number;
@@ -8,15 +7,15 @@ export class CreateCombatStatsDto {
   maxMentalHealth: number;
   mentalResistance: number;
   maxMentalResistance: number;
-  auraHealth: number;
-  maxAuraHealth: number;
-  auraResistance: number;
-  maxAuraResistance: number;
+  auraHealth?: number;
+  maxAuraHealth?: number;
+  auraResistance?: number;
+  maxAuraResistance?: number;
   initiative: number;
-  armorClass: number;
-  conditions: string[];
-  defense: number;
-  attack: number;
-  impact: number;
-  maxDamage: number;
+  armorClass?: number;
+  conditions?: string[];
+  defense?: number;
+  attack?: number;
+  impact?: number;
+  maxDamage?: number;
 }
