@@ -8,20 +8,16 @@ export class InventoriesService {
   constructor(private prisma: PrismaService) {}
 
   async findByCharacterId(characterId: string) {
-    const items = await this.prisma.inventory.findMany({
+    return this.prisma.inventory.findMany({
       where: { characterId },
       include: {
         character: true,
       },
     });
-    return items.map((item) => ({
-      ...item,
-      itemName: item.name,
-    }));
   }
 
   async findByCharacterIdAndType(characterId: string, type: string) {
-    const items = await this.prisma.inventory.findMany({
+    return this.prisma.inventory.findMany({
       where: {
         characterId,
         type,
@@ -30,57 +26,37 @@ export class InventoriesService {
         character: true,
       },
     });
-    return items.map((item) => ({
-      ...item,
-      itemName: item.name,
-    }));
   }
 
   async findOne(id: string) {
-    const item = await this.prisma.inventory.findUnique({
+    return this.prisma.inventory.findUnique({
       where: { id },
       include: {
         character: true,
       },
     });
-    if (!item) {
-      return null;
-    }
-    return {
-      ...item,
-      itemName: item.name,
-    };
   }
 
   async create(createInventoryDto: CreateInventoryDto) {
-    const { characterId, itemName, ...rest } = createInventoryDto;
-    const item = await this.prisma.inventory.create({
+    const { characterId, ...rest } = createInventoryDto;
+    return this.prisma.inventory.create({
       data: {
         character: {
           connect: { id: characterId },
         },
-        name: itemName,
         ...rest,
       },
       include: {
         character: true,
       },
     });
-    return {
-      ...item,
-      itemName: item.name,
-    };
   }
 
   async update(id: string, updateInventoryDto: UpdateInventoryDto) {
-    const { characterId, itemName, ...rest } = updateInventoryDto;
+    const { characterId, ...rest } = updateInventoryDto;
     const updates: any = {
       ...rest,
     };
-
-    if (itemName) {
-      updates.name = itemName;
-    }
 
     if (characterId) {
       updates.character = {
@@ -88,18 +64,13 @@ export class InventoriesService {
       };
     }
 
-    const item = await this.prisma.inventory.update({
+    return this.prisma.inventory.update({
       where: { id },
       data: updates,
       include: {
         character: true,
       },
     });
-
-    return {
-      ...item,
-      itemName: item.name,
-    };
   }
 
   async remove(id: string) {

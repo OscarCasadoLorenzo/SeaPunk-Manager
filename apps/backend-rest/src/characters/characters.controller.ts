@@ -44,7 +44,7 @@ export class CharactersController {
   @ApiResponse({ status: 200, description: 'The character has been updated.' })
   update(
     @Param('id') id: string,
-    @Body() updateCharacterDto: Partial<Character>
+    @Body() updateCharacterDto: any // Allow flexible nested updates
   ): Promise<Character> {
     return this.charactersService.update(id, updateCharacterDto);
   }

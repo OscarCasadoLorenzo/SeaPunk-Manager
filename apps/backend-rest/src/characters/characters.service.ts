@@ -89,16 +89,45 @@ export class CharactersService {
 
   async update(
     id: string,
-    data: Partial<CreateCharacterDto>
+    data: any // Using any to allow flexible nested updates
   ): Promise<Character> {
-    const { attributes, domains, combatStats, ...characterData } = data;
+    const {
+      attributes,
+      domains,
+      combatStats,
+      narrative,
+      inventories,
+      ...characterData
+    } = data;
+
     return this.prisma.character.update({
       where: { id },
       data: {
         ...characterData,
-        attributes: attributes ? { update: attributes } : undefined,
-        domains: domains ? { update: domains } : undefined,
-        combatStats: combatStats ? { update: combatStats } : undefined,
+        attributes: attributes?.update
+          ? { update: attributes.update }
+          : attributes
+            ? { update: attributes }
+            : undefined,
+        domains: domains?.update
+          ? { update: domains.update }
+          : domains
+            ? { update: domains }
+            : undefined,
+        combatStats: combatStats?.update
+          ? { update: combatStats.update }
+          : combatStats
+            ? { update: combatStats }
+            : undefined,
+        narrative: narrative
+          ? {
+              upsert: {
+                create: narrative.update || narrative,
+                update: narrative.update || narrative,
+              },
+            }
+          : undefined,
+        // Note: Inventories are handled separately as they're a one-to-many relationship
       },
       include: {
         attributes: true,
