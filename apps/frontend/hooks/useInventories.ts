@@ -1,5 +1,6 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { fetchApi } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useInventories = (characterId: string) => {
   return useApiQuery(`/inventories/character/${characterId}`, {
@@ -37,14 +38,20 @@ export const useCreateInventory = () => {
 export const useUpdateInventory = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/inventories', 'put', {
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return fetchApi(`/inventories/${id}`, {
+        method: 'PATCH',
+        body: data,
+      });
+    },
     onSuccess: (updatedInventory: any, { id }: any) => {
-      queryClient.invalidateQueries({ queryKey: ['/inventories', id] });
+      queryClient.invalidateQueries({ queryKey: [`/inventories/${id}`] });
       queryClient.invalidateQueries({
-        queryKey: ['/inventories/character', updatedInventory.characterId],
+        queryKey: [`/inventories/character/${updatedInventory.characterId}`],
       });
       queryClient.invalidateQueries({
-        queryKey: ['/characters', updatedInventory.characterId],
+        queryKey: [`/characters/${updatedInventory.characterId}`],
       });
     },
   });

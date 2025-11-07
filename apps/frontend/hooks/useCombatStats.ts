@@ -1,5 +1,6 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { fetchApi } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useCombatStats = (characterId: string) => {
   return useApiQuery(`/combat-stats/character/${characterId}`, {
@@ -25,13 +26,19 @@ export const useCreateCombatStats = () => {
 export const useUpdateCombatStats = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/combat-stats', 'put', {
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return fetchApi(`/combat-stats/${id}`, {
+        method: 'PATCH',
+        body: data,
+      });
+    },
     onSuccess: (updatedCombatStats: any) => {
       queryClient.invalidateQueries({
-        queryKey: ['/combat-stats/character', updatedCombatStats.characterId],
+        queryKey: [`/combat-stats/character/${updatedCombatStats.characterId}`],
       });
       queryClient.invalidateQueries({
-        queryKey: ['/characters', updatedCombatStats.characterId],
+        queryKey: [`/characters/${updatedCombatStats.characterId}`],
       });
     },
   });

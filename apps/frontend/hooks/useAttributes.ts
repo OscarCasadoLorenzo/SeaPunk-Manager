@@ -1,5 +1,6 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { fetchApi } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useAttribute = (characterId: string) => {
   return useApiQuery(`/attributes/character/${characterId}`, {
@@ -25,7 +26,13 @@ export const useCreateAttribute = () => {
 export const useUpdateAttribute = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/attributes', 'put', {
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return fetchApi(`/attributes/${id}`, {
+        method: 'PATCH',
+        body: data,
+      });
+    },
     onSuccess: (updatedAttribute: any) => {
       queryClient.invalidateQueries({
         queryKey: ['/attributes/character', updatedAttribute.characterId],

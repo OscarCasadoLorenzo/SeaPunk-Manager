@@ -1,5 +1,6 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { fetchApi } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useDomain = (characterId: string) => {
   return useApiQuery(`/domains/character/${characterId}`, {
@@ -25,7 +26,13 @@ export const useCreateDomain = () => {
 export const useUpdateDomain = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/domains', 'put', {
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return fetchApi(`/domains/${id}`, {
+        method: 'PATCH',
+        body: data,
+      });
+    },
     onSuccess: (updatedDomain: any) => {
       queryClient.invalidateQueries({
         queryKey: ['/domains/character', updatedDomain.characterId],

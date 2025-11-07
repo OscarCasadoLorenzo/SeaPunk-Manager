@@ -1,6 +1,7 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
+import { fetchApi } from '@/lib/api';
 import { Character } from '@/types';
-import { useQueryClient } from '@tanstack/react-query';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useCharacters = (params?: {
   playerId?: string;
@@ -49,10 +50,16 @@ export const useCreateCharacter = () => {
 export const useUpdateCharacter = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/characters', 'put', {
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return fetchApi(`/characters/${id}`, {
+        method: 'PUT',
+        body: data,
+      });
+    },
     onSuccess: (updatedCharacter: any, { id }: any) => {
       queryClient.invalidateQueries({ queryKey: ['/characters'] });
-      queryClient.invalidateQueries({ queryKey: ['/characters', id] });
+      queryClient.invalidateQueries({ queryKey: [`/characters/${id}`] });
       queryClient.invalidateQueries({
         queryKey: ['/characters/player', updatedCharacter.playerId],
       });

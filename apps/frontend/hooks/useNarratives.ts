@@ -1,5 +1,6 @@
 import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { useQueryClient } from '@tanstack/react-query';
+import { fetchApi } from '@/lib/api';
+import { useMutation, useQueryClient } from '@tanstack/react-query';
 
 export const useNarrative = (characterId: string) => {
   return useApiQuery(`/narratives/character/${characterId}`, {
@@ -25,13 +26,19 @@ export const useCreateNarrative = () => {
 export const useUpdateNarrative = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/narratives', 'put', {
+  return useMutation({
+    mutationFn: async ({ id, data }: { id: string; data: any }) => {
+      return fetchApi(`/narratives/${id}`, {
+        method: 'PATCH',
+        body: data,
+      });
+    },
     onSuccess: (updatedNarrative: any) => {
       queryClient.invalidateQueries({
-        queryKey: ['/narratives/character', updatedNarrative.characterId],
+        queryKey: [`/narratives/character/${updatedNarrative.characterId}`],
       });
       queryClient.invalidateQueries({
-        queryKey: ['/characters', updatedNarrative.characterId],
+        queryKey: [`/characters/${updatedNarrative.characterId}`],
       });
     },
   });
