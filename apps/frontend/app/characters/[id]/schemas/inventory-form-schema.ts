@@ -10,13 +10,7 @@ export const inventoryFormSchema = z
       .number()
       .min(1, 'Quantity must be at least 1')
       .optional(),
-    newItemType: z
-      .enum(['Objeto', 'Consumible', 'placeholder'])
-      .optional()
-      .refine(
-        (val) => !val || val !== 'placeholder',
-        'Please select a valid item type'
-      ),
+    newItemType: z.enum(['Objeto', 'Consumible']).optional(),
 
     // Empty inventory message field
     emptyInventoryMessage: z.string().optional(),
