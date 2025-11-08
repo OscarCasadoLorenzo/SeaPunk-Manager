@@ -4,6 +4,19 @@ import { useApiQuery } from '@/hooks/use-api-query';
 
 import { LoadingSpinner } from './loading-spinner';
 
+// Define Character type locally or import from types
+type Character = {
+  id: string;
+  characterName: string;
+  level: number;
+  archetype: string;
+  faction?: string;
+  race?: string;
+  player?: {
+    playerName: string;
+  };
+};
+
 export function CharacterList() {
   const {
     data: characters,

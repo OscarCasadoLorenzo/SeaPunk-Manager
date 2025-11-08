@@ -1,13 +1,7 @@
 'use client';
 
-import { CharacterList } from '@/components/CharacterList';
-import { useQuery } from '@tanstack/react-query';
+import { CharacterList } from '@/components/character-list';
 
 export function CharacterListWithData() {
-  const { data: characters = [] } = useQuery({
-    queryKey: ['characters'],
-    queryFn: getCharacters,
-  });
-
-  return <CharacterList characters={characters} />;
+  return <CharacterList />;
 }
