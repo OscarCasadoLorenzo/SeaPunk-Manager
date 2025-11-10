@@ -90,17 +90,15 @@ export const FormBuilder = <T extends FieldValues = FieldValues>({
       {config.tabs ? (
         <Tabs defaultValue={config.tabs[0]?.id} className='w-full'>
           <TabsList
-            className={cn(
-              'grid w-full',
-              config.tabs.length === 2 && 'grid-cols-2',
-              config.tabs.length === 3 && 'grid-cols-1 sm:grid-cols-3',
-              config.tabs.length === 4 && 'grid-cols-2 sm:grid-cols-4',
-              config.tabs.length > 4 &&
-                'grid-cols-2 sm:grid-cols-3 lg:grid-cols-4'
-            )}
+            className='!flex !flex-col xs:!flex-row xs:justify-start h-auto p-1'
+            style={{ width: '100%' }}
           >
             {config.tabs.map((tab) => (
-              <TabsTrigger key={tab.id} value={tab.id}>
+              <TabsTrigger
+                key={tab.id}
+                value={tab.id}
+                className='w-full xs:w-auto xs:flex-1'
+              >
                 {tab.label}
               </TabsTrigger>
             ))}
