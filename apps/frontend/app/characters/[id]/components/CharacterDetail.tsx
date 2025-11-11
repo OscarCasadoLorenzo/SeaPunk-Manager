@@ -2,20 +2,11 @@
 
 import { useCharacterContext } from '@/contexts/CharacterContext';
 import { useCharacterWithDetails } from '@/hooks/useCharacters';
-import {
-  Card,
-  CardContent,
-  Skeleton,
-  Tabs,
-  TabsContent,
-  TabsList,
-  TabsTrigger,
-} from '@seapunk/ui';
+import { Card, CardContent, Skeleton } from '@seapunk/ui';
 import { useRouter } from 'next/navigation';
 import { useEffect } from 'react';
-import { InventoryTab } from './InventoryTab';
-import { NarrativeTab } from './NarrativeTab';
-import { StatsTab } from './StatsTab';
+import { useCharacterForm } from '../hooks/use-character-form';
+import { CharacterForm } from './CharacterForm';
 
 interface CharacterDetailProps {
   id: string;
@@ -35,6 +26,9 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
   const { data: character, isLoading: characterLoading } =
     useCharacterWithDetails(selectedCharacterId || id);
 
+  // Initialize form hook with character data
+  const { form, handleSubmit, isLoading } = useCharacterForm(character);
+
   const handleDeleteSuccess = () => {
     setSelectedCharacterId(null);
     router.push('/characters');
@@ -52,44 +46,14 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
     );
   }
 
-  const char = character as any;
-
   return (
     <div className='flex flex-col p-4 w-full max-w-6xl mx-auto'>
-      <div className='space-y-6'>
-        {/* Character header */}
-        <div className='flex justify-between items-start'>
-          <div className='space-y-2'>
-            <h1 className='text-3xl font-bold tracking-tight'>
-              Ficha de Personaje
-            </h1>
-            <p className='text-muted-foreground'>
-              Gestiona la información de {char.characterName}
-            </p>
-          </div>
-        </div>
-
-        {/* Tabbed forms */}
-        <Tabs defaultValue='stats' className='w-full'>
-          <TabsList className='grid w-full grid-cols-3'>
-            <TabsTrigger value='stats'>Estadísticas</TabsTrigger>
-            <TabsTrigger value='narrative'>Narrativa</TabsTrigger>
-            <TabsTrigger value='inventory'>Inventario</TabsTrigger>
-          </TabsList>
-
-          <TabsContent value='stats' className='space-y-6'>
-            <StatsTab character={char} />
-          </TabsContent>
-
-          <TabsContent value='narrative' className='space-y-6'>
-            <NarrativeTab character={char} />
-          </TabsContent>
-
-          <TabsContent value='inventory' className='space-y-6'>
-            <InventoryTab character={char} />
-          </TabsContent>
-        </Tabs>
-      </div>
+      <CharacterForm
+        character={character}
+        form={form}
+        onSubmit={handleSubmit}
+        isLoading={isLoading}
+      />
     </div>
   );
 }
