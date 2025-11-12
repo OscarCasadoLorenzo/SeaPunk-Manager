@@ -7,6 +7,8 @@
   ],
   "scripts": {
     "build": "turbo build",
+    "frontend:build": "cd apps/frontend && npm run build",
+    "backend:build": "cd apps/backend-rest && npm run build",
     "dev": "turbo dev",
     "lint": "turbo lint",
     "clean": "turbo clean",
@@ -26,4 +28,3 @@
     "node": ">=22.0.0"
   }
 }
-
