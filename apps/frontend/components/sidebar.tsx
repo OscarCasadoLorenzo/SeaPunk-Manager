@@ -1,6 +1,6 @@
 'use client';
 
-import { Dice6, Home, Settings, Swords, Users } from 'lucide-react';
+import { Dice6, Home, Settings, Users } from 'lucide-react';
 import Link from 'next/link';
 
 export function Sidebar() {
@@ -20,14 +20,6 @@ export function Sidebar() {
       >
         <Users className='h-6 w-6' />
         <span className='sr-only'>Characters</span>
-      </Link>
-
-      <Link
-        href='/combat'
-        className='rounded-lg p-2 hover:bg-accent hover:text-accent-foreground'
-      >
-        <Swords className='h-6 w-6' />
-        <span className='sr-only'>Combat</span>
       </Link>
 
       <Link
