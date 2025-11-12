@@ -17,6 +17,12 @@
     "declarationMap": true,
     "sourceMap": true
   },
-  "include": ["electron/**/*", "backend/**/*", "renderer/**/*"],
+  "include": [
+    "electron/**/*",
+    "backend/**/*",
+    "renderer/**/*",
+    "apps/frontend/services",
+    "apps/frontend/hooks"
+  ],
   "exclude": ["node_modules", "dist", "build"]
 }

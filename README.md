@@ -1,23 +1,32 @@
 # SeaPunk Manager
 
-A full-stack desktop application built with **Electron**, **React**, **Node.js**, and **PostgreSQL**. This modern task management application follows best practices for security, performance, and maintainability.
+A modern character and campaign management tool for SeaPunk RPG built with **Next.js 14**, **NestJS**, and **shadcn/ui** in a Turborepo monorepo.
 
-![SeaPunk Manager](https://via.placeholder.com/800x400?text=SeaPunk+Manager+Screenshot)
+## 🏗️ Project Structure
+
+```
+.
+├── apps/
+│   ├── frontend/        # Next.js 14 app with React 18 and shadcn/ui
+│   └── backend-rest/    # NestJS REST API server
+├── packages/
+│   ├── ui/             # Shared UI components based on shadcn/ui
+│   ├── types/          # Shared TypeScript types/interfaces
+│   └── config/         # Shared configurations (ESLint, Prettier, etc.)
+└── turbo.json          # Turborepo configuration
+```
 
 ## 🚀 Features
 
-- **Desktop Application**: Cross-platform Electron app for Windows, macOS, and Linux
-- **Modern UI**: React with TypeScript and Tailwind CSS
-- **Real-time Data**: TanStack Query (React Query) for efficient data fetching and caching
-- **Robust Backend**: Node.js with Express.js and PostgreSQL
-- **Type Safety**: Full TypeScript support across the entire stack
-- **Database ORM**: Prisma for type-safe database operations
-- **Security**: Content Security Policy, rate limiting, and secure communication
-- **Development Tools**: Hot reload, ESLint, and comprehensive error handling
+- **Modern Frontend**: Next.js 14 with App Router and React 18
+- **Type-Safe Backend**: NestJS with TypeScript and OpenAPI
+- **Shared UI Components**: shadcn/ui design system with TailwindCSS
+- **Monorepo Architecture**: Turborepo for optimal development workflow
+- **Database Access**: Prisma ORM for type-safe database operations
+- **API Integration**: TanStack Query for efficient data fetching
+- **Development Tools**: ESLint, Prettier, and Jest testing
 
 ## 🛠️ Tech Stack
-
-### Frontend (Renderer)
 
 - **React 18** - Modern React with hooks
 - **TypeScript** - Type safety and better development experience

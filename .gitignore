@@ -3,6 +3,9 @@ node_modules/
 dist/
 build/
 
+# Turborepo
+.turbo/
+
 # Environment files
 .env
 .env.local
