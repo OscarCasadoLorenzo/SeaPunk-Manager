@@ -1,3 +1,4 @@
+import { Sidebar } from '@/components/sidebar';
 import { type Metadata } from 'next';
 import { Inter } from 'next/font/google';
 import React from 'react';
@@ -19,7 +20,12 @@ export default function RootLayout({
   return (
     <html lang='en' suppressHydrationWarning>
       <body className={inter.className}>
-        <Providers>{children}</Providers>
+        <Providers>
+          <div className='flex h-screen'>
+            <Sidebar />
+            <main className='flex-1 overflow-y-auto'>{children}</main>
+          </div>
+        </Providers>
       </body>
     </html>
   );
