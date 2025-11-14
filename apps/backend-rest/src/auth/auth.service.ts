@@ -1,7 +1,12 @@
-import { Injectable } from "@nestjs/common";
+import {
+  ConflictException,
+  Injectable,
+  UnauthorizedException,
+} from "@nestjs/common";
 import { JwtService } from "@nestjs/jwt";
 import * as bcrypt from "bcrypt";
 import { UsersService } from "../users/users.service";
+import { LoginDto, RegisterDto } from "./dto";
 
 @Injectable()
 export class AuthService {
@@ -20,26 +25,55 @@ export class AuthService {
     return null;
   }
 
-  async login(user: any) {
-    const payload = { email: user.email, sub: user.id };
+  async login(loginDto: LoginDto) {
+    const user = await this.validateUser(loginDto.email, loginDto.password);
+
+    if (!user) {
+      throw new UnauthorizedException("Invalid credentials");
+    }
+
+    const payload = { email: user.email, sub: user.id, role: user.role };
+
     return {
       access_token: this.jwtService.sign(payload),
       user: {
         id: user.id,
         email: user.email,
         name: user.name,
+        role: user.role,
       },
     };
   }
 
-  async register(email: string, password: string, name: string) {
-    const hashedPassword = await bcrypt.hash(password, 10);
+  async register(registerDto: RegisterDto) {
+    // Check if user already exists
+    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    if (existingUser) {
+      throw new ConflictException("User with this email already exists");
+    }
+
+    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+
     const user = await this.usersService.create({
-      email,
+      email: registerDto.email,
       password: hashedPassword,
-      name,
+      name: registerDto.name,
+      // role defaults to PLAYER in the database schema
     });
 
-    return this.login(user);
+    // eslint-disable-next-line @typescript-eslint/no-unused-vars
+    const { password: _, ...userWithoutPassword } = user;
+
+    const payload = { email: user.email, sub: user.id, role: user.role };
+
+    return {
+      access_token: this.jwtService.sign(payload),
+      user: {
+        id: userWithoutPassword.id,
+        email: userWithoutPassword.email,
+        name: userWithoutPassword.name,
+        role: userWithoutPassword.role,
+      },
+    };
   }
 }
