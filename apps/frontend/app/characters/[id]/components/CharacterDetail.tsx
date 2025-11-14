@@ -1,19 +1,17 @@
-'use client';
+"use client";
 
-import { useCharacterContext } from '@/contexts/CharacterContext';
-import { useCharacterWithDetails } from '@/hooks/useCharacters';
-import { Card, CardContent, Skeleton } from '@seapunk/ui';
-import { useRouter } from 'next/navigation';
-import { useEffect } from 'react';
-import { useCharacterForm } from '../hooks/use-character-form';
-import { CharacterForm } from './CharacterForm';
+import { useCharacterContext } from "@/contexts/CharacterContext";
+import { useCharacterWithDetails } from "@/hooks/useCharacters";
+import { Card, CardContent, Skeleton } from "@seapunk/ui";
+import { useEffect } from "react";
+import { useCharacterForm } from "../hooks/use-character-form";
+import { CharacterForm } from "./CharacterForm";
 
 interface CharacterDetailProps {
   id: string;
 }
 
 export default function CharacterDetail({ id }: CharacterDetailProps) {
-  const router = useRouter();
   const { selectedCharacterId, setSelectedCharacterId } = useCharacterContext();
 
   // Set the selected character ID from the URL param
@@ -29,17 +27,12 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
   // Initialize form hook with character data
   const { form, handleSubmit, isLoading } = useCharacterForm(character);
 
-  const handleDeleteSuccess = () => {
-    setSelectedCharacterId(null);
-    router.push('/characters');
-  };
-
   if (characterLoading || !character) {
     return (
-      <div className='flex flex-col items-center justify-center p-4 w-full max-w-4xl mx-auto'>
-        <Card className='w-full'>
+      <div className="flex flex-col items-center justify-center p-4 w-full max-w-4xl mx-auto">
+        <Card className="w-full">
           <CardContent>
-            <Skeleton className='h-96 w-full' />
+            <Skeleton className="h-96 w-full" />
           </CardContent>
         </Card>
       </div>
@@ -47,7 +40,7 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
   }
 
   return (
-    <div className='flex flex-col p-4 w-full max-w-6xl mx-auto'>
+    <div className="flex flex-col p-4 w-full max-w-6xl mx-auto">
       <CharacterForm
         character={character}
         form={form}

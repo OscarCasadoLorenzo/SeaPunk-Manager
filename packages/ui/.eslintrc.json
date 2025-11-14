@@ -1,11 +1,10 @@
 {
-  "extends": ["@seapunk/config/eslint"],
-  "parserOptions": {
-    "project": "./tsconfig.json"
-  },
+  "extends": ["plugin:@typescript-eslint/recommended"],
+  "parser": "@typescript-eslint/parser",
+  "plugins": ["@typescript-eslint"],
   "rules": {
     "@typescript-eslint/no-explicit-any": "warn",
-    "react/prop-types": "off",
-    "react/display-name": "off"
+    "@typescript-eslint/explicit-function-return-type": "off",
+    "@typescript-eslint/explicit-module-boundary-types": "off"
   }
 }

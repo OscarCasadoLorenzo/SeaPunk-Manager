@@ -1,8 +1,8 @@
-import { Injectable } from '@nestjs/common';
-import * as bcrypt from 'bcrypt';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateUserDto } from './dto/create-user.dto';
-import { UpdateUserDto } from './dto/update-user.dto';
+import { Injectable } from "@nestjs/common";
+import * as bcrypt from "bcrypt";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateUserDto } from "./dto/create-user.dto";
+import { UpdateUserDto } from "./dto/update-user.dto";
 
 @Injectable()
 export class UsersService {
@@ -53,7 +53,7 @@ export class UsersService {
 
   async update(id: string, updateUserDto: UpdateUserDto) {
     const { password, ...rest } = updateUserDto;
-    let data: any = rest;
+    const data: any = { ...rest };
 
     if (password) {
       const hashedPassword = await bcrypt.hash(password, 10);

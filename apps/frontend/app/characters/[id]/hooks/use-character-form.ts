@@ -1,20 +1,16 @@
-'use client';
+"use client";
 
-import { useCharacterContext } from '@/contexts/CharacterContext';
-import { useUpdateCharacter } from '@/hooks/useCharacters';
-import {
-  useCreateInventory,
-  useDeleteInventory,
-  useUpdateInventory,
-} from '@/hooks/useInventories';
-import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import { z } from 'zod';
-import { inventoryFormSchema } from '../schemas/inventory-form-schema';
-import { narrativeFormSchema } from '../schemas/narrative-form-schema';
-import { statsFormSchema } from '../schemas/stats-form-schema';
+import { useCharacterContext } from "@/contexts/CharacterContext";
+import { useUpdateCharacter } from "@/hooks/useCharacters";
+import { useCreateInventory, useUpdateInventory } from "@/hooks/useInventories";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import { inventoryFormSchema } from "../schemas/inventory-form-schema";
+import { narrativeFormSchema } from "../schemas/narrative-form-schema";
+import { statsFormSchema } from "../schemas/stats-form-schema";
 
 // Combined schema for all tabs
 const characterFormSchema = statsFormSchema
@@ -37,18 +33,18 @@ export const useCharacterForm = (character: any) => {
   const updateCharacter = useUpdateCharacter();
   const createInventory = useCreateInventory();
   const updateInventory = useUpdateInventory();
-  const deleteInventory = useDeleteInventory();
+  // const deleteInventory = useDeleteInventory();
 
   // Extract default values
   const getDefaultValues = (): CharacterFormData => {
     const baseValues: CharacterFormData = {
       // Basic character info
-      playerName: character?.player?.playerName || '',
-      characterName: character?.characterName || '',
-      archetype: character?.archetype || '',
-      faction: character?.faction || '',
-      race: character?.race || '',
-      category: character?.category || '',
+      playerName: character?.player?.playerName || "",
+      characterName: character?.characterName || "",
+      archetype: character?.archetype || "",
+      faction: character?.faction || "",
+      race: character?.race || "",
+      category: character?.category || "",
       level: character?.level || 1,
       epicPoints: character?.epicPoints || 0,
 
@@ -87,18 +83,18 @@ export const useCharacterForm = (character: any) => {
       maxDamage: combatStats?.maxDamage || 0,
 
       // Narrative
-      physicalDescription: narrative?.physicalDescription || '',
-      externalProfile: narrative?.externalProfile || '',
-      internalProfile: narrative?.internalProfile || '',
-      background: narrative?.background || '',
-      specialties: narrative?.specialties || '',
+      physicalDescription: narrative?.physicalDescription || "",
+      externalProfile: narrative?.externalProfile || "",
+      internalProfile: narrative?.internalProfile || "",
+      background: narrative?.background || "",
+      specialties: narrative?.specialties || "",
 
       // Inventory (base fields)
-      newItemName: '',
-      newItemDescription: '',
+      newItemName: "",
+      newItemDescription: "",
       newItemQuantity: 1,
       newItemType: undefined,
-      emptyInventoryMessage: 'No hay objetos en el inventario',
+      emptyInventoryMessage: "No hay objetos en el inventario",
     };
 
     // Add dynamic inventory fields
@@ -106,12 +102,12 @@ export const useCharacterForm = (character: any) => {
       const dynamicFields = inventories.reduce(
         (acc: any, item: any) => {
           acc[`inventory_${item.id}_name`] = item.name;
-          acc[`inventory_${item.id}_description`] = item.description || '';
+          acc[`inventory_${item.id}_description`] = item.description || "";
           acc[`inventory_${item.id}_quantity`] = item.quantity;
           acc[`inventory_${item.id}_type`] = item.type;
           return acc;
         },
-        {} as Record<string, any>
+        {} as Record<string, any>,
       );
 
       return {
@@ -127,8 +123,8 @@ export const useCharacterForm = (character: any) => {
   const form = useForm<CharacterFormData>({
     resolver: zodResolver(characterFormSchema),
     defaultValues: getDefaultValues(),
-    mode: 'onChange',
-    reValidateMode: 'onChange',
+    mode: "onChange",
+    reValidateMode: "onChange",
     shouldFocusError: true,
   });
 
@@ -143,7 +139,7 @@ export const useCharacterForm = (character: any) => {
   // Submit handler
   const handleSubmit = async (data: CharacterFormData) => {
     if (!selectedCharacterId) {
-      toast.error('No hay personaje seleccionado');
+      toast.error("No hay personaje seleccionado");
       return;
     }
 
@@ -259,22 +255,22 @@ export const useCharacterForm = (character: any) => {
         await createInventory.mutateAsync({
           characterId: selectedCharacterId,
           name: data.newItemName,
-          description: data.newItemDescription || '',
+          description: data.newItemDescription || "",
           quantity: data.newItemQuantity || 1,
           type: data.newItemType as string,
         });
 
         // Reset new item fields
-        form.setValue('newItemName', '');
-        form.setValue('newItemDescription', '');
-        form.setValue('newItemQuantity', 1);
-        form.setValue('newItemType', undefined);
+        form.setValue("newItemName", "");
+        form.setValue("newItemDescription", "");
+        form.setValue("newItemQuantity", 1);
+        form.setValue("newItemType", undefined);
       }
 
-      toast.success('Personaje actualizado correctamente');
+      toast.success("Personaje actualizado correctamente");
     } catch (error) {
-      toast.error('Error al actualizar el personaje');
-      console.error('Error updating character:', error);
+      toast.error("Error al actualizar el personaje");
+      console.error("Error updating character:", error);
     }
   };
 
