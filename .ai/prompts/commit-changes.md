@@ -86,7 +86,7 @@ Each logical unit becomes **one commit** unless splitting results in clearer his
 
 For every group:
 
-- Determine the correct **Conventional Commit type**
+- Determine the correct **CONVENTIONAL_COMMIT_TYPE**
 - MUST: Apply the prefix (e.g., `SPM-5`)
 - Write a concise summary line
 - Add detailed bullet points describing what changed
