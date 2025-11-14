@@ -8,7 +8,7 @@
       "cache": true
     },
     "lint": {
-      "dependsOn": ["^build"],
+      "dependsOn": [],
       "outputs": []
     },
     "dev": {
@@ -20,9 +20,9 @@
       "cache": false
     },
     "test": {
-      "dependsOn": ["^build"],
+      "dependsOn": ["^test"],
       "outputs": ["coverage/**"],
-      "cache": false
+      "cache": true
     }
   }
 }
