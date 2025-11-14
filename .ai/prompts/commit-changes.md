@@ -42,7 +42,7 @@ Additionally, **every commit message must contain two extra sections**:
 
 ### **1. Short Description of What Changed**
 
-A clear, precise bullet list explaining what was modified, added, removed, or refactored.
+A clear, precise bulleted list explaining what was modified, added, removed, or refactored.
 
 ### **2. Context / Meaning of the Change**
 
