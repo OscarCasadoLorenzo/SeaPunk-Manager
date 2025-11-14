@@ -10,27 +10,23 @@ datasource db {
   url      = env("DATABASE_URL")
 }
 
-model User {
-  id        String   @id @default(cuid())
-  email     String   @unique
-  name      String
-  password  String
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
-
-  @@map("users")
+enum UserRole {
+  ADMIN
+  MASTER
+  PLAYER
 }
 
-
-
-model Player {
-  id         String      @id @default(cuid())
-  playerName String
-  createdAt  DateTime    @default(now())
-  updatedAt  DateTime    @updatedAt
+model User {
+  id        String      @id @default(cuid())
+  email     String      @unique
+  password  String      // hashed password
+  name      String
+  role      UserRole    @default(PLAYER)
+  createdAt DateTime    @default(now())
+  updatedAt DateTime    @updatedAt
   characters Character[]
 
-  @@map("players")
+  @@map("users")
 }
 
 model Character {
@@ -45,7 +41,7 @@ model Character {
   type                      String
   isNPC                     Boolean       @default(false)
   isVisible                 Boolean       @default(true)
-  playerId                  String
+  userId                    String
   // Legacy fields from old schema (restored for backward compatibility)
   bcat                      Int           @default(0)
   powerLevel                Int           @default(0)
@@ -56,7 +52,7 @@ model Character {
   impactDomain              String?
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
-  player                    Player        @relation(fields: [playerId], references: [id], onDelete: Cascade)
+  user                      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
   attributes                Attribute?
   domains                   Domain?
   combatStats               CombatStats?
