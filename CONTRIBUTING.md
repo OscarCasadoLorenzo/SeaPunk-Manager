@@ -39,7 +39,7 @@ Create a new issue or a discussion and describe the feature / fix / changes you 
 
 1. **Fork the repository**
 
-   In the upper right corner of the [repository main page](https://github.com/OscarCasadoLorenzo/SeaPunk-Manager/issues), find the `Fork` button. Click on it.
+   In the upper right corner of the [repository main page](https://github.com/OscarCasadoLorenzo/SeaPunk-Manager), find the `Fork` button. Click on it to create your own copy of the repository under your GitHub account.
 
 2. **Clone your fork locally**
 
