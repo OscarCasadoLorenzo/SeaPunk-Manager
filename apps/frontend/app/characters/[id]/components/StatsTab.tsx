@@ -1,29 +1,28 @@
-'use client';
+"use client";
 
-import { useStatsForm } from '../hooks/use-stats-form';
+import { useStatsForm } from "../hooks/use-stats-form";
 
 interface StatsTabProps {
   character: any;
 }
 
 export const StatsTab = ({ character }: StatsTabProps) => {
-  const { form, handleSubmit, isLoading, characterLoading } =
-    useStatsForm(character);
+  const { characterLoading } = useStatsForm(character);
 
   if (characterLoading) {
     return (
-      <div className='flex items-center justify-center p-8'>
+      <div className="flex items-center justify-center p-8">
         Cargando estadísticas...
       </div>
     );
   }
 
   return (
-    <div className='space-y-6'>
-      <h2 className='text-2xl font-bold'>Estadísticas</h2>
+    <div className="space-y-6">
+      <h2 className="text-2xl font-bold">Estadísticas</h2>
 
       {/* Basic Info */}
-      <div className='grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg'>
+      <div className="grid grid-cols-2 gap-4 p-4 bg-muted rounded-lg">
         <div>
           <strong>Jugador:</strong> {character?.player?.playerName}
         </div>
@@ -45,9 +44,9 @@ export const StatsTab = ({ character }: StatsTabProps) => {
       </div>
 
       {/* Attributes */}
-      <div className='p-4 bg-muted rounded-lg'>
-        <h3 className='font-bold mb-2'>Atributos</h3>
-        <div className='grid grid-cols-3 gap-2'>
+      <div className="p-4 bg-muted rounded-lg">
+        <h3 className="font-bold mb-2">Atributos</h3>
+        <div className="grid grid-cols-3 gap-2">
           <div>Fuerza: {character?.attributes?.strength}</div>
           <div>Agilidad: {character?.attributes?.agility}</div>
           <div>Voluntad: {character?.attributes?.willpower}</div>
@@ -57,9 +56,9 @@ export const StatsTab = ({ character }: StatsTabProps) => {
       </div>
 
       {/* Domains */}
-      <div className='p-4 bg-muted rounded-lg'>
-        <h3 className='font-bold mb-2'>Dominios</h3>
-        <div className='grid grid-cols-3 gap-2'>
+      <div className="p-4 bg-muted rounded-lg">
+        <h3 className="font-bold mb-2">Dominios</h3>
+        <div className="grid grid-cols-3 gap-2">
           <div>Físico: {character?.domains?.physical}</div>
           <div>Combate: {character?.domains?.combat}</div>
           <div>Social: {character?.domains?.social}</div>
@@ -70,9 +69,9 @@ export const StatsTab = ({ character }: StatsTabProps) => {
       </div>
 
       {/* Combat Stats */}
-      <div className='p-4 bg-muted rounded-lg'>
-        <h3 className='font-bold mb-2'>Estadísticas de Combate</h3>
-        <div className='grid grid-cols-2 gap-2'>
+      <div className="p-4 bg-muted rounded-lg">
+        <h3 className="font-bold mb-2">Estadísticas de Combate</h3>
+        <div className="grid grid-cols-2 gap-2">
           <div>
             Salud Física: {character?.combatStats?.physicalHealth}/
             {character?.combatStats?.maxPhysicalHealth}
