@@ -16,7 +16,7 @@ Every commit must also include a **short description of the changes made** and *
    - Example: `feature/SPM-5` → prefix:
 
      ```
-     SPM-5:
+     SPM-5
      ```
 
 3. All commit messages begin with:
