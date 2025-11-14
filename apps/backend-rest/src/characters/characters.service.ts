@@ -1,7 +1,7 @@
-import { Injectable } from '@nestjs/common';
-import { Character } from '@prisma/client';
-import { PrismaService } from '../prisma/prisma.service';
-import { CreateCharacterDto } from './dto/create-character.dto';
+import { Injectable } from "@nestjs/common";
+import { Character } from "@prisma/client";
+import { PrismaService } from "../prisma/prisma.service";
+import { CreateCharacterDto } from "./dto/create-character.dto";
 
 @Injectable()
 export class CharactersService {
@@ -89,14 +89,15 @@ export class CharactersService {
 
   async update(
     id: string,
-    data: any // Using any to allow flexible nested updates
+    data: any, // Using any to allow flexible nested updates
   ): Promise<Character> {
     const {
       attributes,
       domains,
       combatStats,
       narrative,
-      inventories,
+      // eslint-disable-next-line @typescript-eslint/no-unused-vars
+      inventories: _,
       ...characterData
     } = data;
 
