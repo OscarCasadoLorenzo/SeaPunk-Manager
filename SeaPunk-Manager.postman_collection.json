@@ -1,0 +1,1019 @@
+{
+  "info": {
+    "name": "SeaPunk Manager API",
+    "description": "Complete API collection for SeaPunk Manager - A character and campaign management tool for SeaPunk RPG",
+    "schema": "https://schema.getpostman.com/json/collection/v2.1.0/collection.json",
+    "_exporter_id": "seapunk-manager"
+  },
+  "auth": {
+    "type": "bearer",
+    "bearer": [
+      {
+        "key": "token",
+        "value": "{{auth_token}}",
+        "type": "string"
+      }
+    ]
+  },
+  "variable": [
+    {
+      "key": "base_url",
+      "value": "http://localhost:3001",
+      "type": "string"
+    },
+    {
+      "key": "auth_token",
+      "value": "",
+      "type": "string"
+    }
+  ],
+  "item": [
+    {
+      "name": "Authentication",
+      "item": [
+        {
+          "name": "Register",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 201) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('auth_token', response.access_token);",
+                  "    pm.collectionVariables.set('auth_token', response.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\",\n  \"name\": \"Test User\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/register",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "register"]
+            },
+            "description": "Register a new user account. Returns access token and user info with default PLAYER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Login",
+          "event": [
+            {
+              "listen": "test",
+              "script": {
+                "exec": [
+                  "if (pm.response.code === 200) {",
+                  "    const response = pm.response.json();",
+                  "    pm.environment.set('auth_token', response.access_token);",
+                  "    pm.collectionVariables.set('auth_token', response.access_token);",
+                  "}"
+                ],
+                "type": "text/javascript"
+              }
+            }
+          ],
+          "request": {
+            "auth": {
+              "type": "noauth"
+            },
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"email\": \"user@example.com\",\n  \"password\": \"password123\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/auth/login",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "login"]
+            },
+            "description": "Authenticate with email and password. Returns JWT access token and user info with role."
+          },
+          "response": []
+        },
+        {
+          "name": "Get Current User",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/auth/me",
+              "host": ["{{base_url}}"],
+              "path": ["auth", "me"]
+            },
+            "description": "Get current authenticated user information including role. Requires JWT authentication."
+          },
+          "response": []
+        }
+      ],
+      "description": "Authentication and authorization endpoints"
+    },
+    {
+      "name": "Characters",
+      "item": [
+        {
+          "name": "Get All Characters",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/characters",
+              "host": ["{{base_url}}"],
+              "path": ["characters"]
+            },
+            "description": "Retrieve all characters with their related data (attributes, domains, combat stats, etc.)"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Character by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/characters/:id",
+              "host": ["{{base_url}}"],
+              "path": ["characters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Character UUID"
+                }
+              ]
+            },
+            "description": "Get a specific character by ID with all related data"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Character",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterName\": \"Aragorn\",\n  \"archetype\": \"Ranger\",\n  \"faction\": \"Dunedain\",\n  \"race\": \"Human\",\n  \"level\": 1,\n  \"category\": \"Warrior\",\n  \"epicPoints\": 0,\n  \"type\": \"PC\",\n  \"isNPC\": false,\n  \"isVisible\": true,\n  \"userId\": \"user-uuid-here\",\n  \"attributes\": {\n    \"strength\": 10,\n    \"dexterity\": 10,\n    \"constitution\": 10,\n    \"intelligence\": 10,\n    \"wisdom\": 10,\n    \"charisma\": 10\n  },\n  \"domains\": {\n    \"physical\": 5,\n    \"mental\": 5,\n    \"social\": 5\n  },\n  \"combatStats\": {\n    \"hp\": 100,\n    \"maxHp\": 100,\n    \"armor\": 10,\n    \"initiative\": 5\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/characters",
+              "host": ["{{base_url}}"],
+              "path": ["characters"]
+            },
+            "description": "Create a new character with attributes, domains, and combat stats"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Character",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterName\": \"Updated Name\",\n  \"level\": 2,\n  \"epicPoints\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/characters/:id",
+              "host": ["{{base_url}}"],
+              "path": ["characters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Character UUID"
+                }
+              ]
+            },
+            "description": "Update character data including nested attributes, domains, and combat stats"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Character",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/characters/:id",
+              "host": ["{{base_url}}"],
+              "path": ["characters", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Character UUID"
+                }
+              ]
+            },
+            "description": "Delete a character by ID"
+          },
+          "response": []
+        }
+      ],
+      "description": "Character management endpoints"
+    },
+    {
+      "name": "Attributes",
+      "item": [
+        {
+          "name": "Get All Attributes",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attributes",
+              "host": ["{{base_url}}"],
+              "path": ["attributes"]
+            },
+            "description": "Get all character attributes"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Attribute by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attributes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["attributes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Attribute UUID"
+                }
+              ]
+            },
+            "description": "Get specific attribute by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Attribute",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterId\": \"character-uuid\",\n  \"strength\": 10,\n  \"dexterity\": 10,\n  \"constitution\": 10,\n  \"intelligence\": 10,\n  \"wisdom\": 10,\n  \"charisma\": 10\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/attributes",
+              "host": ["{{base_url}}"],
+              "path": ["attributes"]
+            },
+            "description": "Create character attributes"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Attribute",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"strength\": 12,\n  \"dexterity\": 11\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/attributes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["attributes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Attribute UUID"
+                }
+              ]
+            },
+            "description": "Update character attributes"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Attribute",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/attributes/:id",
+              "host": ["{{base_url}}"],
+              "path": ["attributes", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Attribute UUID"
+                }
+              ]
+            },
+            "description": "Delete character attributes"
+          },
+          "response": []
+        }
+      ],
+      "description": "Character attributes management"
+    },
+    {
+      "name": "Domains",
+      "item": [
+        {
+          "name": "Get All Domains",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/domains",
+              "host": ["{{base_url}}"],
+              "path": ["domains"]
+            },
+            "description": "Get all character domains"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Domain by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/domains/:id",
+              "host": ["{{base_url}}"],
+              "path": ["domains", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Domain UUID"
+                }
+              ]
+            },
+            "description": "Get specific domain by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Domain",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterId\": \"character-uuid\",\n  \"physical\": 5,\n  \"mental\": 5,\n  \"social\": 5,\n  \"combat\": 5,\n  \"magic\": 5\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/domains",
+              "host": ["{{base_url}}"],
+              "path": ["domains"]
+            },
+            "description": "Create character domains"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Domain",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"physical\": 6,\n  \"combat\": 7\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/domains/:id",
+              "host": ["{{base_url}}"],
+              "path": ["domains", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Domain UUID"
+                }
+              ]
+            },
+            "description": "Update character domains"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Domain",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/domains/:id",
+              "host": ["{{base_url}}"],
+              "path": ["domains", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Domain UUID"
+                }
+              ]
+            },
+            "description": "Delete character domains"
+          },
+          "response": []
+        }
+      ],
+      "description": "Character domains management"
+    },
+    {
+      "name": "Aura Gifts",
+      "item": [
+        {
+          "name": "Get All Aura Gifts",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/aura-gifts",
+              "host": ["{{base_url}}"],
+              "path": ["aura-gifts"]
+            },
+            "description": "Get all aura gifts"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Aura Gift by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/aura-gifts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["aura-gifts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Aura Gift UUID"
+                }
+              ]
+            },
+            "description": "Get specific aura gift by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Aura Gift",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fire Aura\",\n  \"description\": \"Grants fire resistance\",\n  \"type\": \"Defensive\",\n  \"level\": 1\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/aura-gifts",
+              "host": ["{{base_url}}"],
+              "path": ["aura-gifts"]
+            },
+            "description": "Create a new aura gift"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Aura Gift",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Enhanced Fire Aura\",\n  \"level\": 2\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/aura-gifts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["aura-gifts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Aura Gift UUID"
+                }
+              ]
+            },
+            "description": "Update an aura gift"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Aura Gift",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/aura-gifts/:id",
+              "host": ["{{base_url}}"],
+              "path": ["aura-gifts", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Aura Gift UUID"
+                }
+              ]
+            },
+            "description": "Delete an aura gift"
+          },
+          "response": []
+        }
+      ],
+      "description": "Aura gifts management"
+    },
+    {
+      "name": "Essences",
+      "item": [
+        {
+          "name": "Get All Essences",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/essences",
+              "host": ["{{base_url}}"],
+              "path": ["essences"]
+            },
+            "description": "Get all essences"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Essence by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/essences/:id",
+              "host": ["{{base_url}}"],
+              "path": ["essences", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Essence UUID"
+                }
+              ]
+            },
+            "description": "Get specific essence by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Essence",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Fire Essence\",\n  \"description\": \"Elemental fire power\",\n  \"type\": \"Elemental\",\n  \"rarity\": \"Rare\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/essences",
+              "host": ["{{base_url}}"],
+              "path": ["essences"]
+            },
+            "description": "Create a new essence"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Essence",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"name\": \"Greater Fire Essence\",\n  \"rarity\": \"Epic\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/essences/:id",
+              "host": ["{{base_url}}"],
+              "path": ["essences", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Essence UUID"
+                }
+              ]
+            },
+            "description": "Update an essence"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Essence",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/essences/:id",
+              "host": ["{{base_url}}"],
+              "path": ["essences", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Essence UUID"
+                }
+              ]
+            },
+            "description": "Delete an essence"
+          },
+          "response": []
+        }
+      ],
+      "description": "Essences management"
+    },
+    {
+      "name": "Effects",
+      "item": [
+        {
+          "name": "Get All Effects",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/effects",
+              "host": ["{{base_url}}"],
+              "path": ["effects"]
+            },
+            "description": "Get all effects"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Effect by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/effects/:id",
+              "host": ["{{base_url}}"],
+              "path": ["effects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Effect UUID"
+                }
+              ]
+            },
+            "description": "Get specific effect by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Effect",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterId\": \"character-uuid\",\n  \"name\": \"Poison\",\n  \"description\": \"Takes damage over time\",\n  \"duration\": 3,\n  \"type\": \"Debuff\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/effects",
+              "host": ["{{base_url}}"],
+              "path": ["effects"]
+            },
+            "description": "Create a new effect"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Effect",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"duration\": 5,\n  \"description\": \"Strong poison effect\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/effects/:id",
+              "host": ["{{base_url}}"],
+              "path": ["effects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Effect UUID"
+                }
+              ]
+            },
+            "description": "Update an effect"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Effect",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/effects/:id",
+              "host": ["{{base_url}}"],
+              "path": ["effects", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Effect UUID"
+                }
+              ]
+            },
+            "description": "Delete an effect"
+          },
+          "response": []
+        }
+      ],
+      "description": "Effects management"
+    },
+    {
+      "name": "Inventories",
+      "item": [
+        {
+          "name": "Get All Inventories",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/inventories",
+              "host": ["{{base_url}}"],
+              "path": ["inventories"]
+            },
+            "description": "Get all inventory items"
+          },
+          "response": []
+        },
+        {
+          "name": "Get Inventory by ID",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/inventories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["inventories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Inventory UUID"
+                }
+              ]
+            },
+            "description": "Get specific inventory item by ID"
+          },
+          "response": []
+        },
+        {
+          "name": "Create Inventory Item",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"characterId\": \"character-uuid\",\n  \"name\": \"Sword of Light\",\n  \"description\": \"A magical sword\",\n  \"quantity\": 1,\n  \"type\": \"WEAPON\",\n  \"weight\": 5,\n  \"value\": 1000\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/inventories",
+              "host": ["{{base_url}}"],
+              "path": ["inventories"]
+            },
+            "description": "Create a new inventory item. Type can be: WEAPON, ARMOR, CONSUMABLE, QUEST_ITEM, MISC"
+          },
+          "response": []
+        },
+        {
+          "name": "Update Inventory Item",
+          "request": {
+            "method": "PATCH",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"quantity\": 2,\n  \"description\": \"An enhanced magical sword\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/inventories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["inventories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Inventory UUID"
+                }
+              ]
+            },
+            "description": "Update an inventory item"
+          },
+          "response": []
+        },
+        {
+          "name": "Delete Inventory Item",
+          "request": {
+            "method": "DELETE",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/inventories/:id",
+              "host": ["{{base_url}}"],
+              "path": ["inventories", ":id"],
+              "variable": [
+                {
+                  "key": "id",
+                  "value": "",
+                  "description": "Inventory UUID"
+                }
+              ]
+            },
+            "description": "Delete an inventory item"
+          },
+          "response": []
+        }
+      ],
+      "description": "Inventory management"
+    },
+    {
+      "name": "Settings",
+      "item": [
+        {
+          "name": "Get Database Stats",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/settings/stats",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "stats"]
+            },
+            "description": "Get database statistics (character count, user count). Requires ADMIN or MASTER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Export Database Backup",
+          "request": {
+            "method": "GET",
+            "header": [],
+            "url": {
+              "raw": "{{base_url}}/settings/export",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "export"]
+            },
+            "description": "Export complete database backup as JSON. Requires ADMIN or MASTER role."
+          },
+          "response": []
+        },
+        {
+          "name": "Import Database Backup",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"metadata\": {\n    \"version\": \"1.0.0\",\n    \"timestamp\": \"2025-11-14T12:00:00Z\",\n    \"characterCount\": 10\n  },\n  \"data\": {\n    \"users\": [],\n    \"characters\": [],\n    \"attributes\": [],\n    \"domains\": [],\n    \"combatStats\": [],\n    \"narratives\": [],\n    \"inventories\": [],\n    \"effects\": [],\n    \"essences\": [],\n    \"auraGifts\": []\n  }\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings/import",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "import"]
+            },
+            "description": "Import database backup from JSON. Requires ADMIN role."
+          },
+          "response": []
+        },
+        {
+          "name": "Reset Database",
+          "request": {
+            "method": "POST",
+            "header": [
+              {
+                "key": "Content-Type",
+                "value": "application/json"
+              }
+            ],
+            "body": {
+              "mode": "raw",
+              "raw": "{\n  \"confirmation\": \"RESET_DATABASE\"\n}"
+            },
+            "url": {
+              "raw": "{{base_url}}/settings/reset",
+              "host": ["{{base_url}}"],
+              "path": ["settings", "reset"]
+            },
+            "description": "Reset entire database (WARNING: Deletes all data). Requires ADMIN role and confirmation string."
+          },
+          "response": []
+        }
+      ],
+      "description": "Database settings and administration (requires elevated permissions)"
+    }
+  ]
+}

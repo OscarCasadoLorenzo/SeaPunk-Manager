@@ -1,103 +1,150 @@
 # SeaPunk Manager
 
-A full-stack desktop application built with **Electron**, **React**, **Node.js**, and **PostgreSQL**. This modern task management application follows best practices for security, performance, and maintainability.
+A modern character and campaign management tool for SeaPunk RPG built with **Next.js 15**, **NestJS 10**, and **shadcn/ui** in a Turborepo monorepo.
 
-![SeaPunk Manager](https://via.placeholder.com/800x400?text=SeaPunk+Manager+Screenshot)
+## 🏗️ Project Structure
+
+```
+.
+├── apps/
+│   ├── frontend/           # Next.js 15 web application
+│   └── backend-rest/       # NestJS 10 REST API server
+├── packages/
+│   ├── ui/                # Shared UI components (shadcn/ui)
+│   ├── tsconfig/          # Shared TypeScript configurations
+│   └── config/            # Shared ESLint & Prettier configs
+├── turbo.json             # Turborepo pipeline configuration
+└── package.json           # Root workspace configuration
+```
 
 ## 🚀 Features
 
-- **Desktop Application**: Cross-platform Electron app for Windows, macOS, and Linux
-- **Modern UI**: React with TypeScript and Tailwind CSS
-- **Real-time Data**: TanStack Query (React Query) for efficient data fetching and caching
-- **Robust Backend**: Node.js with Express.js and PostgreSQL
-- **Type Safety**: Full TypeScript support across the entire stack
-- **Database ORM**: Prisma for type-safe database operations
-- **Security**: Content Security Policy, rate limiting, and secure communication
-- **Development Tools**: Hot reload, ESLint, and comprehensive error handling
+- **Modern Frontend**: Next.js 15 with App Router, React 19, and Server Components
+- **Type-Safe Backend**: NestJS 10 with TypeScript, Prisma ORM, and Swagger API docs
+- **Shared UI Library**: shadcn/ui components with Tailwind CSS 4 and Radix UI primitives
+- **Monorepo Architecture**: Turborepo for optimized builds and caching
+- **Database Access**: Prisma ORM with PostgreSQL for type-safe queries
+- **API Integration**: TanStack Query v5 for server state management
+- **Authentication**: JWT-based auth with Passport.js strategies
+- **Development Tools**: ESLint, Prettier, TypeScript strict mode
 
 ## 🛠️ Tech Stack
 
-### Frontend (Renderer)
+### Frontend (Next.js App)
 
-- **React 18** - Modern React with hooks
-- **TypeScript** - Type safety and better development experience
-- **Tailwind CSS** - Utility-first CSS framework
-- **TanStack Query** - Data fetching and state management
-- **React Router** - Client-side routing
-- **Lucide Icons** - Beautiful SVG icons
-- **Vite** - Fast build tool and development server
+- **Next.js 15** - React framework with App Router
+- **React 19** - Latest React with Server Components
+- **TypeScript 5** - Type safety and developer experience
+- **Tailwind CSS 4** - Utility-first CSS framework
+- **shadcn/ui** - High-quality UI components
+- **TanStack Query v5** - Data fetching and caching
+- **Radix UI** - Accessible component primitives
+- **Lucide React** - Beautiful SVG icons
 
-### Backend (API)
+### Backend (NestJS API)
 
-- **Node.js** (LTS) - JavaScript runtime
-- **Express.js** - Web application framework
+- **NestJS 10** - Progressive Node.js framework
+- **Node.js 22+** - JavaScript runtime
 - **PostgreSQL** - Relational database
-- **Prisma** - Database ORM and query builder
-- **TypeScript** - Type safety for backend code
-- **Security packages** - Helmet, CORS, rate limiting
+- **Prisma 5** - Next-generation ORM
+- **TypeScript 5** - Type safety for backend
+- **Passport.js** - Authentication middleware
+- **JWT** - JSON Web Tokens for auth
+- **Swagger/OpenAPI** - API documentation
+- **Class Validator** - Request validation
+- **Security**: Helmet, CORS, rate limiting
 
-### Desktop (Electron)
+### Shared Packages
 
-- **Electron** - Desktop app framework
-- **Security best practices** - Context isolation, preload scripts
-- **Cross-platform** - Windows, macOS, Linux support
+- **@seapunk/ui** - Shared React components library
+- **@seapunk/config** - ESLint and Prettier configurations
+- **@seapunk/tsconfig** - TypeScript base configurations
 
-## 📁 Project Structure
+## 📁 Detailed Project Structure
+
+### Apps
 
 ```
-SeaPunk-Manager/
-├── electron/                 # Electron main process
-│   ├── main.ts              # Main process entry point
-│   ├── preload.ts           # Preload script for security
-│   └── tsconfig.json        # TypeScript config for Electron
-├── backend/                 # Node.js API server
+apps/
+├── frontend/                # Next.js 15 Web Application
+│   ├── app/                # Next.js App Router (pages, layouts)
+│   ├── components/         # React components
+│   ├── contexts/           # React contexts
+│   ├── hooks/              # Custom React hooks (API, state management)
+│   ├── lib/                # Utility libraries (API client, Prisma)
+│   ├── types/              # TypeScript type definitions
+│   ├── utils/              # Helper functions
+│   └── package.json
+│
+└── backend-rest/           # NestJS 10 REST API
+    ├── src/
+    │   ├── main.ts         # Application entry point
+    │   ├── app.module.ts   # Root module
+    │   ├── [feature]/      # Feature modules (characters, players, auth, etc.)
+    │   │   ├── *.controller.ts
+    │   │   ├── *.service.ts
+    │   │   ├── *.module.ts
+    │   │   └── dto/        # Data Transfer Objects
+    │   └── prisma/         # Prisma service module
+    ├── prisma/
+    │   ├── schema.prisma   # Database schema
+    │   └── migrations/     # Database migrations
+    └── package.json
+```
+
+### Packages
+
+```
+packages/
+├── ui/                     # Shared UI Components Library
 │   ├── src/
-│   │   ├── routes/          # API routes
-│   │   ├── server.ts        # Express server setup
-│   │   └── seed.ts          # Database seeding script
-│   ├── prisma/
-│   │   └── schema.prisma    # Database schema
-│   └── package.json         # Backend dependencies
-├── renderer/                # React frontend
-│   ├── src/
-│   │   ├── components/      # Reusable UI components
-│   │   ├── pages/           # Page components
-│   │   ├── hooks/           # Custom React hooks
-│   │   ├── services/        # API service functions
-│   │   ├── types/           # TypeScript type definitions
-│   │   └── utils/           # Utility functions
-│   ├── public/              # Static assets
-│   └── package.json         # Frontend dependencies
-├── dist/                    # Build output
-├── build/                   # Electron build output
-└── package.json             # Root package.json
+│   │   ├── primitives/    # shadcn/ui base components (40+ components)
+│   │   ├── templates/     # Composite components
+│   │   ├── hooks/         # Custom UI hooks
+│   │   └── lib/           # Utilities (cn helper, etc.)
+│   └── package.json
+│
+├── config/                 # Shared Configurations
+│   ├── eslint/            # ESLint base config
+│   └── tsconfig/          # TypeScript base config
+│
+└── tsconfig/              # TypeScript Configurations
+    └── package.json
 ```
 
 ## 🔧 Prerequisites
 
 Before you begin, ensure you have the following installed:
 
-- **Node.js** (LTS version 18.x or higher)
-- **PostgreSQL** (12.x or higher)
-- **npm** or **yarn**
+- **Node.js** 22.0.0 or higher ([Download](https://nodejs.org/))
+- **npm** 10.9.0 or higher (comes with Node.js)
+- **PostgreSQL** 12.x or higher ([Download](https://www.postgresql.org/download/))
+- **Git** ([Download](https://git-scm.com/downloads))
 
-## 📦 Installation
+## 📦 Installation & Setup
 
-### 1. Clone the repository
+### 1. Clone the Repository
 
 ```bash
-git clone https://github.com/yourusername/seapunk-manager.git
-cd seapunk-manager
+git clone https://github.com/OscarCasadoLorenzo/SeaPunk-Manager.git
+cd SeaPunk-Manager
 ```
 
-### 2. Install dependencies
+### 2. Install Dependencies
 
 ```bash
-# Install root dependencies
+# Install all workspace dependencies (root, apps, and packages)
 npm install
-
-# This will automatically install backend and renderer dependencies
 ```
+
+This will install dependencies for:
+
+- Root workspace
+- `apps/frontend` - Next.js application
+- `apps/backend-rest` - NestJS API
+- `packages/ui` - Shared components
+- `packages/config` - Shared configurations
+- `packages/tsconfig` - Shared TypeScript configs
 
 ### 3. Database Setup
 
@@ -107,250 +154,186 @@ npm install
 # Connect to PostgreSQL
 psql -U postgres
 
-# Create database
+# Create database and user
 CREATE DATABASE seapunk_db;
-
-# Create user (optional)
-CREATE USER seapunk_user WITH ENCRYPTED PASSWORD 'your_password';
+CREATE USER seapunk_user WITH ENCRYPTED PASSWORD 'your_secure_password';
 GRANT ALL PRIVILEGES ON DATABASE seapunk_db TO seapunk_user;
+
+# Exit psql
+\q
 ```
 
-#### Configure Environment Variables
+#### Configure Backend Environment
+
+Create `.env` file in `apps/backend-rest/`:
 
 ```bash
-# Copy the example environment file
-cp .env.example .env
+# Navigate to backend
+cd apps/backend-rest
 
-# Edit the .env file with your database credentials
-DATABASE_URL="postgresql://username:password@localhost:5432/seapunk_db"
-PORT=3001
+# Create .env file
+cat > .env << 'EOF'
+# Database
+DATABASE_URL="postgresql://seapunk_user:your_secure_password@localhost:5432/seapunk_db"
+
+# Server
 NODE_ENV=development
-ELECTRON_IS_DEV=true
+PORT=3001
+
+# JWT Authentication
+JWT_SECRET="your-super-secret-jwt-key-change-this-in-production"
+JWT_EXPIRATION=7d
+
+# CORS (frontend URL)
+FRONTEND_URL=http://localhost:3000
+EOF
 ```
 
 #### Run Database Migrations
 
 ```bash
-# Navigate to backend directory
-cd backend
+# Still in apps/backend-rest/
+npx prisma generate
+npx prisma migrate deploy
 
-# Generate Prisma client
-npm run db:generate
-
-# Run migrations
-npm run db:migrate
-
-# Seed the database with sample data
+# Optional: Seed database with sample data
 npm run db:seed
+```
+
+### 4. Configure Frontend Environment (Optional)
+
+Create `.env.local` file in `apps/frontend/`:
+
+```bash
+cd apps/frontend
+
+cat > .env.local << 'EOF'
+# API Configuration
+NEXT_PUBLIC_API_URL=http://localhost:3001
+EOF
 ```
 
 ## 🚀 Development
 
-### Start the Development Environment
+### Start Full Stack Development
+
+From the **root directory**, run:
 
 ```bash
-# From the root directory
 npm run dev
 ```
 
-This command will:
+This will start:
 
-1. Start the backend API server on `http://localhost:3001`
-2. Start the Electron app with hot reload
+- **Backend API** on `http://localhost:3001`
+- **Frontend Web** on `http://localhost:3000`
 
-### Individual Development Commands
+Both services will run with hot-reload enabled.
+
+#### Backend Only
 
 ```bash
-# Backend only
-npm run dev:backend
-
-# Frontend only (for web development)
-cd renderer && npm run dev
-
-# Electron only (requires backend to be running)
-npm run dev:electron
+# From root
+cd apps/backend-rest
+npm run dev
 ```
+
+The API will be available at `http://localhost:3001/api`
+
+Swagger documentation: `http://localhost:3001/api`
+
+#### Frontend Only
+
+```bash
+# From root
+cd apps/frontend
+npm run dev
+```
+
+The web app will be available at `http://localhost:3000`
 
 ### Database Management
 
+#### Prisma Studio (Visual Database Browser)
+
 ```bash
-# Open Prisma Studio (Database GUI)
-cd backend && npm run db:studio
-
-# Reset database
-cd backend && npx prisma migrate reset
-
-# Generate Prisma client after schema changes
-cd backend && npm run db:generate
+cd apps/backend-rest
+npm run db:studio
 ```
 
-## 🏗️ Building for Production
+Opens Prisma Studio at `http://localhost:5555`
 
-### Build All Components
+#### Reset Database
 
 ```bash
-npm run build
+cd apps/backend-rest
+npm run db:reset
 ```
 
-### Build Individual Components
+⚠️ **Warning**: This will delete all data!
+
+### Environment Variables for Production
+
+#### Backend (.env)
 
 ```bash
-# Backend
-npm run build:backend
-
-# Frontend
-npm run build:renderer
-
-# Electron
-npm run build:electron
+DATABASE_URL=postgresql://user:pass@host:5432/db
+NODE_ENV=production
+PORT=10000
+JWT_SECRET=your-production-secret
+JWT_EXPIRATION=7d
+FRONTEND_URL=https://your-frontend-url.com
 ```
 
-## 📦 Packaging
-
-### Package for Current Platform
+#### Frontend (.env.local)
 
 ```bash
-npm run package
-```
-
-### Package for Specific Platforms
-
-```bash
-# Windows
-npm run package:win
-
-# macOS
-npm run package:mac
-```
-
-The packaged applications will be available in the `build/` directory.
-
-## 🔒 Security Features
-
-- **Content Security Policy** - Prevents XSS attacks
-- **Context Isolation** - Secure communication between processes
-- **Preload Scripts** - Secure API exposure to renderer
-- **Rate Limiting** - API protection against abuse
-- **Input Validation** - Server-side validation
-- **CORS Configuration** - Secure cross-origin requests
-
-## 🧪 Testing
-
-```bash
-# Run type checking
-npm run type-check
-
-# Run linting
-npm run lint
-
-# Fix linting issues
-npm run lint -- --fix
-```
-
-## 📚 API Documentation
-
-### Users API
-
-- `GET /api/users` - Get all users
-- `GET /api/users/:id` - Get user by ID
-- `POST /api/users` - Create new user
-- `PUT /api/users/:id` - Update user
-- `DELETE /api/users/:id` - Delete user
-
-### Tasks API
-
-- `GET /api/tasks` - Get all tasks (with optional filters)
-- `GET /api/tasks/:id` - Get task by ID
-- `POST /api/tasks` - Create new task
-- `PUT /api/tasks/:id` - Update task
-- `DELETE /api/tasks/:id` - Delete task
-
-### Query Parameters
-
-```bash
-# Filter tasks
-GET /api/tasks?userId=123&completed=false&priority=HIGH
+NEXT_PUBLIC_API_URL=https://your-api-url.com
 ```
 
 ## 🔧 Configuration
 
 ### Environment Variables
 
-| Variable          | Description                  | Default     |
-| ----------------- | ---------------------------- | ----------- |
-| `DATABASE_URL`    | PostgreSQL connection string | -           |
-| `PORT`            | Backend server port          | 3001        |
-| `NODE_ENV`        | Environment mode             | development |
-| `ELECTRON_IS_DEV` | Electron development mode    | true        |
+#### Backend (`apps/backend-rest/.env`)
 
-### Database Schema
+| Variable         | Description                  | Required | Default     | Example                                    |
+| ---------------- | ---------------------------- | -------- | ----------- | ------------------------------------------ |
+| `DATABASE_URL`   | PostgreSQL connection string | ✅       | -           | `postgresql://user:pass@localhost:5432/db` |
+| `NODE_ENV`       | Environment mode             | ✅       | development | `development`, `production`                |
+| `PORT`           | Backend server port          | ✅       | 3001        | `3001`, `10000` (Render)                   |
+| `JWT_SECRET`     | Secret key for JWT signing   | ✅       | -           | `your-super-secret-key`                    |
+| `JWT_EXPIRATION` | JWT token expiration time    | ❌       | 7d          | `7d`, `24h`, `30m`                         |
+| `FRONTEND_URL`   | Frontend URL for CORS        | ❌       | \*          | `http://localhost:3000`                    |
 
-The application uses the following main entities:
+#### Frontend (`apps/frontend/.env.local`)
 
-- **Users**: User accounts with authentication
-- **Tasks**: Task management with priorities and due dates
+| Variable              | Description          | Required | Default               | Example                   |
+| --------------------- | -------------------- | -------- | --------------------- | ------------------------- |
+| `NEXT_PUBLIC_API_URL` | Backend API base URL | ❌       | http://localhost:3001 | `https://api.example.com` |
 
-## 🚨 Troubleshooting
+### Turborepo Configuration
 
-### Common Issues
+The `turbo.json` file defines the build pipeline:
 
-1. **Database Connection Error**
-
-   - Ensure PostgreSQL is running
-   - Check connection string in `.env`
-   - Verify database exists
-
-2. **Port Already in Use**
-
-   - Change `PORT` in `.env` file
-   - Kill existing processes: `lsof -ti:3001 | xargs kill`
-
-3. **Build Errors**
-
-   - Clear node_modules: `rm -rf node_modules && npm install`
-   - Clear build cache: `npm run clean`
-
-4. **Electron Won't Start**
-   - Ensure backend is running first
-   - Check for TypeScript compilation errors
-
-### Debug Mode
-
-```bash
-# Enable debug logging
-DEBUG=* npm run dev
-
-# Backend debug only
-cd backend && DEBUG=express:* npm run dev
+```json
+{
+  "pipeline": {
+    "build": {
+      "dependsOn": ["^build"],
+      "outputs": ["dist/**", ".next/**"]
+    },
+    "dev": {
+      "cache": false,
+      "persistent": true
+    },
+    "lint": {
+      "dependsOn": ["^build"]
+    }
+  }
+}
 ```
-
-## 🤝 Contributing
-
-1. Fork the repository
-2. Create a feature branch: `git checkout -b feature/amazing-feature`
-3. Commit your changes: `git commit -m 'Add amazing feature'`
-4. Push to the branch: `git push origin feature/amazing-feature`
-5. Open a Pull Request
 
 ## 📄 License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-
-## 👨‍💻 Author
-
-**Your Name**
-
-- GitHub: [@yourusername](https://github.com/yourusername)
-- LinkedIn: [Your LinkedIn](https://linkedin.com/in/yourprofile)
-
-## 🙏 Acknowledgments
-
-- [Electron](https://electronjs.org/) - Desktop app framework
-- [React](https://reactjs.org/) - Frontend library
-- [Prisma](https://prisma.io/) - Database ORM
-- [TanStack Query](https://tanstack.com/query) - Data fetching library
-- [Tailwind CSS](https://tailwindcss.com/) - CSS framework
-
----
-
-**Made with ❤️ using modern web technologies**
