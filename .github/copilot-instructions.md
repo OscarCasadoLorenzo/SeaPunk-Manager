@@ -1,214 +1,60 @@
-# Copilot Instructions
+# GitHub Copilot Instructions for SeaPunk Manager
 
-## Repository Overview
+## AI Agent Configuration Reference
 
-SeaPunk Manager is a TypeScript-based web application for managing a tabletop RPG game system. It's a monorepo using Turborepo for workspace management, consisting of:
+**All AI coding assistance for this project must follow the guidelines defined in [`AGENTS.md`](../AGENTS.md).**
 
-- Next.js frontend (React)
-- NestJS backend (REST API)
-- Shared UI library
-- Shared types package
-- Configuration packages
+The `AGENTS.md` file provides a centralized reference to:
 
-**Tech Stack:**
+- **Context Files** (`.ai/context/`) - Project background and domain knowledge
+- **Prompt Files** (`.ai/prompts/`) - Automated workflows like commit generation
+- **Rules Files** (`.ai/rules/`) - Coding standards for architecture, security, style, and testing
 
-- TypeScript (strict mode)
-- Next.js 14 (app router)
-- NestJS 10
-- Prisma ORM
-- TanStack Query
-- Tailwind CSS
-- Shadcn/ui components
+---
 
-## Project Layout
+## Quick Reference
 
-### Key Directories
+### 📁 Key Configuration Files
 
-```
-/
-├── apps/
-│   ├── frontend/          # Next.js application
-│   └── backend-rest/      # NestJS REST API
-├── packages/
-│   ├── ui/               # Shared UI components
-│   ├── types/            # Shared TypeScript types
-│   └── config/           # Shared configurations
-```
+| File                            | Purpose                                              |
+| ------------------------------- | ---------------------------------------------------- |
+| `.ai/context/project.md`        | Project overview and architecture summary            |
+| `.ai/prompts/commit-changes.md` | Conventional Commits workflow with GitFlow           |
+| `.ai/rules/architecture.md`     | Monorepo structure and module organization           |
+| `.ai/rules/security.md`         | Security best practices and vulnerability prevention |
+| `.ai/rules/style.md`            | TypeScript, React, and NestJS code style conventions |
+| `.ai/rules/testing.md`          | Testing requirements and coverage expectations       |
 
-### Critical Configuration Files
+### 🚨 Important Rules
 
-- `/turbo.json` - Turborepo configuration
-- `/apps/frontend/next.config.js` - Next.js configuration
-- `/apps/backend-rest/nest-cli.json` - NestJS configuration
-- `/apps/backend-rest/prisma/schema.prisma` - Database schema
-- `/packages/config/eslint/index.js` - Shared ESLint config
+1. **Always follow** the rules defined in `.ai/rules/`
+2. **Ask the user** when conflicts arise between rules
+3. **Never compromise** on security guidelines
+4. **Use Conventional Commits** format with GitFlow branch prefixes (e.g., `SPM-5 feat: ...`)
+5. **Maintain monorepo structure** as defined in architecture rules
 
-## Build and Development Instructions
+---
 
-### Environment Setup
+## For GitHub Copilot
 
-1. Node.js version: 18.x or higher
-2. Required global packages:
+When providing code suggestions:
 
-```bash
-npm install -g turbo
-```
+- ✅ Follow TypeScript strict mode requirements
+- ✅ Use established patterns from `architecture.md`
+- ✅ Apply security practices from `security.md`
+- ✅ Match code style conventions from `style.md`
+- ✅ Include test cases as specified in `testing.md`
 
-### First-time Setup
+---
 
-```bash
-# Install all dependencies (ALWAYS run this first)
-npm install
-# Initialize database (required for backend)
-cd apps/backend-rest
-npx prisma generate
-npx prisma db push
-```
+## Conflict Resolution
 
-### Development Workflow
+If you encounter conflicting requirements:
 
-#### Starting Development Servers
+1. **Stop and ask the user** which approach to take
+2. **Reference the specific rules** that are in conflict
+3. **Propose solutions** based on the priority order in `AGENTS.md`
 
-```bash
-# From repository root:
-npm run dev     # Starts all workspaces
-# Or individually:
-cd apps/frontend && npm run dev
-cd apps/backend-rest && npm run dev
-```
+---
 
-Expected startup times:
-
-- Frontend: ~10 seconds
-- Backend: ~5 seconds
-- Full stack: ~15 seconds
-
-#### Building
-
-```bash
-# From repository root:
-npm run build   # Builds all workspaces
-```
-
-⚠️ Important: Always build packages in this order:
-
-1. `packages/ui`
-2. `apps/*`
-
-### Validation Steps
-
-#### Linting
-
-```bash
-npm run lint    # Lints all workspaces
-```
-
-Common lint errors:
-
-- Unused imports: Run `npm run lint:fix`
-- Import order: Ensure imports follow pattern: external -> internal -> types
-
-#### Testing
-
-```bash
-npm run test    # Runs all tests
-```
-
-#### Type Checking
-
-```bash
-npm run typecheck  # Checks types in all workspaces
-```
-
-### Common Issues & Solutions
-
-1. **Prisma Client Generation**
-   - Error: `PrismaClientInitializationError`
-   - Solution: Run `npx prisma generate` in `apps/backend-rest`
-
-2. **Next.js Build Failures**
-   - Error: `Error: Cannot find module '@seapunk/ui'`
-   - Solution: Build packages first: `cd packages/ui && npm run build`
-
-## Architecture Guidelines
-
-### Frontend Structure
-
-- Pages: `/apps/frontend/app/**/page.tsx`
-- Components:
-  - Shared: `/apps/frontend/components/`
-  - Feature-specific: `/apps/frontend/app/**/components/`
-- Hooks: `/apps/frontend/hooks/`
-- Services: `/apps/frontend/services/`
-
-### Backend Structure
-
-- Modules: `/apps/backend-rest/src/**/`
-- DTOs: `/apps/backend-rest/src/**/dto/`
-- Services: `/apps/backend-rest/src/**/services/`
-
-### Shared Packages
-
-- UI Components: `/packages/ui/src/components/`
-
-## Continuous Integration
-
-GitHub Actions workflow runs:
-
-1. Type checking
-2. Linting
-3. Tests
-4. Build verification
-
-Success criteria:
-
-- No TypeScript errors
-- No lint errors
-- All tests passing
-- Successful build of all workspaces
-
-## Best Practices
-
-1. **Type Safety**
-   - Use strict TypeScript
-   - No `any` types
-   - Prefer interfaces over types
-
-2. **Component Structure**
-   - Business logic in hooks
-   - UI logic in components
-   - Data fetching via services
-
-3. **State Management**
-   - Use TanStack Query for server state
-   - Local state with React hooks
-   - No global state management
-
-4. **API Calls**
-   - Use service layer abstractions
-   - Type all request/response DTOs
-   - Handle errors consistently
-
-## Package-Specific Guidelines
-
-Each package and app in the monorepo has its own README with detailed best practices:
-
-- Frontend App (`apps/frontend/README.md`):
-  - Component architecture
-  - State management
-  - Performance optimization
-  - Testing requirements
-
-- Backend REST API (`apps/backend-rest/README.md`):
-  - Module organization
-  - Controller design
-  - Database practices
-  - Security guidelines
-
-- UI Package (`packages/ui/README.md`):
-  - Component design
-  - Accessibility requirements
-  - Styling guidelines
-  - Testing specifications
-
-Trust these instructions for initial guidance. Only perform additional searches if specific information is missing or needs verification.
+**For complete details, see [`AGENTS.md`](../AGENTS.md)**
