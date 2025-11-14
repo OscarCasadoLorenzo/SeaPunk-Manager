@@ -9,14 +9,8 @@ export class UsersService {
   constructor(private prisma: PrismaService) {}
 
   async create(createUserDto: CreateUserDto) {
-    const { password, ...rest } = createUserDto;
-    const hashedPassword = await bcrypt.hash(password, 10);
-
     return this.prisma.user.create({
-      data: {
-        ...rest,
-        password: hashedPassword,
-      },
+      data: createUserDto,
     });
   }
 
@@ -26,6 +20,7 @@ export class UsersService {
         id: true,
         email: true,
         name: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -39,6 +34,7 @@ export class UsersService {
         id: true,
         email: true,
         name: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },
@@ -67,6 +63,7 @@ export class UsersService {
         id: true,
         email: true,
         name: true,
+        role: true,
         createdAt: true,
         updatedAt: true,
       },

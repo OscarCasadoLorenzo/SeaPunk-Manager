@@ -1,20 +1,21 @@
-'use client';
+"use client";
 
-import { useState } from 'react';
-import { DiceRoller } from './components/DiceRoller';
-import type { DiceResult } from './types';
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { useState } from "react";
+import { DiceRoller } from "./components/DiceRoller";
+import type { DiceResult } from "./types";
 
-export default function DicePage() {
+function DicePageContent() {
   const [diceResult, setDiceResult] = useState<DiceResult | null>(null);
 
   const handleRoll = (
     sides: number,
     modifier: number,
-    count: number
+    count: number,
   ): DiceResult => {
     // Roll dice
     const rolls = Array.from({ length: count }, () =>
-      Math.floor(Math.random() * sides + 1)
+      Math.floor(Math.random() * sides + 1),
     );
 
     // Calculate total
@@ -32,7 +33,7 @@ export default function DicePage() {
         acc[key] = (acc[key] || 0) + 1;
         return acc;
       },
-      {} as Record<string, number>
+      {} as Record<string, number>,
     );
 
     const result: DiceResult = {
@@ -51,11 +52,19 @@ export default function DicePage() {
   };
 
   return (
-    <div className='container mx-auto py-6'>
-      <h1 className='text-3xl font-bold mb-6'>Dice Roller</h1>
-      <div className='grid grid-cols-1 md:grid-cols-2 gap-6'>
+    <div className="container mx-auto py-6">
+      <h1 className="text-3xl font-bold mb-6">Dice Roller</h1>
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <DiceRoller diceResult={diceResult} onRoll={handleRoll} />
       </div>
     </div>
+  );
+}
+
+export default function DicePage() {
+  return (
+    <ProtectedRoute>
+      <DicePageContent />
+    </ProtectedRoute>
   );
 }

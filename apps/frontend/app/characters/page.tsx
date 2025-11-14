@@ -1,9 +1,10 @@
-'use client';
+"use client";
 
-import { useCharacterContext } from '@/contexts/CharacterContext';
-import { useCharacters } from '@/hooks';
-import { Character } from '@/types';
-import { FormBuilder } from '@/utils/form-builder';
+import { ProtectedRoute } from "@/components/ProtectedRoute";
+import { useCharacterContext } from "@/contexts/CharacterContext";
+import { useCharacters } from "@/hooks";
+import { Character } from "@/types";
+import { FormBuilder } from "@/utils/form-builder";
 import {
   Button,
   Card,
@@ -16,13 +17,13 @@ import {
   DialogTitle,
   DialogTrigger,
   Skeleton,
-} from '@seapunk/ui';
-import { Plus } from 'lucide-react';
-import { useEffect } from 'react';
-import CharacterDetail from './[id]/components/CharacterDetail';
-import { useCreateCharacterLogic } from './useCreateCharacterLogic';
+} from "@seapunk/ui";
+import { Plus } from "lucide-react";
+import { useEffect } from "react";
+import CharacterDetail from "./[id]/components/CharacterDetail";
+import { useCreateCharacterLogic } from "./useCreateCharacterLogic";
 
-export default function CharacterList() {
+function CharacterListContent() {
   const { data, isLoading, isError } = useCharacters();
   const { selectedCharacterId, setSelectedCharacterId } = useCharacterContext();
   const {
@@ -36,8 +37,8 @@ export default function CharacterList() {
   } = useCreateCharacterLogic();
 
   useEffect(() => {
-    console.log('CharacterList component mounted');
-    console.log('Data:', data);
+    console.log("CharacterList component mounted");
+    console.log("Data:", data);
   }, [data]);
 
   const handleCharacterSelect = (characterId: string) => {
@@ -45,10 +46,10 @@ export default function CharacterList() {
   };
 
   return (
-    <div className='flex gap-4 h-full'>
-      <Card className='w-80 flex-shrink-0'>
+    <div className="flex gap-4 h-full">
+      <Card className="w-80 flex-shrink-0">
         <CardHeader>
-          <div className='flex items-center justify-between'>
+          <div className="flex items-center justify-between">
             <CardTitle>Lista de Personajes</CardTitle>
             <Dialog
               open={isCreating}
@@ -57,22 +58,22 @@ export default function CharacterList() {
               <DialogTrigger asChild>
                 <Button
                   onClick={handleStartCreation}
-                  size='sm'
-                  className='flex items-center gap-2'
+                  size="sm"
+                  className="flex items-center gap-2"
                 >
-                  <Plus className='h-4 w-4' />
+                  <Plus className="h-4 w-4" />
                 </Button>
               </DialogTrigger>
-              <DialogContent className='max-w-4xl max-h-[90vh] overflow-y-auto'>
+              <DialogContent className="max-w-4xl max-h-[90vh] overflow-y-auto">
                 <DialogHeader>
                   <DialogTitle>Crear Nuevo Personaje</DialogTitle>
                 </DialogHeader>
-                <div className='mt-4'>
+                <div className="mt-4">
                   <FormBuilder
                     config={{
                       ...createCharacterFormConfig,
                       cancelButton: {
-                        text: 'Cancelar',
+                        text: "Cancelar",
                         onClick: handleCancel,
                       },
                     }}
@@ -87,9 +88,9 @@ export default function CharacterList() {
         </CardHeader>
         <CardContent>
           {isLoading ? (
-            <Skeleton className='h-8 w-full' />
+            <Skeleton className="h-8 w-full" />
           ) : isError ? (
-            <div className='text-red-500'>Error al cargar personajes.</div>
+            <div className="text-red-500">Error al cargar personajes.</div>
           ) : (
             <div>
               {data && data.length > 0 ? (
@@ -97,16 +98,16 @@ export default function CharacterList() {
                   <div
                     key={char.id}
                     className={`cursor-pointer hover:bg-muted/50 ${
-                      selectedCharacterId === char.id ? 'bg-muted' : ''
+                      selectedCharacterId === char.id ? "bg-muted" : ""
                     }`}
                     onClick={() => handleCharacterSelect(char.id)}
                   >
-                    <span className='font-medium'>{char.characterName}</span>
+                    <span className="font-medium">{char.characterName}</span>
                   </div>
                 ))
               ) : (
                 <div>
-                  <span className='text-center'>No hay personajes.</span>
+                  <span className="text-center">No hay personajes.</span>
                 </div>
               )}
             </div>
@@ -115,10 +116,18 @@ export default function CharacterList() {
       </Card>
 
       {selectedCharacterId && (
-        <div className='flex-1 overflow-auto'>
+        <div className="flex-1 overflow-auto">
           <CharacterDetail key={selectedCharacterId} id={selectedCharacterId} />
         </div>
       )}
     </div>
+  );
+}
+
+export default function CharacterList() {
+  return (
+    <ProtectedRoute>
+      <CharacterListContent />
+    </ProtectedRoute>
   );
 }
