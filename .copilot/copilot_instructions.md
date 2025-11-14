@@ -30,7 +30,7 @@ The `AGENTS.md` file provides a centralized reference to:
 1. **Always follow** the rules defined in `.ai/rules/`
 2. **Ask the user** when conflicts arise between rules
 3. **Never compromise** on security guidelines
-4. **Use Conventional Commits** format with GitFlow branch prefixes (e.g., `SPM-5 feat: ...`)
+4. **Use Conventional Commits** format with GitFlow branch prefixes (e.g., 
 5. **Maintain monorepo structure** as defined in architecture rules
 
 ---
