@@ -3,20 +3,19 @@ import {
   Injectable,
   InternalServerErrorException,
   Logger,
-} from '@nestjs/common';
-import { PrismaService } from '../prisma/prisma.service';
-import { BackupImportResponseDto } from './dto/backup-import-response.dto';
-import { BackupMetadataDto } from './dto/backup-metadata.dto';
-import { DatabaseStatsDto } from './dto/database-stats.dto';
-import { ImportStatsDto } from './dto/import-stats.dto';
-import { ResetConfirmationDto } from './dto/reset-confirmation.dto';
-import { ResetResponseDto } from './dto/reset-response.dto';
+} from "@nestjs/common";
+import { PrismaService } from "../prisma/prisma.service";
+import { BackupImportResponseDto } from "./dto/backup-import-response.dto";
+import { BackupMetadataDto } from "./dto/backup-metadata.dto";
+import { DatabaseStatsDto } from "./dto/database-stats.dto";
+import { ImportStatsDto } from "./dto/import-stats.dto";
+import { ResetConfirmationDto } from "./dto/reset-confirmation.dto";
+import { ResetResponseDto } from "./dto/reset-response.dto";
 
 interface BackupData {
   metadata: BackupMetadataDto;
   data: {
     users?: any[];
-    players?: any[];
     characters?: any[];
     attributes?: any[];
     domains?: any[];
@@ -39,32 +38,29 @@ export class SettingsService {
 
   async getDatabaseStats(): Promise<DatabaseStatsDto> {
     try {
-      const [characters, players, users] = await Promise.all([
+      const [characters, users] = await Promise.all([
         this.prisma.character.count(),
-        this.prisma.player.count(),
         this.prisma.user.count(),
       ]);
 
       return {
         characters,
-        players,
         users,
       };
     } catch (error) {
-      this.logger.error('Error fetching database stats:', error);
+      this.logger.error("Error fetching database stats:", error);
       throw new InternalServerErrorException(
-        'Error al obtener estadísticas de la base de datos'
+        "Error al obtener estadísticas de la base de datos",
       );
     }
   }
 
   async exportBackup(): Promise<BackupData> {
     try {
-      this.logger.log('Starting database export...');
+      this.logger.log("Starting database export...");
 
       const [
         users,
-        players,
         characters,
         attributes,
         domains,
@@ -78,7 +74,6 @@ export class SettingsService {
         characterAuraGifts,
       ] = await Promise.all([
         this.prisma.user.findMany(),
-        this.prisma.player.findMany(),
         this.prisma.character.findMany(),
         this.prisma.attribute.findMany(),
         this.prisma.domain.findMany(),
@@ -95,13 +90,12 @@ export class SettingsService {
       const backup: BackupData = {
         metadata: {
           exportedAt: new Date().toISOString(),
-          version: '1.0.0',
-          source: 'SeaPunk Manager',
-          description: 'Complete database backup for SeaPunk Manager',
+          version: "1.0.0",
+          source: "SeaPunk Manager",
+          description: "Complete database backup for SeaPunk Manager",
         },
         data: {
           users,
-          players,
           characters,
           attributes,
           domains,
@@ -116,27 +110,27 @@ export class SettingsService {
         },
       };
 
-      this.logger.log('Export completed successfully');
+      this.logger.log("Export completed successfully");
       return backup;
     } catch (error) {
-      this.logger.error('Error exporting database:', error);
+      this.logger.error("Error exporting database:", error);
       throw new InternalServerErrorException(
-        'Error al exportar la base de datos'
+        "Error al exportar la base de datos",
       );
     }
   }
 
   async resetDatabase(
-    resetDto: ResetConfirmationDto
+    resetDto: ResetConfirmationDto,
   ): Promise<ResetResponseDto> {
     try {
-      if (resetDto.confirmationPhrase !== 'RESET DATABASE') {
+      if (resetDto.confirmationPhrase !== "RESET DATABASE") {
         throw new BadRequestException(
-          'Debe escribir exactamente "RESET DATABASE" para confirmar'
+          'Debe escribir exactamente "RESET DATABASE" para confirmar',
         );
       }
 
-      this.logger.log('Starting database reset...');
+      this.logger.log("Starting database reset...");
 
       // Delete all data in the correct order (respecting foreign key constraints)
       await this.prisma.$transaction(async (tx) => {
@@ -158,72 +152,64 @@ export class SettingsService {
         // Delete independent tables
         await tx.auraGift.deleteMany();
         await tx.essence.deleteMany();
-        await tx.player.deleteMany();
         await tx.user.deleteMany();
       });
 
-      this.logger.log('Database reset completed successfully');
+      this.logger.log("Database reset completed successfully");
 
       return {
         success: true,
-        message: 'Base de datos reseteada exitosamente',
+        message: "Base de datos reseteada exitosamente",
         resetAt: new Date().toISOString(),
       };
     } catch (error) {
-      this.logger.error('Error resetting database:', error);
+      this.logger.error("Error resetting database:", error);
       if (error instanceof BadRequestException) {
         throw error;
       }
       throw new InternalServerErrorException(
-        'Error al resetear la base de datos'
+        "Error al resetear la base de datos",
       );
     }
   }
 
   async importBackup(backupData: BackupData): Promise<BackupImportResponseDto> {
     try {
-      this.logger.log('Starting database import...');
+      this.logger.log("Starting database import...");
 
       // Validate backup structure
       if (!backupData.data || !backupData.metadata) {
-        this.logger.error('Invalid backup structure:', {
+        this.logger.error("Invalid backup structure:", {
           hasData: !!backupData.data,
           hasMetadata: !!backupData.metadata,
         });
         throw new BadRequestException(
-          'Formato de backup inválido - debe contener metadata y data'
+          "Formato de backup inválido - debe contener metadata y data",
         );
       }
 
       // Validate metadata
       if (
         !backupData.metadata.source ||
-        backupData.metadata.source !== 'SeaPunk Manager'
+        backupData.metadata.source !== "SeaPunk Manager"
       ) {
         this.logger.warn(
-          'Backup source validation warning:',
-          backupData.metadata.source
+          "Backup source validation warning:",
+          backupData.metadata.source,
         );
       }
 
-      this.logger.log('Backup metadata:', backupData.metadata);
+      this.logger.log("Backup metadata:", backupData.metadata);
 
       const { data } = backupData;
       const dataKeys = Object.keys(data);
-      this.logger.log('Data tables to import:', dataKeys);
+      this.logger.log("Data tables to import:", dataKeys);
 
       // Import data in the correct order
       await this.prisma.$transaction(async (tx) => {
         // Import independent tables first
         if (data.users?.length > 0) {
           await tx.user.createMany({ data: data.users, skipDuplicates: true });
-        }
-
-        if (data.players?.length > 0) {
-          await tx.player.createMany({
-            data: data.players,
-            skipDuplicates: true,
-          });
         }
 
         if (data.essences?.length > 0) {
@@ -310,7 +296,6 @@ export class SettingsService {
       // Calculate import statistics
       const importStats: ImportStatsDto = {
         users: data.users?.length || 0,
-        players: data.players?.length || 0,
         characters: data.characters?.length || 0,
         attributes: data.attributes?.length || 0,
         domains: data.domains?.length || 0,
@@ -324,21 +309,21 @@ export class SettingsService {
         characterAuraGifts: data.characterAuraGifts?.length || 0,
       };
 
-      this.logger.log('Import completed successfully:', importStats);
+      this.logger.log("Import completed successfully:", importStats);
 
       return {
         success: true,
-        message: 'Backup importado exitosamente',
+        message: "Backup importado exitosamente",
         importedAt: new Date().toISOString(),
         metadata: backupData.metadata,
         importStats,
       };
     } catch (error) {
-      this.logger.error('Error importing backup:', error);
+      this.logger.error("Error importing backup:", error);
       if (error instanceof BadRequestException) {
         throw error;
       }
-      throw new InternalServerErrorException('Error al importar el backup');
+      throw new InternalServerErrorException("Error al importar el backup");
     }
   }
 }
