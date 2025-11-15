@@ -1,13 +1,12 @@
 "use client";
 
 import { useUsers } from "@/hooks";
-import { FormBuilder, createFormConfig } from "@/utils/form-builder";
-import { Button } from "@seapunk/ui";
+import { FormBuilder } from "@/utils/form-builder";
+import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@seapunk/ui";
 import { useState } from "react";
-import { UseFormReturn } from "react-hook-form";
-import { createInventoryFormSections } from "../config/inventory-form-config";
-import { createNarrativeFormSections } from "../config/narrative-form-config";
-import { createStatsFormSections } from "../config/stats-form-config";
+import { useInventoryForm } from "../hooks/use-inventory-form";
+import { useNarrativeForm } from "../hooks/use-narrative-form";
+import { useStatsForm } from "../hooks/use-stats-form";
 import {
   type FormMode,
   isCreateMode,
@@ -17,8 +16,6 @@ import {
 
 interface CharacterFormProps {
   character?: any;
-  form: UseFormReturn<any>;
-  onSubmit: (data: any) => void;
   isLoading?: boolean;
   mode?: FormMode;
   onModeChange?: (mode: FormMode) => void;
@@ -26,13 +23,12 @@ interface CharacterFormProps {
 
 export const CharacterForm = ({
   character,
-  form,
-  onSubmit,
   isLoading = false,
   mode = "view",
   onModeChange,
 }: CharacterFormProps) => {
   const [internalMode, setInternalMode] = useState<FormMode>(mode);
+  const [activeTab, setActiveTab] = useState<string>("stats");
 
   // Fetch users for the player selector
   const { data: users = [] } = useUsers();
@@ -41,9 +37,21 @@ export const CharacterForm = ({
   const currentMode = onModeChange ? mode : internalMode;
   const handleModeChange = onModeChange || setInternalMode;
 
-  // Get form state to check if there are changes
-  const isDirty = form.formState.isDirty;
-  const isValid = form.formState.isValid;
+  // ✅ Use individual hooks for each tab
+  const statsForm = useStatsForm(character, currentMode, users);
+  const narrativeForm = useNarrativeForm(character, currentMode);
+  const inventoryForm = useInventoryForm(character, currentMode);
+
+  // Get combined dirty state
+  const isDirty =
+    statsForm.form.formState.isDirty ||
+    narrativeForm.form.formState.isDirty ||
+    inventoryForm.form.formState.isDirty;
+
+  const isValid =
+    statsForm.form.formState.isValid &&
+    narrativeForm.form.formState.isValid &&
+    inventoryForm.form.formState.isValid;
 
   // Handle edit mode toggle
   const handleEditToggle = () => {
@@ -53,7 +61,9 @@ export const CharacterForm = ({
         "¿Deseas descartar los cambios sin guardar?",
       );
       if (confirmDiscard) {
-        form.reset();
+        statsForm.form.reset();
+        narrativeForm.form.reset();
+        inventoryForm.form.reset();
         handleModeChange("view");
       }
     } else {
@@ -61,18 +71,11 @@ export const CharacterForm = ({
     }
   };
 
-  // Handle form submission
-  const handleFormSubmit = async (data: any) => {
-    await onSubmit(data);
-    // After successful submit in edit mode, return to view mode
-    if (!isCreateMode(currentMode)) {
-      handleModeChange("view");
-    }
-  };
-
   // Handle cancel
   const handleCancel = () => {
-    form.reset();
+    statsForm.form.reset();
+    narrativeForm.form.reset();
+    inventoryForm.form.reset();
     if (!isCreateMode(currentMode)) {
       handleModeChange("view");
     }
@@ -93,39 +96,6 @@ export const CharacterForm = ({
   const getSubmitButtonText = () => {
     return isCreateMode(currentMode) ? "Crear Personaje" : "Guardar Cambios";
   };
-
-  // Create form configuration with tabs
-  const formConfig = createFormConfig({
-    tabs: [
-      {
-        id: "stats",
-        label: "Estadísticas",
-        sections: createStatsFormSections(currentMode, users),
-      },
-      {
-        id: "narrative",
-        label: "Narrativa",
-        sections: createNarrativeFormSections(currentMode),
-      },
-      {
-        id: "inventory",
-        label: "Inventario",
-        sections: createInventoryFormSections(
-          currentMode,
-          character?.inventories || [],
-        ),
-      },
-    ],
-    submitButton: {
-      text: getSubmitButtonText(),
-      disabled: !isDirty || !isValid || isLoading,
-      loading: isLoading,
-    },
-    cancelButton: {
-      text: "Cancelar",
-      onClick: handleCancel,
-    },
-  });
 
   return (
     <div className="space-y-6">
@@ -153,13 +123,111 @@ export const CharacterForm = ({
         )}
       </div>
 
-      {/* Form Builder */}
-      <FormBuilder
-        config={formConfig}
-        form={form}
-        onSubmit={handleFormSubmit}
-        isLoading={isLoading}
-      />
+      {/* Tabs for different form sections */}
+      <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
+        <TabsList className="grid w-full grid-cols-3">
+          <TabsTrigger value="stats">Estadísticas</TabsTrigger>
+          <TabsTrigger value="narrative">Narrativa</TabsTrigger>
+          <TabsTrigger value="inventory">Inventario</TabsTrigger>
+        </TabsList>
+
+        <TabsContent value="stats" className="mt-6">
+          <FormBuilder
+            config={statsForm.formConfig}
+            form={statsForm.form}
+            onSubmit={statsForm.handleSubmit}
+            isLoading={statsForm.isLoading}
+          >
+            {/* Custom buttons for stats tab */}
+            {isFieldEditable(currentMode) && (
+              <div className="flex gap-3 justify-end pt-6 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={
+                    !statsForm.form.formState.isDirty || !isValid || isLoading
+                  }
+                >
+                  {isLoading ? "Guardando..." : getSubmitButtonText()}
+                </Button>
+              </div>
+            )}
+          </FormBuilder>
+        </TabsContent>
+
+        <TabsContent value="narrative" className="mt-6">
+          <FormBuilder
+            config={narrativeForm.formConfig}
+            form={narrativeForm.form}
+            onSubmit={narrativeForm.handleSubmit}
+            isLoading={narrativeForm.isLoading}
+          >
+            {/* Custom buttons for narrative tab */}
+            {isFieldEditable(currentMode) && (
+              <div className="flex gap-3 justify-end pt-6 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={
+                    !narrativeForm.form.formState.isDirty ||
+                    !isValid ||
+                    isLoading
+                  }
+                >
+                  {isLoading ? "Guardando..." : getSubmitButtonText()}
+                </Button>
+              </div>
+            )}
+          </FormBuilder>
+        </TabsContent>
+
+        <TabsContent value="inventory" className="mt-6">
+          <FormBuilder
+            config={inventoryForm.formConfig}
+            form={inventoryForm.form}
+            onSubmit={inventoryForm.handleSubmit}
+            isLoading={inventoryForm.isLoading}
+          >
+            {/* Custom buttons for inventory tab */}
+            {isFieldEditable(currentMode) && (
+              <div className="flex gap-3 justify-end pt-6 border-t">
+                <Button
+                  type="button"
+                  variant="outline"
+                  onClick={handleCancel}
+                  disabled={isLoading}
+                >
+                  Cancelar
+                </Button>
+                <Button
+                  type="submit"
+                  disabled={
+                    !inventoryForm.form.formState.isDirty ||
+                    !isValid ||
+                    isLoading
+                  }
+                >
+                  {isLoading ? "Guardando..." : getSubmitButtonText()}
+                </Button>
+              </div>
+            )}
+          </FormBuilder>
+        </TabsContent>
+      </Tabs>
 
       {/* Show dirty indicator when changes detected */}
       {isFieldEditable(currentMode) && isDirty && (

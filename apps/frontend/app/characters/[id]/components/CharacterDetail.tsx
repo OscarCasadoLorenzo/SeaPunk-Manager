@@ -4,7 +4,6 @@ import { useCharacterContext } from "@/contexts/CharacterContext";
 import { useCharacterWithDetails } from "@/hooks/useCharacters";
 import { Card, CardContent, Skeleton } from "@seapunk/ui";
 import { useEffect } from "react";
-import { useCharacterForm } from "../hooks/use-character-form";
 import { CharacterForm } from "./CharacterForm";
 
 interface CharacterDetailProps {
@@ -24,9 +23,6 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
   const { data: character, isLoading: characterLoading } =
     useCharacterWithDetails(selectedCharacterId || id);
 
-  // Initialize form hook with character data in view mode by default
-  const { form, handleSubmit, isLoading } = useCharacterForm(character, "view");
-
   if (characterLoading || !character) {
     return (
       <div className="flex flex-col items-center justify-center p-4 w-full max-w-4xl mx-auto">
@@ -41,13 +37,7 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
 
   return (
     <div className="flex flex-col p-4 w-full max-w-6xl mx-auto">
-      <CharacterForm
-        character={character}
-        form={form}
-        onSubmit={handleSubmit}
-        isLoading={isLoading}
-        mode="view"
-      />
+      <CharacterForm character={character} mode="view" />
     </div>
   );
 }
