@@ -3,7 +3,9 @@
 import { useUsers } from "@/hooks";
 import { FormBuilder } from "@/utils/form-builder";
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@seapunk/ui";
+import { type ReactNode } from "react";
 import { useState } from "react";
+import { type UseFormReturn } from "react-hook-form";
 import { useInventoryForm } from "../hooks/use-inventory-form";
 import { useNarrativeForm } from "../hooks/use-narrative-form";
 import { useStatsForm } from "../hooks/use-stats-form";
@@ -19,6 +21,15 @@ interface CharacterFormProps {
   isLoading?: boolean;
   mode?: FormMode;
   onModeChange?: (mode: FormMode) => void;
+}
+
+interface TabConfig {
+  id: string;
+  label: string;
+  form: UseFormReturn<any>;
+  formConfig: any;
+  handleSubmit: (data: any) => Promise<void>;
+  isLoading: boolean;
 }
 
 export const CharacterForm = ({
@@ -37,33 +48,42 @@ export const CharacterForm = ({
   const currentMode = onModeChange ? mode : internalMode;
   const handleModeChange = onModeChange || setInternalMode;
 
-  // ✅ Use individual hooks for each tab
+  // Individual hooks for each tab
   const statsForm = useStatsForm(character, currentMode, users);
   const narrativeForm = useNarrativeForm(character, currentMode);
   const inventoryForm = useInventoryForm(character, currentMode);
 
-  // Get combined dirty state
-  const isDirty =
-    statsForm.form.formState.isDirty ||
-    narrativeForm.form.formState.isDirty ||
-    inventoryForm.form.formState.isDirty;
+  // Tab configuration
+  const tabs: TabConfig[] = [
+    {
+      id: "stats",
+      label: "Estadísticas",
+      ...statsForm,
+    },
+    {
+      id: "narrative",
+      label: "Narrativa",
+      ...narrativeForm,
+    },
+    {
+      id: "inventory",
+      label: "Inventario",
+      ...inventoryForm,
+    },
+  ];
 
-  const isValid =
-    statsForm.form.formState.isValid &&
-    narrativeForm.form.formState.isValid &&
-    inventoryForm.form.formState.isValid;
+  // Get combined dirty state
+  const isDirty = tabs.some((tab) => tab.form.formState.isDirty);
+  const isValid = tabs.every((tab) => tab.form.formState.isValid);
 
   // Handle edit mode toggle
   const handleEditToggle = () => {
     if (isFieldEditable(currentMode) && isDirty) {
-      // If exiting edit mode with unsaved changes, confirm
       const confirmDiscard = window.confirm(
         "¿Deseas descartar los cambios sin guardar?",
       );
       if (confirmDiscard) {
-        statsForm.form.reset();
-        narrativeForm.form.reset();
-        inventoryForm.form.reset();
+        tabs.forEach((tab) => tab.form.reset());
         handleModeChange("view");
       }
     } else {
@@ -73,9 +93,7 @@ export const CharacterForm = ({
 
   // Handle cancel
   const handleCancel = () => {
-    statsForm.form.reset();
-    narrativeForm.form.reset();
-    inventoryForm.form.reset();
+    tabs.forEach((tab) => tab.form.reset());
     if (!isCreateMode(currentMode)) {
       handleModeChange("view");
     }
@@ -95,6 +113,30 @@ export const CharacterForm = ({
   // Get submit button text based on mode
   const getSubmitButtonText = () => {
     return isCreateMode(currentMode) ? "Crear Personaje" : "Guardar Cambios";
+  };
+
+  // Render form actions
+  const renderFormActions = (tabForm: UseFormReturn<any>): ReactNode => {
+    if (!isFieldEditable(currentMode)) return null;
+
+    return (
+      <div className="flex gap-3 justify-end pt-6 border-t">
+        <Button
+          type="button"
+          variant="outline"
+          onClick={handleCancel}
+          disabled={isLoading}
+        >
+          Cancelar
+        </Button>
+        <Button
+          type="submit"
+          disabled={!tabForm.formState.isDirty || !isValid || isLoading}
+        >
+          {isLoading ? "Guardando..." : getSubmitButtonText()}
+        </Button>
+      </div>
+    );
   };
 
   return (
@@ -125,108 +167,26 @@ export const CharacterForm = ({
 
       {/* Tabs for different form sections */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className="grid w-full grid-cols-3">
-          <TabsTrigger value="stats">Estadísticas</TabsTrigger>
-          <TabsTrigger value="narrative">Narrativa</TabsTrigger>
-          <TabsTrigger value="inventory">Inventario</TabsTrigger>
+        <TabsList className={`grid w-full grid-cols-${tabs.length}`}>
+          {tabs.map((tab) => (
+            <TabsTrigger key={tab.id} value={tab.id}>
+              {tab.label}
+            </TabsTrigger>
+          ))}
         </TabsList>
 
-        <TabsContent value="stats" className="mt-6">
-          <FormBuilder
-            config={statsForm.formConfig}
-            form={statsForm.form}
-            onSubmit={statsForm.handleSubmit}
-            isLoading={statsForm.isLoading}
-          >
-            {/* Custom buttons for stats tab */}
-            {isFieldEditable(currentMode) && (
-              <div className="flex gap-3 justify-end pt-6 border-t">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    !statsForm.form.formState.isDirty || !isValid || isLoading
-                  }
-                >
-                  {isLoading ? "Guardando..." : getSubmitButtonText()}
-                </Button>
-              </div>
-            )}
-          </FormBuilder>
-        </TabsContent>
-
-        <TabsContent value="narrative" className="mt-6">
-          <FormBuilder
-            config={narrativeForm.formConfig}
-            form={narrativeForm.form}
-            onSubmit={narrativeForm.handleSubmit}
-            isLoading={narrativeForm.isLoading}
-          >
-            {/* Custom buttons for narrative tab */}
-            {isFieldEditable(currentMode) && (
-              <div className="flex gap-3 justify-end pt-6 border-t">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    !narrativeForm.form.formState.isDirty ||
-                    !isValid ||
-                    isLoading
-                  }
-                >
-                  {isLoading ? "Guardando..." : getSubmitButtonText()}
-                </Button>
-              </div>
-            )}
-          </FormBuilder>
-        </TabsContent>
-
-        <TabsContent value="inventory" className="mt-6">
-          <FormBuilder
-            config={inventoryForm.formConfig}
-            form={inventoryForm.form}
-            onSubmit={inventoryForm.handleSubmit}
-            isLoading={inventoryForm.isLoading}
-          >
-            {/* Custom buttons for inventory tab */}
-            {isFieldEditable(currentMode) && (
-              <div className="flex gap-3 justify-end pt-6 border-t">
-                <Button
-                  type="button"
-                  variant="outline"
-                  onClick={handleCancel}
-                  disabled={isLoading}
-                >
-                  Cancelar
-                </Button>
-                <Button
-                  type="submit"
-                  disabled={
-                    !inventoryForm.form.formState.isDirty ||
-                    !isValid ||
-                    isLoading
-                  }
-                >
-                  {isLoading ? "Guardando..." : getSubmitButtonText()}
-                </Button>
-              </div>
-            )}
-          </FormBuilder>
-        </TabsContent>
+        {tabs.map((tab) => (
+          <TabsContent key={tab.id} value={tab.id} className="mt-6">
+            <FormBuilder
+              config={tab.formConfig}
+              form={tab.form}
+              onSubmit={tab.handleSubmit}
+              isLoading={tab.isLoading}
+            >
+              {renderFormActions(tab.form)}
+            </FormBuilder>
+          </TabsContent>
+        ))}
       </Tabs>
 
       {/* Show dirty indicator when changes detected */}
