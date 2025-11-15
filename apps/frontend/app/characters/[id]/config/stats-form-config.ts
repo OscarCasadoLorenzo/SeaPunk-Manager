@@ -2,69 +2,76 @@ import {
   createField,
   createSection,
   type FormSectionConfig,
-} from '@/utils/form-builder';
+} from "@/utils/form-builder";
+import { type FormMode, isFieldEditable } from "../types/form-mode";
 
 export const createStatsFormSections = (
-  isEditMode: boolean
+  mode: FormMode,
+  users: Array<{ id: string; name: string; email: string }> = [],
 ): FormSectionConfig[] => {
   return [
     createSection({
-      title: 'Información Básica',
-      description: 'Datos generales del personaje',
+      title: "Información Básica",
+      description: "Datos generales del personaje",
       columns: 2,
       fields: [
-        createField('text', {
-          name: 'playerName',
-          label: 'Jugador',
-          disabled: true, // Always disabled, read-only
-          placeholder: 'Nombre del jugador',
-        }),
-        createField('text', {
-          name: 'characterName',
-          label: 'Nombre del Personaje',
+        createField("select", {
+          name: "userId",
+          label: "Jugador",
           required: true,
-          disabled: !isEditMode,
-          placeholder: 'Nombre del personaje',
+          disabled: !isFieldEditable(mode),
+          placeholder: "Selecciona un jugador",
+          options: users.map((user) => ({
+            value: user.id,
+            label: `${user.name} (${user.email})`,
+          })),
         }),
-        createField('text', {
-          name: 'archetype',
-          label: 'Arquetipo',
+        createField("text", {
+          name: "characterName",
+          label: "Nombre del Personaje",
           required: true,
-          disabled: !isEditMode,
-          placeholder: 'Arquetipo del personaje',
+          disabled: !isFieldEditable(mode),
+          placeholder: "Nombre del personaje",
         }),
-        createField('text', {
-          name: 'faction',
-          label: 'Facción',
+        createField("text", {
+          name: "archetype",
+          label: "Arquetipo",
           required: true,
-          disabled: !isEditMode,
-          placeholder: 'Facción del personaje',
+          disabled: !isFieldEditable(mode),
+          placeholder: "Arquetipo del personaje",
         }),
-        createField('text', {
-          name: 'race',
-          label: 'Raza',
+        createField("text", {
+          name: "faction",
+          label: "Facción",
           required: true,
-          disabled: !isEditMode,
-          placeholder: 'Raza del personaje',
+          disabled: !isFieldEditable(mode),
+          placeholder: "Facción del personaje",
         }),
-        createField('text', {
-          name: 'category',
-          label: 'Categoría',
-          disabled: !isEditMode,
-          placeholder: 'Categoría (opcional)',
-        }),
-        createField('number', {
-          name: 'level',
-          label: 'Nivel',
+        createField("text", {
+          name: "race",
+          label: "Raza",
           required: true,
-          disabled: !isEditMode,
+          disabled: !isFieldEditable(mode),
+          placeholder: "Raza del personaje",
+        }),
+        createField("text", {
+          name: "category",
+          label: "Categoría",
+          disabled: !isFieldEditable(mode),
+          placeholder: "Categoría (opcional)",
+        }),
+        createField("number", {
+          name: "level",
+          label: "Nivel",
+          required: true,
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 1,
         }),
-        createField('number', {
-          name: 'epicPoints',
-          label: 'Puntos Épicos',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "epicPoints",
+          label: "Puntos Épicos",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
@@ -72,47 +79,47 @@ export const createStatsFormSections = (
     }),
 
     createSection({
-      title: 'Atributos',
-      description: 'Atributos principales del personaje',
+      title: "Atributos",
+      description: "Atributos principales del personaje",
       columns: 3,
       fields: [
-        createField('number', {
-          name: 'strength',
-          label: 'Fuerza',
+        createField("number", {
+          name: "strength",
+          label: "Fuerza",
           required: true,
-          disabled: !isEditMode,
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 1,
         }),
-        createField('number', {
-          name: 'agility',
-          label: 'Agilidad',
+        createField("number", {
+          name: "agility",
+          label: "Agilidad",
           required: true,
-          disabled: !isEditMode,
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 1,
         }),
-        createField('number', {
-          name: 'willpower',
-          label: 'Voluntad',
+        createField("number", {
+          name: "willpower",
+          label: "Voluntad",
           required: true,
-          disabled: !isEditMode,
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 1,
         }),
-        createField('number', {
-          name: 'luck',
-          label: 'Suerte',
+        createField("number", {
+          name: "luck",
+          label: "Suerte",
           required: true,
-          disabled: !isEditMode,
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 1,
         }),
-        createField('number', {
-          name: 'intelligence',
-          label: 'Inteligencia',
+        createField("number", {
+          name: "intelligence",
+          label: "Inteligencia",
           required: true,
-          disabled: !isEditMode,
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 1,
         }),
@@ -120,77 +127,77 @@ export const createStatsFormSections = (
     }),
 
     createSection({
-      title: 'Dominios',
-      description: 'Dominios de conocimiento y habilidad',
+      title: "Dominios",
+      description: "Dominios de conocimiento y habilidad",
       columns: 3,
       fields: [
-        createField('number', {
-          name: 'physical',
-          label: 'Físico',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "physical",
+          label: "Físico",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'combat',
-          label: 'Combate',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "combat",
+          label: "Combate",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'social',
-          label: 'Social',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "social",
+          label: "Social",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'environmental',
-          label: 'Ambiental',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "environmental",
+          label: "Ambiental",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'stealth',
-          label: 'Sigilo',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "stealth",
+          label: "Sigilo",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'knowledge',
-          label: 'Conocimiento',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "knowledge",
+          label: "Conocimiento",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'technical',
-          label: 'Técnico',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "technical",
+          label: "Técnico",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'resources',
-          label: 'Recursos',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "resources",
+          label: "Recursos",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'demonic',
-          label: 'Demoníaco',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "demonic",
+          label: "Demoníaco",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'aura',
-          label: 'Aura',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "aura",
+          label: "Aura",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
@@ -198,98 +205,98 @@ export const createStatsFormSections = (
     }),
 
     createSection({
-      title: 'Estadísticas de Combate',
-      description: 'Salud, resistencia y estadísticas de combate',
+      title: "Estadísticas de Combate",
+      description: "Salud, resistencia y estadísticas de combate",
       columns: 2,
       fields: [
-        createField('number', {
-          name: 'physicalHealth',
-          label: 'Salud Física',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "physicalHealth",
+          label: "Salud Física",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'maxPhysicalHealth',
-          label: 'Salud Física Máxima',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "maxPhysicalHealth",
+          label: "Salud Física Máxima",
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'physicalResistance',
-          label: 'Resistencia Física',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "physicalResistance",
+          label: "Resistencia Física",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'maxPhysicalResistance',
-          label: 'Resistencia Física Máxima',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "maxPhysicalResistance",
+          label: "Resistencia Física Máxima",
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'mentalHealth',
-          label: 'Salud Mental',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "mentalHealth",
+          label: "Salud Mental",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'maxMentalHealth',
-          label: 'Salud Mental Máxima',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "maxMentalHealth",
+          label: "Salud Mental Máxima",
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'mentalResistance',
-          label: 'Resistencia Mental',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "mentalResistance",
+          label: "Resistencia Mental",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'maxMentalResistance',
-          label: 'Resistencia Mental Máxima',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "maxMentalResistance",
+          label: "Resistencia Mental Máxima",
+          disabled: !isFieldEditable(mode),
           min: 1,
           defaultValue: 100,
         }),
-        createField('number', {
-          name: 'initiative',
-          label: 'Iniciativa',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "initiative",
+          label: "Iniciativa",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'defense',
-          label: 'Defensa',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "defense",
+          label: "Defensa",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'attack',
-          label: 'Ataque',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "attack",
+          label: "Ataque",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'impact',
-          label: 'Impacto',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "impact",
+          label: "Impacto",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
-        createField('number', {
-          name: 'maxDamage',
-          label: 'Daño Máximo',
-          disabled: !isEditMode,
+        createField("number", {
+          name: "maxDamage",
+          label: "Daño Máximo",
+          disabled: !isFieldEditable(mode),
           min: 0,
           defaultValue: 0,
         }),
