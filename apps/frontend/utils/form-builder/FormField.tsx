@@ -12,17 +12,17 @@ import {
   SelectTrigger,
   SelectValue,
   Textarea,
-} from '@seapunk/ui';
-import { Trash2 } from 'lucide-react';
-import React from 'react';
-import { Controller, FieldValues } from 'react-hook-form';
-import toast from 'react-hot-toast';
-import { FieldConfig, FieldProps } from './types';
+} from "@seapunk/ui";
+import { Trash2 } from "lucide-react";
+import React from "react";
+import { Controller, FieldValues } from "react-hook-form";
+import toast from "react-hot-toast";
+import { FieldConfig, FieldProps } from "./types";
 
 // Error message component
 const ErrorMessage: React.FC<{ message?: string }> = ({ message }) => {
   if (!message) return null;
-  return <p className='text-sm text-red-500 mt-1'>{message}</p>;
+  return <p className="text-sm text-red-500 mt-1">{message}</p>;
 };
 
 // Description component
@@ -30,7 +30,7 @@ const FieldDescription: React.FC<{ description?: string }> = ({
   description,
 }) => {
   if (!description) return null;
-  return <p className='text-sm text-muted-foreground mt-1'>{description}</p>;
+  return <p className="text-sm text-muted-foreground mt-1">{description}</p>;
 };
 
 // Text input field
@@ -41,16 +41,18 @@ const TextFieldComponent: React.FC<FieldProps> = ({
 }) => {
   const fieldConfig = config as Extract<
     FieldConfig,
-    { type: 'text' | 'email' | 'password' | 'url' }
+    { type: "text" | "email" | "password" | "url" }
   >;
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label
         htmlFor={config.name}
         className={
-          config.required ? 'after:content-["*"] after:text-red-500' : ''
+          config.required
+            ? 'after:content-["*"] after:text-red-500 after:ml-1'
+            : ""
         }
       >
         {config.label}
@@ -66,7 +68,7 @@ const TextFieldComponent: React.FC<FieldProps> = ({
             placeholder={config.placeholder}
             disabled={config.disabled}
             maxLength={fieldConfig.maxLength}
-            className={error ? 'border-red-500' : ''}
+            className={error ? "border-red-500" : ""}
           />
         )}
       />
@@ -82,15 +84,17 @@ const NumberFieldComponent: React.FC<FieldProps> = ({
   form,
   className,
 }) => {
-  const fieldConfig = config as Extract<FieldConfig, { type: 'number' }>;
+  const fieldConfig = config as Extract<FieldConfig, { type: "number" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label
         htmlFor={config.name}
         className={
-          config.required ? 'after:content-["*"] after:text-red-500' : ''
+          config.required
+            ? 'after:content-["*"] after:text-red-500 after:ml-1'
+            : ""
         }
       >
         {config.label}
@@ -102,16 +106,16 @@ const NumberFieldComponent: React.FC<FieldProps> = ({
           <Input
             {...field}
             id={config.name}
-            type='number'
+            type="number"
             placeholder={config.placeholder}
             disabled={config.disabled}
             min={fieldConfig.min}
             max={fieldConfig.max}
             step={fieldConfig.step}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
-              field.onChange(e.target.value ? Number(e.target.value) : '')
+              field.onChange(e.target.value ? Number(e.target.value) : "")
             }
-            className={error ? 'border-red-500' : ''}
+            className={error ? "border-red-500" : ""}
           />
         )}
       />
@@ -127,15 +131,17 @@ const TextareaFieldComponent: React.FC<FieldProps> = ({
   form,
   className,
 }) => {
-  const fieldConfig = config as Extract<FieldConfig, { type: 'textarea' }>;
+  const fieldConfig = config as Extract<FieldConfig, { type: "textarea" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label
         htmlFor={config.name}
         className={
-          config.required ? 'after:content-["*"] after:text-red-500' : ''
+          config.required
+            ? 'after:content-["*"] after:text-red-500 after:ml-1'
+            : ""
         }
       >
         {config.label}
@@ -151,7 +157,7 @@ const TextareaFieldComponent: React.FC<FieldProps> = ({
             disabled={config.disabled}
             rows={fieldConfig.rows}
             maxLength={fieldConfig.maxLength}
-            className={error ? 'border-red-500' : ''}
+            className={error ? "border-red-500" : ""}
           />
         )}
       />
@@ -167,23 +173,25 @@ const SelectFieldComponent: React.FC<FieldProps> = ({
   form,
   className,
 }) => {
-  const fieldConfig = config as Extract<FieldConfig, { type: 'select' }>;
+  const fieldConfig = config as Extract<FieldConfig, { type: "select" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
   if (fieldConfig.multiple) {
     // Multi-select implementation would require a custom component
     // For now, we'll implement single select
     console.warn(
-      'Multi-select not yet implemented, falling back to single select'
+      "Multi-select not yet implemented, falling back to single select",
     );
   }
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label
         htmlFor={config.name}
         className={
-          config.required ? 'after:content-["*"] after:text-red-500' : ''
+          config.required
+            ? 'after:content-["*"] after:text-red-500 after:ml-1'
+            : ""
         }
       >
         {config.label}
@@ -197,7 +205,7 @@ const SelectFieldComponent: React.FC<FieldProps> = ({
             defaultValue={field.value}
             disabled={config.disabled}
           >
-            <SelectTrigger className={error ? 'border-red-500' : ''}>
+            <SelectTrigger className={error ? "border-red-500" : ""}>
               <SelectValue placeholder={config.placeholder} />
             </SelectTrigger>
             <SelectContent>
@@ -229,12 +237,12 @@ const CheckboxFieldComponent: React.FC<FieldProps> = ({
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Controller
         name={config.name}
         control={form.control}
         render={({ field }) => (
-          <div className='flex items-center space-x-2'>
+          <div className="flex items-center space-x-2">
             <Checkbox
               id={config.name}
               checked={field.value}
@@ -244,7 +252,9 @@ const CheckboxFieldComponent: React.FC<FieldProps> = ({
             <Label
               htmlFor={config.name}
               className={
-                config.required ? 'after:content-["*"] after:text-red-500' : ''
+                config.required
+                  ? 'after:content-["*"] after:text-red-500 after:ml-1'
+                  : ""
               }
             >
               {config.label}
@@ -264,14 +274,16 @@ const RadioGroupFieldComponent: React.FC<FieldProps> = ({
   form,
   className,
 }) => {
-  const fieldConfig = config as Extract<FieldConfig, { type: 'radio' }>;
+  const fieldConfig = config as Extract<FieldConfig, { type: "radio" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label
         className={
-          config.required ? 'after:content-["*"] after:text-red-500' : ''
+          config.required
+            ? 'after:content-["*"] after:text-red-500 after:ml-1'
+            : ""
         }
       >
         {config.label}
@@ -286,7 +298,7 @@ const RadioGroupFieldComponent: React.FC<FieldProps> = ({
             disabled={config.disabled}
           >
             {fieldConfig.options.map((option) => (
-              <div key={option.value} className='flex items-center space-x-2'>
+              <div key={option.value} className="flex items-center space-x-2">
                 <RadioGroupItem
                   value={String(option.value)}
                   id={`${config.name}-${option.value}`}
@@ -314,16 +326,18 @@ const DateFieldComponent: React.FC<FieldProps> = ({
 }) => {
   const fieldConfig = config as Extract<
     FieldConfig,
-    { type: 'date' | 'datetime-local' | 'time' }
+    { type: "date" | "datetime-local" | "time" }
   >;
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label
         htmlFor={config.name}
         className={
-          config.required ? 'after:content-["*"] after:text-red-500' : ''
+          config.required
+            ? 'after:content-["*"] after:text-red-500 after:ml-1'
+            : ""
         }
       >
         {config.label}
@@ -337,7 +351,7 @@ const DateFieldComponent: React.FC<FieldProps> = ({
             id={config.name}
             type={fieldConfig.type}
             disabled={config.disabled}
-            className={error ? 'border-red-500' : ''}
+            className={error ? "border-red-500" : ""}
           />
         )}
       />
@@ -353,15 +367,17 @@ const FileFieldComponent: React.FC<FieldProps> = ({
   form,
   className,
 }) => {
-  const fieldConfig = config as Extract<FieldConfig, { type: 'file' }>;
+  const fieldConfig = config as Extract<FieldConfig, { type: "file" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
-    <div className={cn('space-y-2', className)}>
+    <div className={cn("space-y-2", className)}>
       <Label
         htmlFor={config.name}
         className={
-          config.required ? 'after:content-["*"] after:text-red-500' : ''
+          config.required
+            ? 'after:content-["*"] after:text-red-500 after:ml-1'
+            : ""
         }
       >
         {config.label}
@@ -369,18 +385,18 @@ const FileFieldComponent: React.FC<FieldProps> = ({
       <Controller
         name={config.name}
         control={form.control}
-        render={({ field: { onChange, value, ...field } }) => (
+        render={({ field: { onChange, ...field } }) => (
           <Input
             {...field}
             id={config.name}
-            type='file'
+            type="file"
             accept={fieldConfig.accept}
             multiple={fieldConfig.multiple}
             disabled={config.disabled}
             onChange={(e: React.ChangeEvent<HTMLInputElement>) =>
               onChange(e.target.files)
             }
-            className={error ? 'border-red-500' : ''}
+            className={error ? "border-red-500" : ""}
           />
         )}
       />
@@ -392,11 +408,11 @@ const FileFieldComponent: React.FC<FieldProps> = ({
 
 // Custom field component for handling special field types
 const CustomFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
-  const fieldConfig = config as Extract<FieldConfig, { type: 'custom' }>;
+  const fieldConfig = config as Extract<FieldConfig, { type: "custom" }>;
 
   const handleDeleteClick = () => {
     if (
-      fieldConfig.customComponent === 'deleteButton' &&
+      fieldConfig.customComponent === "deleteButton" &&
       fieldConfig.customProps
     ) {
       const { itemId, itemName } = fieldConfig.customProps;
@@ -409,24 +425,24 @@ const CustomFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
         if (deleteHandler) {
           deleteHandler(itemId, itemName);
         } else {
-          toast.error('No se pudo eliminar el objeto. Inténtalo de nuevo.');
+          toast.error("No se pudo eliminar el objeto. Inténtalo de nuevo.");
         }
       }
     }
   };
 
-  if (fieldConfig.customComponent === 'deleteButton') {
+  if (fieldConfig.customComponent === "deleteButton") {
     return (
-      <div className={cn('space-y-2', className)}>
+      <div className={cn("space-y-2", className)}>
         <Label>{fieldConfig.label}</Label>
         <Button
-          type='button'
-          variant={fieldConfig.customProps?.variant || 'destructive'}
-          size={fieldConfig.customProps?.size || 'sm'}
+          type="button"
+          variant={fieldConfig.customProps?.variant || "destructive"}
+          size={fieldConfig.customProps?.size || "sm"}
           onClick={handleDeleteClick}
-          className='w-full'
+          className="w-full"
         >
-          <Trash2 className='h-4 w-4 mr-2' />
+          <Trash2 className="h-4 w-4 mr-2" />
           Eliminar
         </Button>
       </div>
@@ -445,10 +461,10 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
   const combinedClassName = cn(config.className, className);
 
   switch (config.type) {
-    case 'text':
-    case 'email':
-    case 'password':
-    case 'url':
+    case "text":
+    case "email":
+    case "password":
+    case "url":
       return (
         <TextFieldComponent
           config={config}
@@ -456,7 +472,7 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'number':
+    case "number":
       return (
         <NumberFieldComponent
           config={config}
@@ -464,7 +480,7 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'textarea':
+    case "textarea":
       return (
         <TextareaFieldComponent
           config={config}
@@ -472,7 +488,7 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'select':
+    case "select":
       return (
         <SelectFieldComponent
           config={config}
@@ -480,7 +496,7 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'checkbox':
+    case "checkbox":
       return (
         <CheckboxFieldComponent
           config={config}
@@ -488,7 +504,7 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'radio':
+    case "radio":
       return (
         <RadioGroupFieldComponent
           config={config}
@@ -496,9 +512,9 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'date':
-    case 'datetime-local':
-    case 'time':
+    case "date":
+    case "datetime-local":
+    case "time":
       return (
         <DateFieldComponent
           config={config}
@@ -506,7 +522,7 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'file':
+    case "file":
       return (
         <FileFieldComponent
           config={config}
@@ -514,7 +530,7 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
           className={combinedClassName}
         />
       );
-    case 'custom':
+    case "custom":
       return (
         <CustomFieldComponent
           config={config}
