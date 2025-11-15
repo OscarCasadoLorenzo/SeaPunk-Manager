@@ -1,5 +1,6 @@
 "use client";
 
+import { fetchApi } from "@/lib/api";
 import { useRouter } from "next/navigation";
 import {
   createContext,
@@ -30,8 +31,6 @@ interface AuthContextType {
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
 
-const API_BASE_URL = process.env.NEXT_PUBLIC_API_URL || "http://localhost:3001";
-
 export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null);
   const [token, setToken] = useState<string | null>(null);
@@ -51,23 +50,9 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
           // Validate token by fetching current user
           try {
-            const response = await fetch(`${API_BASE_URL}/auth/me`, {
-              headers: {
-                Authorization: `Bearer ${storedToken}`,
-              },
-            });
-
-            if (!response.ok) {
-              // Token is invalid, clear auth state
-              localStorage.removeItem("auth_token");
-              localStorage.removeItem("auth_user");
-              setToken(null);
-              setUser(null);
-            } else {
-              const data = await response.json();
-              setUser(data.user);
-              localStorage.setItem("auth_user", JSON.stringify(data.user));
-            }
+            const data = await fetchApi<{ user: User }>("/auth/me");
+            setUser(data.user);
+            localStorage.setItem("auth_user", JSON.stringify(data.user));
           } catch (error) {
             console.error("Error validating token:", error);
             localStorage.removeItem("auth_token");
@@ -88,20 +73,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const login = async (email: string, password: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/login`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const data = await fetchApi<{ access_token: string; user: User }>(
+        "/auth/login",
+        {
+          method: "POST",
+          body: { email, password },
+          requiresAuth: false,
         },
-        body: JSON.stringify({ email, password }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Login failed");
-      }
-
-      const data = await response.json();
+      );
 
       setToken(data.access_token);
       setUser(data.user);
@@ -119,20 +98,14 @@ export function AuthProvider({ children }: { children: ReactNode }) {
 
   const register = async (email: string, password: string, name: string) => {
     try {
-      const response = await fetch(`${API_BASE_URL}/auth/register`, {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
+      const data = await fetchApi<{ access_token: string; user: User }>(
+        "/auth/register",
+        {
+          method: "POST",
+          body: { email, password, name },
+          requiresAuth: false,
         },
-        body: JSON.stringify({ email, password, name }),
-      });
-
-      if (!response.ok) {
-        const error = await response.json();
-        throw new Error(error.message || "Registration failed");
-      }
-
-      const data = await response.json();
+      );
 
       setToken(data.access_token);
       setUser(data.user);

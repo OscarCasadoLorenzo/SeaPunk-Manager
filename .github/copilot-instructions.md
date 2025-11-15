@@ -16,14 +16,19 @@ The `AGENTS.md` file provides a centralized reference to:
 
 ### 📁 Key Configuration Files
 
-| File                            | Purpose                                              |
-| ------------------------------- | ---------------------------------------------------- |
-| `.ai/context/project.md`        | Project overview and architecture summary            |
-| `.ai/prompts/commit-changes.md` | Conventional Commits workflow with GitFlow           |
-| `.ai/rules/architecture.md`     | Monorepo structure and module organization           |
-| `.ai/rules/security.md`         | Security best practices and vulnerability prevention |
-| `.ai/rules/style.md`            | TypeScript, React, and NestJS code style conventions |
-| `.ai/rules/testing.md`          | Testing requirements and coverage expectations       |
+| File                        | Purpose                                                  |
+| --------------------------- | -------------------------------------------------------- |
+| `.ai/context/project.md`    | Project overview and architecture summary                |
+| `.ai/rules/architecture.md` | Monorepo structure and module organization               |
+| `.ai/rules/security.md`     | Security best practices and vulnerability prevention     |
+| `.ai/rules/style.md`        | TypeScript, React, and NestJS code style conventions     |
+| `.ai/rules/testing.md`      | Testing requirements and coverage expectations           |
+| `.ai/rules/frontend.md`     | MUST: Frontend development guidelines and best practices |
+| `.ai/rules/backend.md`      | MUST: Backend development guidelines and best practices  |
+
+MUST: When you a are creating or updating a frontend file (under `apps/frontend`) you must at least check the specs in `.ai/rules/frontend.md`. These rules, instructions and directives must be followed always.
+
+MUST: When you a are creating or updating a backend file (under `apps/backend`) you must at least check the specs in `.ai/rules/backend.md`These rules, instructions and directives must be followed always.
 
 ### 🚨 Important Rules
 

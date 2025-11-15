@@ -1,108 +1,177 @@
-import { useCharacterContext } from '@/contexts/CharacterContext';
-import { useUpdateNarrative } from '@/hooks/useNarratives';
-import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
-import {
-  narrativeFormSchema,
-  type NarrativeFormData,
-} from '../schemas/narrative-form-schema';
+"use client";
 
-export const useNarrativeForm = (character: any) => {
+import { useCharacterContext } from "@/contexts/CharacterContext";
+import { useUpdateCharacter } from "@/hooks/useCharacters";
+import {
+  createField,
+  createFormConfig,
+  createSection,
+  type FormConfig,
+} from "@/utils/form-builder";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
+import { z } from "zod";
+import {
+  type FormMode,
+  isCreateMode,
+  isFieldEditable,
+} from "../types/form-mode";
+
+// ✅ Schema defined inline
+const narrativeFormSchema = z.object({
+  physicalDescription: z.string().optional(),
+  externalProfile: z.string().optional(),
+  internalProfile: z.string().optional(),
+  background: z.string().optional(),
+  specialties: z.string().optional(),
+});
+
+type NarrativeFormData = z.infer<typeof narrativeFormSchema>;
+
+export const useNarrativeForm = (character: any, mode: FormMode = "view") => {
   const { selectedCharacterId } = useCharacterContext();
 
-  // Extract data from the passed character object
+  // Extract data from character object
   const narrative = character?.narrative;
-  const narrativeLoading = false;
 
-  // Mutation hooks
-  const updateNarrative = useUpdateNarrative();
+  // Mutation hook
+  const updateCharacter = useUpdateCharacter();
 
-  // Extract current values for default form values
-  const getDefaultValues = (): NarrativeFormData => {
-    if (!narrative) {
-      return {
-        physicalDescription: '',
-        externalProfile: '',
-        internalProfile: '',
-        background: '',
-        specialties: '',
-      };
-    }
+  // ✅ Extract default values
+  const getDefaultValues = (): NarrativeFormData => ({
+    physicalDescription: narrative?.physicalDescription || "",
+    externalProfile: narrative?.externalProfile || "",
+    internalProfile: narrative?.internalProfile || "",
+    background: narrative?.background || "",
+    specialties: narrative?.specialties || "",
+  });
 
-    return {
-      physicalDescription: narrative.physicalDescription || '',
-      externalProfile: narrative.externalProfile || '',
-      internalProfile: narrative.internalProfile || '',
-      background: narrative.background || '',
-      specialties: narrative.specialties || '',
-    };
-  };
+  // ✅ Form configuration inline
+  const formConfig: FormConfig = React.useMemo(
+    () =>
+      createFormConfig({
+        sections: [
+          createSection({
+            title: "Narrativa del Personaje",
+            description: "Historia y descripción del personaje",
+            columns: 1,
+            fields: [
+              createField("textarea", {
+                name: "physicalDescription",
+                label: "Descripción Física",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe la apariencia física del personaje...",
+                rows: 4,
+              }),
+              createField("textarea", {
+                name: "externalProfile",
+                label: "Perfil Externo",
+                disabled: !isFieldEditable(mode),
+                placeholder:
+                  "Describe cómo se comporta el personaje en público...",
+                rows: 4,
+              }),
+              createField("textarea", {
+                name: "internalProfile",
+                label: "Perfil Interno",
+                disabled: !isFieldEditable(mode),
+                placeholder:
+                  "Describe los pensamientos y motivaciones del personaje...",
+                rows: 4,
+              }),
+              createField("textarea", {
+                name: "background",
+                label: "Trasfondo",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Cuenta la historia del personaje...",
+                rows: 6,
+              }),
+              createField("textarea", {
+                name: "specialties",
+                label: "Especialidades",
+                disabled: !isFieldEditable(mode),
+                placeholder:
+                  "Describe las habilidades especiales del personaje...",
+                rows: 4,
+              }),
+            ],
+          }),
+        ],
+      }),
+    [mode],
+  );
 
   // Form setup
   const form = useForm<NarrativeFormData>({
     resolver: zodResolver(narrativeFormSchema),
     defaultValues: getDefaultValues(),
-    mode: 'onChange',
-    reValidateMode: 'onChange',
+    mode: "onChange",
+    reValidateMode: "onChange",
     shouldFocusError: true,
   });
 
-  // Reset form when character changes (immediate reset to prevent showing old data)
+  // Update form when character data changes (only in edit/view mode)
   React.useEffect(() => {
-    if (selectedCharacterId) {
-      // Immediately reset to default empty values when character changes
-      form.reset({
-        physicalDescription: '',
-        externalProfile: '',
-        internalProfile: '',
-        background: '',
-        specialties: '',
-      });
+    if (character && selectedCharacterId && !isCreateMode(mode)) {
+      form.reset(getDefaultValues());
     }
-  }, [selectedCharacterId]);
+  }, [character, selectedCharacterId, mode]);
 
-  // Update form with actual narrative data when it loads
-  React.useEffect(() => {
-    if (narrative && selectedCharacterId) {
-      const defaultValues = getDefaultValues();
-      form.reset(defaultValues);
+  // ✅ Submit handler
+  const handleSubmit = async (data: NarrativeFormData): Promise<void> => {
+    if (!selectedCharacterId) {
+      toast.error("No hay personaje seleccionado");
+      return;
     }
-  }, [narrative, selectedCharacterId]);
-
-  // Submit handler
-  const handleSubmit = async (data: NarrativeFormData) => {
-    const narr = narrative as any;
-    if (!selectedCharacterId || !narr?.id) return;
 
     try {
-      await updateNarrative.mutateAsync({
-        id: narr.id,
-        data: {
-          physicalDescription: data.physicalDescription,
-          externalProfile: data.externalProfile,
-          internalProfile: data.internalProfile,
-          background: data.background,
-          specialties: data.specialties,
-        },
+      const updatePayload: any = {};
+
+      // Add narrative if it exists
+      if (narrative?.id) {
+        updatePayload.narrative = {
+          update: {
+            physicalDescription: data.physicalDescription || "",
+            externalProfile: data.externalProfile || "",
+            internalProfile: data.internalProfile || "",
+            background: data.background || "",
+            specialties: data.specialties || "",
+          },
+        };
+      } else {
+        // Create narrative if it doesn't exist
+        updatePayload.narrative = {
+          create: {
+            physicalDescription: data.physicalDescription || "",
+            externalProfile: data.externalProfile || "",
+            internalProfile: data.internalProfile || "",
+            background: data.background || "",
+            specialties: data.specialties || "",
+          },
+        };
+      }
+
+      await updateCharacter.mutateAsync({
+        id: selectedCharacterId,
+        data: updatePayload,
       });
 
-      toast.success('Narrativa actualizada correctamente');
+      toast.success("Narrativa actualizada correctamente");
     } catch (error) {
-      toast.error('Error al actualizar la narrativa');
-      console.error('Error updating narrative:', error);
+      toast.error("Error al actualizar la narrativa");
+      console.error("Error updating narrative:", error);
     }
   };
 
   // Loading state
-  const isLoading = updateNarrative.isPending;
+  const isLoading = updateCharacter.isPending;
 
   return {
     form,
+    formConfig, // ✅ Config exposed from hook
     handleSubmit,
     isLoading,
-    narrativeLoading,
-    narrative,
   };
 };
