@@ -52,24 +52,32 @@ export const CharacterForm = ({
   const narrativeForm = useNarrativeForm(character, currentMode);
   const inventoryForm = useInventoryForm(character, currentMode);
 
-  // Tab configuration
-  const tabs: TabConfig[] = [
-    {
-      id: "stats",
-      label: "Estadísticas",
-      ...statsForm,
-    },
-    {
-      id: "narrative",
-      label: "Narrativa",
-      ...narrativeForm,
-    },
-    {
-      id: "inventory",
-      label: "Inventario",
-      ...inventoryForm,
-    },
-  ];
+  // Tab configuration - only stats in create mode, all tabs otherwise
+  const tabs: TabConfig[] = isCreateMode(currentMode)
+    ? [
+        {
+          id: "stats",
+          label: "Estadísticas",
+          ...statsForm,
+        },
+      ]
+    : [
+        {
+          id: "stats",
+          label: "Estadísticas",
+          ...statsForm,
+        },
+        {
+          id: "narrative",
+          label: "Narrativa",
+          ...narrativeForm,
+        },
+        {
+          id: "inventory",
+          label: "Inventario",
+          ...inventoryForm,
+        },
+      ];
 
   // Get combined dirty state
   const isDirty = tabs.some((tab) => tab.form.formState.isDirty);
@@ -149,6 +157,12 @@ export const CharacterForm = ({
               : "Ficha de Personaje"}
           </h1>
           <p className="text-muted-foreground">{getHeaderText()}</p>
+          {isCreateMode(currentMode) && (
+            <p className="text-sm text-muted-foreground">
+              💡 Completa las estadísticas básicas. Podrás añadir narrativa e
+              inventario después desde la página de edición.
+            </p>
+          )}
         </div>
 
         {/* Only show edit button in view/edit modes, not in create mode */}
@@ -166,13 +180,16 @@ export const CharacterForm = ({
 
       {/* Tabs for different form sections */}
       <Tabs value={activeTab} onValueChange={setActiveTab} className="w-full">
-        <TabsList className={`grid w-full grid-cols-${tabs.length}`}>
-          {tabs.map((tab) => (
-            <TabsTrigger key={tab.id} value={tab.id}>
-              {tab.label}
-            </TabsTrigger>
-          ))}
-        </TabsList>
+        {/* Only show tabs navigation if not in create mode */}
+        {!isCreateMode(currentMode) && (
+          <TabsList className={"flex w-full"}>
+            {tabs.map((tab) => (
+              <TabsTrigger key={tab.id} value={tab.id}>
+                {tab.label}
+              </TabsTrigger>
+            ))}
+          </TabsList>
+        )}
 
         {tabs.map((tab) => (
           <TabsContent key={tab.id} value={tab.id} className="mt-6">
