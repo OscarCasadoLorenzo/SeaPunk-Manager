@@ -24,8 +24,8 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
   const { data: character, isLoading: characterLoading } =
     useCharacterWithDetails(selectedCharacterId || id);
 
-  // Initialize form hook with character data
-  const { form, handleSubmit, isLoading } = useCharacterForm(character);
+  // Initialize form hook with character data in view mode by default
+  const { form, handleSubmit, isLoading } = useCharacterForm(character, "view");
 
   if (characterLoading || !character) {
     return (
@@ -46,6 +46,7 @@ export default function CharacterDetail({ id }: CharacterDetailProps) {
         form={form}
         onSubmit={handleSubmit}
         isLoading={isLoading}
+        mode="view"
       />
     </div>
   );
