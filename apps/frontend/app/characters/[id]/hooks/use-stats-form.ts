@@ -83,7 +83,7 @@ export const useStatsForm = (character: any) => {
 
     return {
       // Basic character info
-      playerName: character.player?.playerName || "",
+      userId: character.userId || "",
       characterName: character.characterName || "",
       archetype: character.archetype || "",
       faction: character.faction || "",
