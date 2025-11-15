@@ -216,7 +216,9 @@ export const useCharacterForm = (character: any, mode: FormMode = "view") => {
         }
 
         // Create character
-        const newCharacter = await createCharacter.mutateAsync(createPayload);
+        const newCharacter = (await createCharacter.mutateAsync(
+          createPayload,
+        )) as { id: string };
 
         // Create initial inventory item if provided
         if (data.newItemName && data.newItemType && newCharacter?.id) {

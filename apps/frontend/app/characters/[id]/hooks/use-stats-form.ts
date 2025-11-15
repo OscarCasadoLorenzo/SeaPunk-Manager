@@ -1,16 +1,16 @@
-import { useCharacterContext } from '@/contexts/CharacterContext';
-import { useUpdateAttribute } from '@/hooks/useAttributes';
-import { useUpdateCharacter } from '@/hooks/useCharacters';
-import { useUpdateCombatStats } from '@/hooks/useCombatStats';
-import { useUpdateDomain } from '@/hooks/useDomains';
-import { zodResolver } from '@hookform/resolvers/zod';
-import React from 'react';
-import { useForm } from 'react-hook-form';
-import { toast } from 'sonner';
+import { useCharacterContext } from "@/contexts/CharacterContext";
+import { useUpdateAttribute } from "@/hooks/useAttributes";
+import { useUpdateCharacter } from "@/hooks/useCharacters";
+import { useUpdateCombatStats } from "@/hooks/useCombatStats";
+import { useUpdateDomain } from "@/hooks/useDomains";
+import { zodResolver } from "@hookform/resolvers/zod";
+import React from "react";
+import { useForm } from "react-hook-form";
+import { toast } from "sonner";
 import {
   statsFormSchema,
   type StatsFormData,
-} from '../schemas/stats-form-schema';
+} from "../schemas/stats-form-schema";
 
 export const useStatsForm = (character: any) => {
   const { selectedCharacterId } = useCharacterContext();
@@ -32,12 +32,12 @@ export const useStatsForm = (character: any) => {
     if (!character || !attributes || !domains || !combatStats) {
       return {
         // Basic character info defaults
-        playerName: '',
-        characterName: '',
-        archetype: '',
-        faction: '',
-        race: '',
-        category: '',
+        userId: "",
+        characterName: "",
+        archetype: "",
+        faction: "",
+        race: "",
+        category: "",
         level: 1,
         epicPoints: 0,
 
@@ -83,12 +83,12 @@ export const useStatsForm = (character: any) => {
 
     return {
       // Basic character info
-      playerName: character.player?.playerName || '',
-      characterName: character.characterName || '',
-      archetype: character.archetype || '',
-      faction: character.faction || '',
-      race: character.race || '',
-      category: character.category || '',
+      playerName: character.player?.playerName || "",
+      characterName: character.characterName || "",
+      archetype: character.archetype || "",
+      faction: character.faction || "",
+      race: character.race || "",
+      category: character.category || "",
       level: character.level || 1,
       epicPoints: character.epicPoints || 0,
 
@@ -132,8 +132,8 @@ export const useStatsForm = (character: any) => {
   const form = useForm<StatsFormData>({
     resolver: zodResolver(statsFormSchema),
     defaultValues: getDefaultValues(),
-    mode: 'onChange',
-    reValidateMode: 'onChange',
+    mode: "onChange",
+    reValidateMode: "onChange",
     shouldFocusError: true,
   });
 
@@ -142,12 +142,12 @@ export const useStatsForm = (character: any) => {
     if (selectedCharacterId) {
       // Immediately reset to default empty values when character changes
       form.reset({
-        playerName: '',
-        characterName: '',
-        archetype: '',
-        faction: '',
-        race: '',
-        category: '',
+        playerName: "",
+        characterName: "",
+        archetype: "",
+        faction: "",
+        race: "",
+        category: "",
         level: 1,
         epicPoints: 0,
         strength: 1,
@@ -270,10 +270,10 @@ export const useStatsForm = (character: any) => {
         });
       }
 
-      toast.success('Estadísticas actualizadas correctamente');
+      toast.success("Estadísticas actualizadas correctamente");
     } catch (error) {
-      toast.error('Error al actualizar las estadísticas');
-      console.error('Error updating stats:', error);
+      toast.error("Error al actualizar las estadísticas");
+      console.error("Error updating stats:", error);
     }
   };
 
