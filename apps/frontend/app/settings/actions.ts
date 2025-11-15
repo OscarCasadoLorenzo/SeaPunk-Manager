@@ -1,9 +1,14 @@
 // Client-side API calls for database settings
 import { fetchApi, fetchApiRaw } from "@/lib/api";
 
+interface DatabaseStats {
+  characters: number;
+  users: number;
+}
+
 // Database statistics
-export async function getDatabaseStats() {
-  return fetchApi("/settings/stats", {
+export async function getDatabaseStats(): Promise<DatabaseStats> {
+  return fetchApi<DatabaseStats>("/settings/stats", {
     cache: "no-store",
   });
 }
