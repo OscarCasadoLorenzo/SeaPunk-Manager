@@ -142,7 +142,7 @@ export const useStatsForm = (character: any) => {
     if (selectedCharacterId) {
       // Immediately reset to default empty values when character changes
       form.reset({
-        playerName: "",
+        userId: "",
         characterName: "",
         archetype: "",
         faction: "",
