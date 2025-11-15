@@ -1,7 +1,7 @@
 "use client";
 
 import { useCharacterContext } from "@/contexts/CharacterContext";
-import { useUpdateCharacter } from "@/hooks/useCharacters";
+import { useCreateCharacter, useUpdateCharacter } from "@/hooks/useCharacters";
 import { useCreateInventory, useUpdateInventory } from "@/hooks/useInventories";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
@@ -11,6 +11,7 @@ import { z } from "zod";
 import { inventoryFormSchema } from "../schemas/inventory-form-schema";
 import { narrativeFormSchema } from "../schemas/narrative-form-schema";
 import { statsFormSchema } from "../schemas/stats-form-schema";
+import { type FormMode, isCreateMode } from "../types/form-mode";
 
 // Combined schema for all tabs
 const characterFormSchema = statsFormSchema
@@ -19,7 +20,7 @@ const characterFormSchema = statsFormSchema
 
 type CharacterFormData = z.infer<typeof characterFormSchema>;
 
-export const useCharacterForm = (character: any) => {
+export const useCharacterForm = (character: any, mode: FormMode = "view") => {
   const { selectedCharacterId } = useCharacterContext();
 
   // Extract data from character object
@@ -30,6 +31,7 @@ export const useCharacterForm = (character: any) => {
   const inventories = character?.inventories || [];
 
   // Mutation hooks
+  const createCharacter = useCreateCharacter();
   const updateCharacter = useUpdateCharacter();
   const createInventory = useCreateInventory();
   const updateInventory = useUpdateInventory();
@@ -39,7 +41,7 @@ export const useCharacterForm = (character: any) => {
   const getDefaultValues = (): CharacterFormData => {
     const baseValues: CharacterFormData = {
       // Basic character info
-      playerName: character?.player?.playerName || "",
+      userId: character?.userId || "",
       characterName: character?.characterName || "",
       archetype: character?.archetype || "",
       faction: character?.faction || "",
@@ -128,16 +130,115 @@ export const useCharacterForm = (character: any) => {
     shouldFocusError: true,
   });
 
-  // Update form when character data changes
+  // Update form when character data changes (only in edit/view mode)
   React.useEffect(() => {
-    if (character && selectedCharacterId) {
+    if (character && selectedCharacterId && !isCreateMode(mode)) {
       const defaultValues = getDefaultValues();
       form.reset(defaultValues);
     }
-  }, [character, selectedCharacterId]);
+  }, [character, selectedCharacterId, mode]);
 
   // Submit handler
   const handleSubmit = async (data: CharacterFormData) => {
+    // CREATE MODE
+    if (isCreateMode(mode)) {
+      try {
+        // Build create payload with nested data
+        const createPayload: any = {
+          characterName: data.characterName,
+          archetype: data.archetype,
+          faction: data.faction,
+          race: data.race,
+          category: data.category || "",
+          level: data.level,
+          epicPoints: data.epicPoints,
+          type: "player", // Default type
+          isNPC: false,
+          isVisible: true,
+          userId: data.userId, // Get from form selection
+        };
+
+        // Add nested attributes
+        createPayload.attributes = {
+          strength: data.strength,
+          agility: data.agility,
+          willpower: data.willpower,
+          luck: data.luck,
+          intelligence: data.intelligence,
+        };
+
+        // Add nested domains
+        createPayload.domains = {
+          physical: data.physical,
+          combat: data.combat,
+          social: data.social,
+          environmental: data.environmental,
+          stealth: data.stealth,
+          knowledge: data.knowledge,
+          technical: data.technical,
+          resources: data.resources,
+          demonic: data.demonic,
+          aura: data.aura,
+        };
+
+        // Add nested combat stats
+        createPayload.combatStats = {
+          physicalHealth: data.physicalHealth,
+          maxPhysicalHealth: data.maxPhysicalHealth,
+          physicalResistance: data.physicalResistance,
+          maxPhysicalResistance: data.maxPhysicalResistance,
+          mentalHealth: data.mentalHealth,
+          maxMentalHealth: data.maxMentalHealth,
+          mentalResistance: data.mentalResistance,
+          maxMentalResistance: data.maxMentalResistance,
+          initiative: data.initiative,
+          defense: data.defense,
+          attack: data.attack,
+          impact: data.impact,
+          maxDamage: data.maxDamage,
+        };
+
+        // Add narrative if provided
+        if (
+          data.physicalDescription ||
+          data.externalProfile ||
+          data.internalProfile ||
+          data.background ||
+          data.specialties
+        ) {
+          createPayload.narrative = {
+            physicalDescription: data.physicalDescription || "",
+            externalProfile: data.externalProfile || "",
+            internalProfile: data.internalProfile || "",
+            background: data.background || "",
+            specialties: data.specialties || "",
+          };
+        }
+
+        // Create character
+        const newCharacter = await createCharacter.mutateAsync(createPayload);
+
+        // Create initial inventory item if provided
+        if (data.newItemName && data.newItemType && newCharacter?.id) {
+          await createInventory.mutateAsync({
+            characterId: newCharacter.id,
+            name: data.newItemName,
+            description: data.newItemDescription || "",
+            quantity: data.newItemQuantity || 1,
+            type: data.newItemType as string,
+          });
+        }
+
+        toast.success("Personaje creado correctamente");
+        return newCharacter;
+      } catch (error) {
+        toast.error("Error al crear el personaje");
+        console.error("Error creating character:", error);
+        throw error;
+      }
+    }
+
+    // UPDATE MODE
     if (!selectedCharacterId) {
       toast.error("No hay personaje seleccionado");
       return;
@@ -276,6 +377,7 @@ export const useCharacterForm = (character: any) => {
 
   // Loading state
   const isLoading =
+    createCharacter.isPending ||
     updateCharacter.isPending ||
     createInventory.isPending ||
     updateInventory.isPending;
