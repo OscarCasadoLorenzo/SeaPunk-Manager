@@ -36,6 +36,10 @@ Establish coding standards and best practices.
 
 - **`testing.md`** - Testing requirements, strategies, and patterns for unit tests, integration tests, E2E tests, and coverage expectations.
 
+- **`frontend.md`** - MUST: Frontend development guidelines and best practices
+
+- **`backend.md`** - MUST: Frontend development guidelines and best practices
+
 ---
 
 ## 🚨 Conflict Resolution

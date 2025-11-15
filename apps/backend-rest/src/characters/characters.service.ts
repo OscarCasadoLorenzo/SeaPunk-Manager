@@ -41,12 +41,14 @@ export class CharactersService {
   }
 
   async create(data: CreateCharacterDto): Promise<Character> {
-    const { attributes, domains, combatStats, ...characterData } = data;
+    const { attributes, domains, combatStats, narrative, ...characterData } =
+      data;
     return this.prisma.character.create({
       data: {
         ...characterData,
         attributes: attributes ? { create: attributes } : undefined,
         domains: domains ? { create: domains } : undefined,
+        narrative: narrative ? { create: narrative } : undefined,
         combatStats: combatStats
           ? {
               create: {
