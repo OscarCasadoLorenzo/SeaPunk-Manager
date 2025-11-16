@@ -231,6 +231,7 @@ describe("CharactersService", () => {
       isVisible: false,
       userId: "user-id-456",
       attributes: {
+        characterId: "new-id-123",
         strength: 5,
         agility: 10,
         willpower: 8,
@@ -238,11 +239,17 @@ describe("CharactersService", () => {
         intelligence: 12,
       },
       domains: {
+        characterId: "new-id-123",
         physical: 2,
-        mental: 5,
+        combat: 5,
         social: 4,
-        survival: 1,
+        environmental: 1,
+        stealth: 3,
         knowledge: 7,
+        technical: 2,
+        resources: 1,
+        demonic: 0,
+        aura: 2,
       },
       combatStats: {
         physicalHealth: 50,
@@ -557,7 +564,7 @@ describe("CharactersService", () => {
 
     it("should handle validation errors for invalid data types", async () => {
       const invalidUpdateData = {
-        level: "not-a-number" as any, // Invalid type
+        level: "not-a-number" as unknown as number, // Invalid type
       };
 
       const dbError = new Error("Invalid input type");
