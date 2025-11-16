@@ -1,6 +1,6 @@
 // Main exports
-export { FormBuilder } from './FormBuilder';
-export { FormField } from './FormField';
+export { FormBuilder } from "./FormBuilder";
+export { FormField } from "./FormField";
 
 // Types
 export type {
@@ -12,14 +12,18 @@ export type {
   FileFieldConfig,
   FormBuilderProps,
   FormConfig,
+  FormMode,
   FormSectionConfig,
   FormTabConfig,
+  isCreateMode,
+  isFieldEditable,
+  isViewMode,
   NumberFieldConfig,
   RadioGroupFieldConfig,
   SelectFieldConfig,
   TextareaFieldConfig,
   TextFieldConfig,
-} from './types';
+} from "./types";
 
 // Utilities
 export {
@@ -29,7 +33,7 @@ export {
   createTab,
   createValidationSchema,
   extractDefaultValues,
-} from './schema';
+} from "./schema";
 
 // Re-export default
-export { default } from './FormBuilder';
+export { default } from "./FormBuilder";

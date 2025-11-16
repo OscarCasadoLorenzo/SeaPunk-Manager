@@ -7,17 +7,15 @@ import {
   createFormConfig,
   createSection,
   type FormConfig,
+  type FormMode,
+  isCreateMode,
+  isFieldEditable,
 } from "@/utils/form-builder";
 import { zodResolver } from "@hookform/resolvers/zod";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
-import {
-  type FormMode,
-  isCreateMode,
-  isFieldEditable,
-} from "../types/form-mode";
 
 // ✅ Schema defined inline
 const narrativeFormSchema = z.object({

@@ -1,19 +1,19 @@
 "use client";
 
 import { useUsers } from "@/hooks";
-import { FormBuilder } from "@/utils/form-builder";
+import {
+  FormBuilder,
+  type FormMode,
+  isCreateMode,
+  isFieldEditable,
+  isViewMode,
+} from "@/utils/form-builder";
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@seapunk/ui";
 import { type ReactNode, useState } from "react";
 import { type UseFormReturn } from "react-hook-form";
 import { useInventoryForm } from "../hooks/use-inventory-form";
 import { useNarrativeForm } from "../hooks/use-narrative-form";
 import { useStatsForm } from "../hooks/use-stats-form";
-import {
-  type FormMode,
-  isCreateMode,
-  isFieldEditable,
-  isViewMode,
-} from "../types/form-mode";
 
 interface CharacterFormProps {
   character?: any;
