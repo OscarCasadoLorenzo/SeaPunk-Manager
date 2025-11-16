@@ -19,11 +19,12 @@ coverage:
         threshold: 5%
 
 comment:
-  layout: "reach,diff,flags,tree,footer"
+  layout: "diff, flags, files"
   behavior: default
-  require_changes: no
-  require_base: no
-  require_head: yes
+  require_changes: false
+  require_base: false
+  require_head: true
+  hide_project_coverage: false
 
 ignore:
   - "**/*.test.ts"
