@@ -17,7 +17,7 @@
  */
 
 import fs from "fs";
-import type { CoverageMap } from "istanbul-lib-coverage";
+import type { CoverageMap, CoverageMapData } from "istanbul-lib-coverage";
 import { createCoverageMap } from "istanbul-lib-coverage";
 import { createContext } from "istanbul-lib-report";
 import reports from "istanbul-reports";
@@ -32,10 +32,6 @@ const WORKSPACES = [
 
 const ROOT_COVERAGE_DIR = path.join(process.cwd(), "coverage");
 const COVERAGE_FILE = "coverage-final.json";
-
-interface CoverageData {
-  [key: string]: unknown;
-}
 
 /**
  * Find all coverage files in the monorepo
@@ -78,7 +74,7 @@ function mergeCoverageData(coverageFiles: string[]): CoverageMap {
   for (const filePath of coverageFiles) {
     const coverageData = JSON.parse(
       fs.readFileSync(filePath, "utf8"),
-    ) as CoverageData;
+    ) as CoverageMapData;
     coverageMap.merge(coverageData);
   }
 
