@@ -15,9 +15,6 @@ export type {
   FormMode,
   FormSectionConfig,
   FormTabConfig,
-  isCreateMode,
-  isFieldEditable,
-  isViewMode,
   NumberFieldConfig,
   RadioGroupFieldConfig,
   SelectFieldConfig,
@@ -35,5 +32,6 @@ export {
   extractDefaultValues,
 } from "./schema";
 
+export { isCreateMode, isFieldEditable, isViewMode } from "./types";
 // Re-export default
 export { default } from "./FormBuilder";
