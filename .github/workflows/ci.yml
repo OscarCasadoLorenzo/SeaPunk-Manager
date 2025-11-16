@@ -3,8 +3,8 @@ name: CI
 on:
   pull_request:
     paths-ignore:
-      - '**.md'
-      - 'docs/**'
+      - "**.md"
+      - "docs/**"
   push:
     branches: [main, develop]
 
@@ -22,7 +22,7 @@ jobs:
         uses: actions/setup-node@v4
         with:
           node-version: 22
-          cache: 'npm'
+          cache: "npm"
 
       - name: Cache node_modules
         uses: actions/cache@v4
@@ -67,3 +67,16 @@ jobs:
 
       - name: Test
         run: npm run test
+
+      - name: Merge Coverage Reports
+        run: npm run coverage:merge
+
+      - name: Upload Coverage to Codecov
+        uses: codecov/codecov-action@v4
+        with:
+          token: ${{ secrets.CODECOV_TOKEN }}
+          files: ./coverage/lcov.info
+          flags: unittests
+          name: codecov-umbrella
+          fail_ci_if_error: true
+          verbose: true

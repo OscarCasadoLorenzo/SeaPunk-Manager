@@ -1,6 +1,6 @@
-import { ReactNode } from 'react';
-import { FieldValues, UseFormReturn } from 'react-hook-form';
-import { z } from 'zod';
+import { ReactNode } from "react";
+import { FieldValues, UseFormReturn } from "react-hook-form";
+import { z } from "zod";
 
 // Base field configuration
 export interface BaseFieldConfig {
@@ -17,52 +17,52 @@ export interface BaseFieldConfig {
 
 // Specific field type configurations
 export interface TextFieldConfig extends BaseFieldConfig {
-  type: 'text' | 'email' | 'password' | 'url';
+  type: "text" | "email" | "password" | "url";
   maxLength?: number;
   minLength?: number;
 }
 
 export interface NumberFieldConfig extends BaseFieldConfig {
-  type: 'number';
+  type: "number";
   min?: number;
   max?: number;
   step?: number;
 }
 
 export interface TextareaFieldConfig extends BaseFieldConfig {
-  type: 'textarea';
+  type: "textarea";
   rows?: number;
   maxLength?: number;
   minLength?: number;
 }
 
 export interface SelectFieldConfig extends BaseFieldConfig {
-  type: 'select';
+  type: "select";
   options: Array<{ value: string | number; label: string; disabled?: boolean }>;
   multiple?: boolean;
 }
 
 export interface CheckboxFieldConfig extends BaseFieldConfig {
-  type: 'checkbox';
+  type: "checkbox";
 }
 
 export interface RadioGroupFieldConfig extends BaseFieldConfig {
-  type: 'radio';
+  type: "radio";
   options: Array<{ value: string | number; label: string; disabled?: boolean }>;
 }
 
 export interface DateFieldConfig extends BaseFieldConfig {
-  type: 'date' | 'datetime-local' | 'time';
+  type: "date" | "datetime-local" | "time";
 }
 
 export interface FileFieldConfig extends BaseFieldConfig {
-  type: 'file';
+  type: "file";
   accept?: string;
   multiple?: boolean;
 }
 
 export interface CustomFieldConfig extends BaseFieldConfig {
-  type: 'custom';
+  type: "custom";
   customComponent: string;
   customProps?: Record<string, any>;
 }
@@ -133,18 +133,47 @@ export interface FieldProps<T extends FieldValues = FieldValues> {
 
 // Utility types
 export type FormData<T extends FormConfig> = {
-  [K in T['sections'] extends readonly any[]
-    ? T['sections'][number]['fields'][number]['name']
-    : T['tabs'] extends readonly any[]
-      ? T['tabs'][number]['sections'][number]['fields'][number]['name']
+  [K in T["sections"] extends readonly any[]
+    ? T["sections"][number]["fields"][number]["name"]
+    : T["tabs"] extends readonly any[]
+      ? T["tabs"][number]["sections"][number]["fields"][number]["name"]
       : never]: any;
 };
 
 // Validation schema builder utility
 export type ValidationSchema<T extends FormConfig> = z.ZodObject<{
-  [K in T['sections'] extends readonly any[]
-    ? T['sections'][number]['fields'][number]['name']
-    : T['tabs'] extends readonly any[]
-      ? T['tabs'][number]['sections'][number]['fields'][number]['name']
+  [K in T["sections"] extends readonly any[]
+    ? T["sections"][number]["fields"][number]["name"]
+    : T["tabs"] extends readonly any[]
+      ? T["tabs"][number]["sections"][number]["fields"][number]["name"]
       : never]: z.ZodType<any>;
 }>;
+
+/**
+ * Form mode type for character forms
+ * - view: Read-only mode, all fields disabled
+ * - edit: Edit mode, editable fields enabled
+ * - create: Creation mode, all fields enabled (except auto-generated ones)
+ */
+export type FormMode = "view" | "edit" | "create";
+
+/**
+ * Helper function to determine if a field should be editable based on mode
+ */
+export const isFieldEditable = (mode: FormMode): boolean => {
+  return mode === "edit" || mode === "create";
+};
+
+/**
+ * Helper function to check if we're in create mode
+ */
+export const isCreateMode = (mode: FormMode): boolean => {
+  return mode === "create";
+};
+
+/**
+ * Helper function to check if we're in view mode
+ */
+export const isViewMode = (mode: FormMode): boolean => {
+  return mode === "view";
+};
