@@ -252,13 +252,10 @@ describe("validatePasswordStrength", () => {
 
   describe("score calculation", () => {
     it("should give 20 points per requirement (5 requirements total)", () => {
-      // 0 requirements met
-      expect(validatePasswordStrength("abc").score).toBe(0);
+      // 0 requirements met - only special chars
+      expect(validatePasswordStrength("!!!").score).toBe(20); // only hasSpecialChar
 
-      // 1 requirement met (minLength only)
-      expect(validatePasswordStrength("abcdefgh").score).toBe(20);
-
-      // 2 requirements met (minLength + hasLowercase)
+      // 1 requirement met (minLength + hasLowercase)
       expect(validatePasswordStrength("abcdefgh").score).toBe(40);
 
       // 3 requirements met (minLength + hasLowercase + hasUppercase)
@@ -318,7 +315,7 @@ describe("validatePasswordStrength", () => {
     it("should provide feedback for all unmet requirements", () => {
       const result = validatePasswordStrength("abc");
 
-      expect(result.feedback).toHaveLength(5);
+      expect(result.feedback).toHaveLength(4); // abc has lowercase, so 4 unmet requirements
       expect(result.feedback).toContain("Must be at least 8 characters long");
       expect(result.feedback).toContain(
         "Add at least one uppercase letter (A-Z)",
@@ -326,6 +323,10 @@ describe("validatePasswordStrength", () => {
       expect(result.feedback).toContain("Add at least one number (0-9)");
       expect(result.feedback).toContain(
         "Add at least one special character (@$!%*?&#, etc.)",
+      );
+      // Should NOT contain lowercase feedback since 'abc' has lowercase
+      expect(result.feedback).not.toContain(
+        "Add at least one lowercase letter (a-z)",
       );
     });
 
