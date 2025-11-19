@@ -52,7 +52,7 @@ export class UsersService {
     const data: any = { ...rest };
 
     if (password) {
-      const hashedPassword = await bcrypt.hash(password, 10);
+      const hashedPassword = await bcrypt.hash(password, 12);
       data.password = hashedPassword;
     }
 
