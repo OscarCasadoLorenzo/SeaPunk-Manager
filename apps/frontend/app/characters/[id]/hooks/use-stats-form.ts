@@ -63,28 +63,47 @@ const statsFormSchema = z.object({
   auraValue: z.number().min(0, "Aura cannot be negative"),
   auraEssence: z.string().default(""),
 
-  // Combat Stats
-  physicalHealth: z.number().min(0, "Physical health cannot be negative"),
+  // Combat Stats - Current values (only for edit/view mode)
+  physicalHealth: z
+    .number()
+    .min(0, "Physical health cannot be negative")
+    .optional(),
+  physicalResistance: z
+    .number()
+    .min(0, "Physical resistance cannot be negative")
+    .optional(),
+  mentalHealth: z
+    .number()
+    .min(0, "Mental health cannot be negative")
+    .optional(),
+  mentalResistance: z
+    .number()
+    .min(0, "Mental resistance cannot be negative")
+    .optional(),
+  initiative: z.number().min(0, "Initiative cannot be negative").optional(),
+  defense: z.number().min(0, "Defense cannot be negative").optional(),
+  attack: z.number().min(0, "Attack cannot be negative").optional(),
+  impact: z.number().min(0, "Impact cannot be negative").optional(),
+
+  // Combat Stats - Max values (required for create, editable in edit/view mode)
   maxPhysicalHealth: z
     .number()
     .min(1, "Max physical health must be at least 1"),
-  physicalResistance: z
-    .number()
-    .min(0, "Physical resistance cannot be negative"),
   maxPhysicalResistance: z
     .number()
     .min(1, "Max physical resistance must be at least 1"),
-  mentalHealth: z.number().min(0, "Mental health cannot be negative"),
   maxMentalHealth: z.number().min(1, "Max mental health must be at least 1"),
-  mentalResistance: z.number().min(0, "Mental resistance cannot be negative"),
   maxMentalResistance: z
     .number()
     .min(1, "Max mental resistance must be at least 1"),
-  initiative: z.number().min(0, "Initiative cannot be negative"),
-  defense: z.number().min(0, "Defense cannot be negative"),
-  attack: z.number().min(0, "Attack cannot be negative"),
-  impact: z.number().min(0, "Impact cannot be negative"),
-  maxDamage: z.number().min(0, "Max damage cannot be negative"),
+  maxInitiative: z
+    .number()
+    .min(0, "Max initiative cannot be negative")
+    .optional(),
+  maxDefense: z.number().min(0, "Max defense cannot be negative").optional(),
+  maxAttack: z.number().min(0, "Max attack cannot be negative").optional(),
+  maxImpact: z.number().min(0, "Max impact cannot be negative").optional(),
+  maxDamage: z.number().min(0, "Max damage cannot be negative").optional(),
 });
 
 type StatsFormData = z.infer<typeof statsFormSchema>;
@@ -147,19 +166,23 @@ export const useStatsForm = (
     auraValue: domains?.auraValue || 0,
     auraEssence: domains?.auraEssence || "",
 
-    // Combat Stats
-    physicalHealth: combatStats?.physicalHealth || 100,
+    // Combat Stats - Current values (only needed in edit/view mode, not create)
+    physicalHealth: combatStats?.physicalHealth,
     maxPhysicalHealth: combatStats?.maxPhysicalHealth || 100,
-    physicalResistance: combatStats?.physicalResistance || 100,
+    physicalResistance: combatStats?.physicalResistance,
     maxPhysicalResistance: combatStats?.maxPhysicalResistance || 100,
-    mentalHealth: combatStats?.mentalHealth || 100,
+    mentalHealth: combatStats?.mentalHealth,
     maxMentalHealth: combatStats?.maxMentalHealth || 100,
-    mentalResistance: combatStats?.mentalResistance || 100,
+    mentalResistance: combatStats?.mentalResistance,
     maxMentalResistance: combatStats?.maxMentalResistance || 100,
-    initiative: combatStats?.initiative || 0,
-    defense: combatStats?.defense || 0,
-    attack: combatStats?.attack || 0,
-    impact: combatStats?.impact || 0,
+    initiative: combatStats?.initiative,
+    maxInitiative: combatStats?.maxInitiative || 0,
+    defense: combatStats?.defense,
+    maxDefense: combatStats?.maxDefense || 0,
+    attack: combatStats?.attack,
+    maxAttack: combatStats?.maxAttack || 0,
+    impact: combatStats?.impact,
+    maxImpact: combatStats?.maxImpact || 0,
     maxDamage: combatStats?.maxDamage || 0,
   });
 
@@ -418,30 +441,48 @@ export const useStatsForm = (
 
           createSection({
             title: "Estadísticas de Combate",
-            description: "Salud, resistencia y estadísticas de combate",
+            description: isCreateMode(mode)
+              ? "Define los valores máximos. Los valores actuales se inicializarán automáticamente."
+              : "Salud, resistencia y estadísticas de combate",
             columns: 2,
             fields: [
-              createField("number", {
-                name: "physicalHealth",
-                label: "Salud Física",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+              // In CREATE mode, only show max* fields
+              // In EDIT/VIEW mode, show both current and max fields
+
+              // Physical Health
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "physicalHealth",
+                      label: "Salud Física",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxPhysicalHealth",
-                label: "Salud Física Máxima",
+                label: isCreateMode(mode)
+                  ? "Salud Física Máxima"
+                  : "Salud Física Máxima",
                 disabled: !isFieldEditable(mode),
                 min: 1,
                 defaultValue: 100,
               }),
-              createField("number", {
-                name: "physicalResistance",
-                label: "Resistencia Física",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+
+              // Physical Resistance
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "physicalResistance",
+                      label: "Resistencia Física",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxPhysicalResistance",
                 label: "Resistencia Física Máxima",
@@ -449,13 +490,19 @@ export const useStatsForm = (
                 min: 1,
                 defaultValue: 100,
               }),
-              createField("number", {
-                name: "mentalHealth",
-                label: "Salud Mental",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+
+              // Mental Health
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "mentalHealth",
+                      label: "Salud Mental",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxMentalHealth",
                 label: "Salud Mental Máxima",
@@ -463,13 +510,19 @@ export const useStatsForm = (
                 min: 1,
                 defaultValue: 100,
               }),
-              createField("number", {
-                name: "mentalResistance",
-                label: "Resistencia Mental",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+
+              // Mental Resistance
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "mentalResistance",
+                      label: "Resistencia Mental",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxMentalResistance",
                 label: "Resistencia Mental Máxima",
@@ -477,34 +530,90 @@ export const useStatsForm = (
                 min: 1,
                 defaultValue: 100,
               }),
+
+              // Initiative
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "initiative",
+                      label: "Iniciativa",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "initiative",
-                label: "Iniciativa",
+                name: "maxInitiative",
+                label: isCreateMode(mode)
+                  ? "Iniciativa Máxima"
+                  : "Iniciativa Máxima",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Defense
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "defense",
+                      label: "Defensa",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "defense",
-                label: "Defensa",
+                name: "maxDefense",
+                label: isCreateMode(mode) ? "Defensa Máxima" : "Defensa Máxima",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Attack
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "attack",
+                      label: "Ataque",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "attack",
-                label: "Ataque",
+                name: "maxAttack",
+                label: isCreateMode(mode) ? "Ataque Máximo" : "Ataque Máximo",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Impact
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "impact",
+                      label: "Impacto",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "impact",
-                label: "Impacto",
+                name: "maxImpact",
+                label: isCreateMode(mode) ? "Impacto Máximo" : "Impacto Máximo",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Max Damage (no current value, always show)
               createField("number", {
                 name: "maxDamage",
                 label: "Daño Máximo",
@@ -586,21 +695,18 @@ export const useStatsForm = (
           auraEssence: data.auraEssence,
         };
 
-        // Add nested combat stats
+        // Add nested combat stats - Only max values for creation
+        // Current values will be initialized by the backend service
         createPayload.combatStats = {
-          physicalHealth: data.physicalHealth,
           maxPhysicalHealth: data.maxPhysicalHealth,
-          physicalResistance: data.physicalResistance,
           maxPhysicalResistance: data.maxPhysicalResistance,
-          mentalHealth: data.mentalHealth,
           maxMentalHealth: data.maxMentalHealth,
-          mentalResistance: data.mentalResistance,
           maxMentalResistance: data.maxMentalResistance,
-          initiative: data.initiative,
-          defense: data.defense,
-          attack: data.attack,
-          impact: data.impact,
-          maxDamage: data.maxDamage,
+          maxInitiative: data.maxInitiative ?? 0,
+          maxDefense: data.maxDefense ?? 0,
+          maxAttack: data.maxAttack ?? 0,
+          maxImpact: data.maxImpact ?? 0,
+          maxDamage: data.maxDamage ?? 0,
         };
 
         const newCharacter = (await createCharacter.mutateAsync(
@@ -682,7 +788,7 @@ export const useStatsForm = (
         };
       }
 
-      // Add combat stats if they exist
+      // Add combat stats if they exist - Include both current and max values
       if (combatStats?.id) {
         updatePayload.combatStats = {
           update: {
@@ -695,9 +801,13 @@ export const useStatsForm = (
             mentalResistance: data.mentalResistance,
             maxMentalResistance: data.maxMentalResistance,
             initiative: data.initiative,
+            maxInitiative: data.maxInitiative,
             defense: data.defense,
+            maxDefense: data.maxDefense,
             attack: data.attack,
+            maxAttack: data.maxAttack,
             impact: data.impact,
+            maxImpact: data.maxImpact,
             maxDamage: data.maxDamage,
           },
         };

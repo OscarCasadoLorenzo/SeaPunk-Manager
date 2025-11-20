@@ -99,25 +99,33 @@ model Domain {
 model CombatStats {
   id                    String    @id @default(cuid())
   characterId           String    @unique
+
   physicalHealth        Int
   maxPhysicalHealth     Int
+
   physicalResistance    Int
   maxPhysicalResistance Int
+
   mentalHealth          Int
   maxMentalHealth       Int
+
   mentalResistance      Int
   maxMentalResistance   Int
-  auraHealth           Int       @default(0)
-  maxAuraHealth        Int       @default(0)
-  auraResistance       Int       @default(0)
-  maxAuraResistance    Int       @default(0)
-  initiative            Int
-  armorClass           Int       @default(10)
-  conditions           String[]  @default([])
-  defense              Int       @default(10)
-  attack               Int       @default(0)
-  impact               Int       @default(0)
-  maxDamage            Int       @default(0)
+
+  initiative            Int       @default(0)
+  maxInitiative         Int       @default(0)
+
+  defense               Int       @default(0)
+  maxDefense            Int       @default(0)
+
+  attack                Int       @default(0)
+  maxAttack             Int       @default(0)
+
+  impact                Int       @default(0)
+  maxImpact             Int       @default(0)
+
+  maxDamage             Int       @default(0)
+
   character             Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("combat_stats")
