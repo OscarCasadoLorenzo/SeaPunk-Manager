@@ -41,14 +41,6 @@ model Character {
   isNPC                     Boolean       @default(false)
   isVisible                 Boolean       @default(true)
   userId                    String
-  // Legacy fields from old schema (restored for backward compatibility)
-  bcat                      Int           @default(0)
-  powerLevel                Int           @default(0)
-  physicalResistanceDomain  String?
-  mentalResistanceDomain    String?
-  defenseDomain             String?
-  attackDomain              String?
-  impactDomain              String?
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
   user                      User          @relation(fields: [userId], references: [id], onDelete: Cascade)

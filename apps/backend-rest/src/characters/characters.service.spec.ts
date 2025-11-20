@@ -29,13 +29,6 @@ describe("CharactersService", () => {
     isNPC: false,
     isVisible: true,
     userId: "user-id-123",
-    bcat: 0,
-    powerLevel: 0,
-    physicalResistanceDomain: null,
-    mentalResistanceDomain: null,
-    defenseDomain: null,
-    attackDomain: null,
-    impactDomain: null,
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
   };
@@ -675,26 +668,6 @@ describe("CharactersService", () => {
   });
 
   describe("Edge Cases - Complex Scenarios", () => {
-    it("should handle character with all optional fields set to null", async () => {
-      const characterWithNulls = {
-        ...mockCharacter,
-        physicalResistanceDomain: null,
-        mentalResistanceDomain: null,
-        defenseDomain: null,
-        attackDomain: null,
-        impactDomain: null,
-      };
-
-      mockPrismaService.character.findUnique.mockResolvedValue(
-        characterWithNulls,
-      );
-
-      const result = await service.findOne("test-id-123");
-
-      expect(result).toEqual(characterWithNulls);
-      expect(result.physicalResistanceDomain).toBeNull();
-    });
-
     it("should handle character with maximum level and epic points", async () => {
       const maxCharacter = {
         ...mockCharacter,
