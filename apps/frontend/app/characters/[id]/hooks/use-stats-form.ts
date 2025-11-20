@@ -298,14 +298,14 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "combatValue",
-                label: "Combate",
+                label: "Batalla",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
               createField("text", {
                 name: "combatEssence",
-                label: "Esencia de Combate",
+                label: "Esencia de Batalla",
                 disabled: !isFieldEditable(mode),
                 placeholder: "Describe el dominio de combate",
               }),
@@ -337,14 +337,14 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "stealthValue",
-                label: "Sigilo",
+                label: "Ocultación",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
               createField("text", {
                 name: "stealthEssence",
-                label: "Esencia de Sigilo",
+                label: "Esencia de Ocultación",
                 disabled: !isFieldEditable(mode),
                 placeholder: "Describe el dominio de sigilo",
               }),
