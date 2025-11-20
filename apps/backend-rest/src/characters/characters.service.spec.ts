@@ -163,6 +163,7 @@ describe("CharactersService", () => {
           effects: true,
           inventories: true,
           narrative: true,
+          essences: true,
         },
       });
     });
@@ -208,6 +209,7 @@ describe("CharactersService", () => {
           effects: true,
           inventories: true,
           narrative: true,
+          essences: true,
         },
       });
     });
