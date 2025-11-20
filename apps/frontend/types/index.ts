@@ -25,6 +25,15 @@ export interface Character {
   effects?: unknown[];
   inventories?: unknown[];
   narrative?: unknown;
+  essences?: Essence[];
+}
+
+export interface Essence {
+  id: string;
+  characterId: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CharacterAttributes {
