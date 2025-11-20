@@ -217,7 +217,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "agility",
-                label: "Agilidad",
+                label: "Dinamismo",
                 required: true,
                 disabled: !isFieldEditable(mode),
                 min: 1,
