@@ -30,16 +30,26 @@ export interface CharacterAttributes {
 export interface CharacterDomains {
   id: string;
   characterId: string;
-  physical: number;
-  combat: number;
-  social: number;
-  environmental: number;
-  stealth: number;
-  knowledge: number;
-  technical: number;
-  resources: number;
-  demonic: number;
-  aura: number;
+  physicalValue: number;
+  physicalEssence: string;
+  combatValue: number;
+  combatEssence: string;
+  socialValue: number;
+  socialEssence: string;
+  environmentalValue: number;
+  environmentalEssence: string;
+  stealthValue: number;
+  stealthEssence: string;
+  knowledgeValue: number;
+  knowledgeEssence: string;
+  technicalValue: number;
+  technicalEssence: string;
+  resourcesValue: number;
+  resourcesEssence: string;
+  demonicValue: number;
+  demonicEssence: string;
+  auraValue: number;
+  auraEssence: string;
 }
 
 export interface CombatStats {
