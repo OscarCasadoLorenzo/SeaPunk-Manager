@@ -24,19 +24,11 @@ describe("CharactersService", () => {
     faction: "Alliance",
     race: "Human",
     level: 5,
-    category: "Hero",
     epicPoints: 100,
     type: "Player",
     isNPC: false,
     isVisible: true,
     userId: "user-id-123",
-    bcat: 0,
-    powerLevel: 0,
-    physicalResistanceDomain: null,
-    mentalResistanceDomain: null,
-    defenseDomain: null,
-    attackDomain: null,
-    impactDomain: null,
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
   };
@@ -55,11 +47,26 @@ describe("CharactersService", () => {
     domains: {
       id: "domain-id-123",
       characterId: "test-id-123",
-      physical: 5,
-      mental: 4,
-      social: 3,
-      survival: 2,
-      knowledge: 6,
+      physicalValue: 5,
+      physicalEssence: "Test physical essence",
+      combatValue: 4,
+      combatEssence: "Test combat essence",
+      socialValue: 3,
+      socialEssence: "Test social essence",
+      environmentalValue: 2,
+      environmentalEssence: "Test environmental essence",
+      stealthValue: 6,
+      stealthEssence: "Test stealth essence",
+      knowledgeValue: 6,
+      knowledgeEssence: "Test knowledge essence",
+      technicalValue: 2,
+      technicalEssence: "Test technical essence",
+      resourcesValue: 1,
+      resourcesEssence: "Test resources essence",
+      demonicValue: 0,
+      demonicEssence: "Test demonic essence",
+      auraValue: 2,
+      auraEssence: "Test aura essence",
     },
     combatStats: {
       id: "combat-id-123",
@@ -82,6 +89,7 @@ describe("CharactersService", () => {
       defense: 10,
       attack: 12,
       impact: 8,
+      maxImpact: 20,
       maxDamage: 20,
     },
     user: {
@@ -90,7 +98,6 @@ describe("CharactersService", () => {
       email: "test@example.com",
     },
     auraGifts: [],
-    essences: [],
     effects: [],
     inventories: [],
     narrative: null,
@@ -134,7 +141,6 @@ describe("CharactersService", () => {
           combatStats: true,
           user: true,
           auraGifts: true,
-          essences: true,
           effects: true,
           inventories: true,
           narrative: true,
@@ -180,7 +186,6 @@ describe("CharactersService", () => {
           combatStats: true,
           user: true,
           auraGifts: true,
-          essences: true,
           effects: true,
           inventories: true,
           narrative: true,
@@ -224,7 +229,6 @@ describe("CharactersService", () => {
       faction: "Horde",
       race: "Elf",
       level: 1,
-      category: "NPC",
       epicPoints: 0,
       type: "Enemy",
       isNPC: true,
@@ -240,36 +244,36 @@ describe("CharactersService", () => {
       },
       domains: {
         characterId: "new-id-123",
-        physical: 2,
-        combat: 5,
-        social: 4,
-        environmental: 1,
-        stealth: 3,
-        knowledge: 7,
-        technical: 2,
-        resources: 1,
-        demonic: 0,
-        aura: 2,
+        physicalValue: 2,
+        physicalEssence: "Physical essence",
+        combatValue: 5,
+        combatEssence: "Combat essence",
+        socialValue: 4,
+        socialEssence: "Social essence",
+        environmentalValue: 1,
+        environmentalEssence: "Environmental essence",
+        stealthValue: 3,
+        stealthEssence: "Stealth essence",
+        knowledgeValue: 7,
+        knowledgeEssence: "Knowledge essence",
+        technicalValue: 2,
+        technicalEssence: "Technical essence",
+        resourcesValue: 1,
+        resourcesEssence: "Resources essence",
+        demonicValue: 0,
+        demonicEssence: "Demonic essence",
+        auraValue: 2,
+        auraEssence: "Aura essence",
       },
       combatStats: {
-        physicalHealth: 50,
         maxPhysicalHealth: 50,
-        physicalResistance: 25,
         maxPhysicalResistance: 25,
-        mentalHealth: 70,
         maxMentalHealth: 70,
-        mentalResistance: 35,
         maxMentalResistance: 35,
-        auraHealth: 40,
-        maxAuraHealth: 40,
-        auraResistance: 20,
-        maxAuraResistance: 20,
-        initiative: 3,
-        armorClass: 12,
-        conditions: [],
-        defense: 8,
-        attack: 10,
-        impact: 6,
+        maxInitiative: 3,
+        maxDefense: 8,
+        maxAttack: 10,
+        maxImpact: 15,
         maxDamage: 15,
       },
     };
@@ -285,6 +289,7 @@ describe("CharactersService", () => {
         combatStats: createDto.combatStats,
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(null);
       mockPrismaService.character.create.mockResolvedValue(
         expectedCreatedCharacter,
       );
@@ -292,6 +297,9 @@ describe("CharactersService", () => {
       const result = await service.create(createDto);
 
       expect(result).toEqual(expectedCreatedCharacter);
+      expect(prisma.character.findUnique).toHaveBeenCalledWith({
+        where: { characterName: createDto.characterName },
+      });
       expect(prisma.character.create).toHaveBeenCalledTimes(1);
       expect(prisma.character.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -302,13 +310,36 @@ describe("CharactersService", () => {
           domains: { create: createDto.domains },
           combatStats: {
             create: expect.objectContaining({
-              physicalHealth: createDto.combatStats.physicalHealth,
-              maxPhysicalHealth: createDto.combatStats.maxPhysicalHealth,
+              // Current values should be initialized to max values
+              physicalHealth: createDto.combatStats?.maxPhysicalHealth,
+              maxPhysicalHealth: createDto.combatStats?.maxPhysicalHealth,
+              physicalResistance: createDto.combatStats?.maxPhysicalResistance,
+              maxPhysicalResistance:
+                createDto.combatStats?.maxPhysicalResistance,
+              mentalHealth: createDto.combatStats?.maxMentalHealth,
+              maxMentalHealth: createDto.combatStats?.maxMentalHealth,
+              mentalResistance: createDto.combatStats?.maxMentalResistance,
+              maxMentalResistance: createDto.combatStats?.maxMentalResistance,
             }),
           },
         }),
         include: expect.any(Object),
       });
+    });
+
+    it("should throw ConflictException when character name already exists", async () => {
+      const existingCharacter = { ...mockCharacter };
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        existingCharacter,
+      );
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        `Character with name "${createDto.characterName}" already exists`,
+      );
+      expect(prisma.character.findUnique).toHaveBeenCalledWith({
+        where: { characterName: createDto.characterName },
+      });
+      expect(prisma.character.create).not.toHaveBeenCalled();
     });
 
     it("should create a character without optional relations", async () => {
@@ -318,7 +349,6 @@ describe("CharactersService", () => {
         faction: "Neutral",
         race: "Dwarf",
         level: 1,
-        category: "NPC",
         epicPoints: 0,
         type: "Merchant",
         userId: "user-id-789",
@@ -330,6 +360,7 @@ describe("CharactersService", () => {
         ...minimalDto,
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(null);
       mockPrismaService.character.create.mockResolvedValue(expectedCharacter);
 
       const result = await service.create(minimalDto);
@@ -449,8 +480,10 @@ describe("CharactersService", () => {
     it("should update nested domains relation without explicit update key", async () => {
       const updateData = {
         domains: {
-          physical: 10,
-          mental: 8,
+          physicalValue: 10,
+          physicalEssence: "Updated physical essence",
+          combatValue: 8,
+          combatEssence: "Updated combat essence",
         },
       };
 
@@ -458,8 +491,10 @@ describe("CharactersService", () => {
         ...mockCharacterWithRelations,
         domains: {
           ...mockCharacterWithRelations.domains,
-          physical: 10,
-          mental: 8,
+          physicalValue: 10,
+          physicalEssence: "Updated physical essence",
+          combatValue: 8,
+          combatEssence: "Updated combat essence",
         },
       };
 
@@ -632,26 +667,6 @@ describe("CharactersService", () => {
   });
 
   describe("Edge Cases - Complex Scenarios", () => {
-    it("should handle character with all optional fields set to null", async () => {
-      const characterWithNulls = {
-        ...mockCharacter,
-        physicalResistanceDomain: null,
-        mentalResistanceDomain: null,
-        defenseDomain: null,
-        attackDomain: null,
-        impactDomain: null,
-      };
-
-      mockPrismaService.character.findUnique.mockResolvedValue(
-        characterWithNulls,
-      );
-
-      const result = await service.findOne("test-id-123");
-
-      expect(result).toEqual(characterWithNulls);
-      expect(result.physicalResistanceDomain).toBeNull();
-    });
-
     it("should handle character with maximum level and epic points", async () => {
       const maxCharacter = {
         ...mockCharacter,

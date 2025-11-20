@@ -16,20 +16,11 @@ export class CreateCharacterDto {
   faction: string;
   race: string;
   level: number;
-  category: string;
   epicPoints: number;
   type: string;
   isNPC?: boolean;
   isVisible?: boolean;
   userId: string;
-  // Legacy fields (optional, for backward compatibility)
-  bcat?: number;
-  powerLevel?: number;
-  physicalResistanceDomain?: string;
-  mentalResistanceDomain?: string;
-  defenseDomain?: string;
-  attackDomain?: string;
-  impactDomain?: string;
   attributes?: CreateAttributeDto;
   domains?: CreateDomainDto;
   combatStats?: CreateCombatStatsDto;

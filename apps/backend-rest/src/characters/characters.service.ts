@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { Character } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCharacterDto } from "./dto/create-character.dto";
@@ -15,7 +15,6 @@ export class CharactersService {
         combatStats: true,
         user: true,
         auraGifts: true,
-        essences: true,
         effects: true,
         inventories: true,
         narrative: true,
@@ -32,7 +31,6 @@ export class CharactersService {
         combatStats: true,
         user: true,
         auraGifts: true,
-        essences: true,
         effects: true,
         inventories: true,
         narrative: true,
@@ -43,6 +41,18 @@ export class CharactersService {
   async create(data: CreateCharacterDto): Promise<Character> {
     const { attributes, domains, combatStats, narrative, ...characterData } =
       data;
+
+    // Check if character name already exists
+    const existingCharacter = await this.prisma.character.findUnique({
+      where: { characterName: characterData.characterName },
+    });
+
+    if (existingCharacter) {
+      throw new ConflictException(
+        `Character with name "${characterData.characterName}" already exists`,
+      );
+    }
+
     return this.prisma.character.create({
       data: {
         ...characterData,
@@ -52,25 +62,24 @@ export class CharactersService {
         combatStats: combatStats
           ? {
               create: {
-                physicalHealth: combatStats.physicalHealth,
+                // Initialize current values to match max values for new characters
+                physicalHealth: combatStats.maxPhysicalHealth,
                 maxPhysicalHealth: combatStats.maxPhysicalHealth,
-                physicalResistance: combatStats.physicalResistance,
+                physicalResistance: combatStats.maxPhysicalResistance,
                 maxPhysicalResistance: combatStats.maxPhysicalResistance,
-                mentalHealth: combatStats.mentalHealth,
+                mentalHealth: combatStats.maxMentalHealth,
                 maxMentalHealth: combatStats.maxMentalHealth,
-                mentalResistance: combatStats.mentalResistance,
+                mentalResistance: combatStats.maxMentalResistance,
                 maxMentalResistance: combatStats.maxMentalResistance,
-                auraHealth: combatStats.auraHealth,
-                maxAuraHealth: combatStats.maxAuraHealth,
-                auraResistance: combatStats.auraResistance,
-                maxAuraResistance: combatStats.maxAuraResistance,
-                initiative: combatStats.initiative,
-                armorClass: combatStats.armorClass,
-                conditions: combatStats.conditions,
-                defense: combatStats.defense,
-                attack: combatStats.attack,
-                impact: combatStats.impact,
-                maxDamage: combatStats.maxDamage,
+                initiative: combatStats.maxInitiative ?? 0,
+                maxInitiative: combatStats.maxInitiative ?? 0,
+                defense: combatStats.maxDefense ?? 0,
+                maxDefense: combatStats.maxDefense ?? 0,
+                attack: combatStats.maxAttack ?? 0,
+                maxAttack: combatStats.maxAttack ?? 0,
+                impact: combatStats.maxImpact ?? 0,
+                maxImpact: combatStats.maxImpact ?? 0,
+                maxDamage: combatStats.maxDamage ?? 0,
               },
             }
           : undefined,
@@ -81,7 +90,6 @@ export class CharactersService {
         combatStats: true,
         user: true,
         auraGifts: true,
-        essences: true,
         effects: true,
         inventories: true,
         narrative: true,
@@ -138,7 +146,6 @@ export class CharactersService {
         combatStats: true,
         user: true,
         auraGifts: true,
-        essences: true,
         effects: true,
         inventories: true,
         narrative: true,

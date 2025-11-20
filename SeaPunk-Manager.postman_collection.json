@@ -591,121 +591,6 @@
       "description": "Aura gifts management"
     },
     {
-      "name": "Essences",
-      "item": [
-        {
-          "name": "Get All Essences",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/essences",
-              "host": ["{{base_url}}"],
-              "path": ["essences"]
-            },
-            "description": "Get all essences"
-          },
-          "response": []
-        },
-        {
-          "name": "Get Essence by ID",
-          "request": {
-            "method": "GET",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/essences/:id",
-              "host": ["{{base_url}}"],
-              "path": ["essences", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "",
-                  "description": "Essence UUID"
-                }
-              ]
-            },
-            "description": "Get specific essence by ID"
-          },
-          "response": []
-        },
-        {
-          "name": "Create Essence",
-          "request": {
-            "method": "POST",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Fire Essence\",\n  \"description\": \"Elemental fire power\",\n  \"type\": \"Elemental\",\n  \"rarity\": \"Rare\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/essences",
-              "host": ["{{base_url}}"],
-              "path": ["essences"]
-            },
-            "description": "Create a new essence"
-          },
-          "response": []
-        },
-        {
-          "name": "Update Essence",
-          "request": {
-            "method": "PATCH",
-            "header": [
-              {
-                "key": "Content-Type",
-                "value": "application/json"
-              }
-            ],
-            "body": {
-              "mode": "raw",
-              "raw": "{\n  \"name\": \"Greater Fire Essence\",\n  \"rarity\": \"Epic\"\n}"
-            },
-            "url": {
-              "raw": "{{base_url}}/essences/:id",
-              "host": ["{{base_url}}"],
-              "path": ["essences", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "",
-                  "description": "Essence UUID"
-                }
-              ]
-            },
-            "description": "Update an essence"
-          },
-          "response": []
-        },
-        {
-          "name": "Delete Essence",
-          "request": {
-            "method": "DELETE",
-            "header": [],
-            "url": {
-              "raw": "{{base_url}}/essences/:id",
-              "host": ["{{base_url}}"],
-              "path": ["essences", ":id"],
-              "variable": [
-                {
-                  "key": "id",
-                  "value": "",
-                  "description": "Essence UUID"
-                }
-              ]
-            },
-            "description": "Delete an essence"
-          },
-          "response": []
-        }
-      ],
-      "description": "Essences management"
-    },
-    {
       "name": "Effects",
       "item": [
         {
@@ -978,7 +863,7 @@
             ],
             "body": {
               "mode": "raw",
-              "raw": "{\n  \"metadata\": {\n    \"version\": \"1.0.0\",\n    \"timestamp\": \"2025-11-14T12:00:00Z\",\n    \"characterCount\": 10\n  },\n  \"data\": {\n    \"users\": [],\n    \"characters\": [],\n    \"attributes\": [],\n    \"domains\": [],\n    \"combatStats\": [],\n    \"narratives\": [],\n    \"inventories\": [],\n    \"effects\": [],\n    \"essences\": [],\n    \"auraGifts\": []\n  }\n}"
+              "raw": "{\n  \"metadata\": {\n    \"version\": \"1.0.0\",\n    \"timestamp\": \"2025-11-14T12:00:00Z\",\n    \"characterCount\": 10\n  },\n  \"data\": {\n    \"users\": [],\n    \"characters\": [],\n    \"attributes\": [],\n    \"domains\": [],\n    \"combatStats\": [],\n    \"narratives\": [],\n    \"inventories\": [],\n    \"effects\": [],\n    \"auraGifts\": []\n  }\n}"
             },
             "url": {
               "raw": "{{base_url}}/settings/import",

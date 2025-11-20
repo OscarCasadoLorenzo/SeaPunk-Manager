@@ -20,6 +20,7 @@ interface CharacterFormProps {
   isLoading?: boolean;
   mode?: FormMode;
   onModeChange?: (mode: FormMode) => void;
+  onCreateSuccess?: (characterId: string) => void;
 }
 
 interface TabConfig {
@@ -36,6 +37,7 @@ export const CharacterForm = ({
   isLoading = false,
   mode = "view",
   onModeChange,
+  onCreateSuccess,
 }: CharacterFormProps) => {
   const [internalMode, setInternalMode] = useState<FormMode>(mode);
   const [activeTab, setActiveTab] = useState<string>("stats");
@@ -48,7 +50,9 @@ export const CharacterForm = ({
   const handleModeChange = onModeChange || setInternalMode;
 
   // Individual hooks for each tab
-  const statsForm = useStatsForm(character, currentMode, users);
+  const statsForm = useStatsForm(character, currentMode, users, {
+    onCreateSuccess,
+  });
   const narrativeForm = useNarrativeForm(character, currentMode);
   const inventoryForm = useInventoryForm(character, currentMode);
 

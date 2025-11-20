@@ -14,19 +14,11 @@ describe("CharactersController", () => {
     faction: "Alliance",
     race: "Human",
     level: 5,
-    category: "Hero",
     epicPoints: 100,
     type: "Player",
     isNPC: false,
     isVisible: true,
     userId: "user-id-123",
-    bcat: 0,
-    powerLevel: 0,
-    physicalResistanceDomain: null,
-    mentalResistanceDomain: null,
-    defenseDomain: null,
-    attackDomain: null,
-    impactDomain: null,
     createdAt: new Date("2025-01-01"),
     updatedAt: new Date("2025-01-01"),
   };
@@ -183,19 +175,11 @@ describe("CharactersController", () => {
         faction: "Horde",
         race: "Elf",
         level: 1,
-        category: "NPC",
         epicPoints: 0,
         type: "Enemy",
         isNPC: true,
         isVisible: false,
         userId: "user-id-456",
-        bcat: 0,
-        powerLevel: 0,
-        physicalResistanceDomain: null,
-        mentalResistanceDomain: null,
-        defenseDomain: null,
-        attackDomain: null,
-        impactDomain: null,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -221,15 +205,9 @@ describe("CharactersController", () => {
         faction: "Neutral",
         race: "Orc",
         level: 3,
-        category: "Ally",
         epicPoints: 50,
         type: "Companion",
         userId: "user-id-789",
-        physicalResistanceDomain: "Fire",
-        mentalResistanceDomain: "Psychic",
-        defenseDomain: "Shield",
-        attackDomain: "Melee",
-        impactDomain: "Heavy",
       };
 
       const createdCharacter: Character = {
@@ -237,8 +215,6 @@ describe("CharactersController", () => {
         ...createDto,
         isNPC: false,
         isVisible: true,
-        bcat: 0,
-        powerLevel: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -258,7 +234,6 @@ describe("CharactersController", () => {
         faction: "Order",
         race: "Human",
         level: 10,
-        category: "Elite",
         epicPoints: 1000,
         type: "Boss",
         userId: "user-id-999",
@@ -284,8 +259,6 @@ describe("CharactersController", () => {
         ...createDtoWithRelations,
         isNPC: false,
         isVisible: true,
-        bcat: 0,
-        powerLevel: 0,
         createdAt: new Date(),
         updatedAt: new Date(),
       };
@@ -573,25 +546,6 @@ describe("CharactersController", () => {
 
       // Verify controller only calls service, doesn't do any data manipulation
       expect(service.findAll).toHaveBeenCalled();
-    });
-
-    it("should handle null values in update gracefully", async () => {
-      const updateWithNulls = {
-        physicalResistanceDomain: null,
-        mentalResistanceDomain: null,
-      };
-
-      const updatedCharacter = {
-        ...mockCharacter,
-        ...updateWithNulls,
-      };
-
-      mockCharactersService.update.mockResolvedValue(updatedCharacter);
-
-      const result = await controller.update("test-id-123", updateWithNulls);
-
-      expect(result.physicalResistanceDomain).toBeNull();
-      expect(result.mentalResistanceDomain).toBeNull();
     });
   });
 });
