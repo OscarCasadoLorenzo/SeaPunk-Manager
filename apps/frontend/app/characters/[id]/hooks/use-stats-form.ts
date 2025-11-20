@@ -2,6 +2,7 @@
 
 import { useCharacterContext } from "@/contexts/CharacterContext";
 import { useCreateCharacter, useUpdateCharacter } from "@/hooks/useCharacters";
+import type { Character } from "@/types";
 import {
   createField,
   createFormConfig,
@@ -12,10 +13,15 @@ import {
   isFieldEditable,
 } from "@/utils/form-builder";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+interface UseStatsFormOptions {
+  onCreateSuccess?: (characterId: string) => void;
+}
 
 // ✅ Schema defined inline
 const statsFormSchema = z.object({
@@ -87,8 +93,10 @@ export const useStatsForm = (
   character: any,
   mode: FormMode = "view",
   users: Array<{ id: string; name: string; email: string }> = [],
+  options?: UseStatsFormOptions,
 ) => {
   const { selectedCharacterId } = useCharacterContext();
+  const router = useRouter();
 
   // Extract data from character object
   const attributes = character?.attributes;
@@ -595,8 +603,21 @@ export const useStatsForm = (
           maxDamage: data.maxDamage,
         };
 
-        await createCharacter.mutateAsync(createPayload);
+        const newCharacter = (await createCharacter.mutateAsync(
+          createPayload,
+        )) as Character;
+
         toast.success("Personaje creado correctamente");
+
+        // Reset form and redirect
+        form.reset();
+
+        // Call onSuccess callback or navigate directly
+        if (options?.onCreateSuccess && newCharacter?.id) {
+          options.onCreateSuccess(newCharacter.id);
+        } else if (newCharacter?.id) {
+          router.push(`/characters/${newCharacter.id}`);
+        }
       } catch (error) {
         toast.error("Error al crear el personaje");
         console.error("Error creating character:", error);
