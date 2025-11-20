@@ -58,7 +58,6 @@ model Character {
   narrative                 Narrative?
   inventories               Inventory[]
   effects                   Effect[]
-  essences                  CharacterEssence[]
   auraGifts                 CharacterAuraGift[]
 
   @@map("characters")
@@ -78,19 +77,29 @@ model Attribute {
 }
 
 model Domain {
-  id            String    @id @default(cuid())
-  characterId   String    @unique
-  physical      Int
-  combat        Int
-  social        Int
-  environmental Int
-  stealth       Int
-  knowledge     Int
-  technical     Int
-  resources     Int
-  demonic       Int
-  aura          Int
-  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  id                  String    @id @default(cuid())
+  characterId         String    @unique
+  physicalValue       Int
+  physicalEssence     String    @default("")
+  combatValue         Int
+  combatEssence       String    @default("")
+  socialValue         Int
+  socialEssence       String    @default("")
+  environmentalValue  Int
+  environmentalEssence String   @default("")
+  stealthValue        Int
+  stealthEssence      String    @default("")
+  knowledgeValue      Int
+  knowledgeEssence    String    @default("")
+  technicalValue      Int
+  technicalEssence    String    @default("")
+  resourcesValue      Int
+  resourcesEssence    String    @default("")
+  demonicValue        Int
+  demonicEssence      String    @default("")
+  auraValue           Int
+  auraEssence         String    @default("")
+  character           Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("domains")
 }
@@ -171,16 +180,6 @@ model Effect {
   @@map("effects")
 }
 
-model Essence {
-  id         String             @id @default(cuid())
-  name       String             @unique
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  characters CharacterEssence[]
-
-  @@map("essences")
-}
-
 model AuraGift {
   id         String              @id @default(cuid())
   name       String              @unique
@@ -192,19 +191,6 @@ model AuraGift {
 }
 
 // Many-to-many relationship tables
-model CharacterEssence {
-  id          String    @id @default(cuid())
-  characterId String
-  essenceId   String
-  level       Int       @default(1)
-  createdAt   DateTime  @default(now())
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  essence     Essence   @relation(fields: [essenceId], references: [id], onDelete: Cascade)
-
-  @@unique([characterId, essenceId])
-  @@map("character_essences")
-}
-
 model CharacterAuraGift {
   id          String    @id @default(cuid())
   characterId String
