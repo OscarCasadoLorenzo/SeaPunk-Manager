@@ -102,6 +102,10 @@ export async function fetchApiRaw(
       localStorage.removeItem("auth_user");
       window.location.href = "/login";
     }
+    // Handle 403 Forbidden
+    if (response.status === 403 && typeof window !== "undefined") {
+      window.location.href = "/unauthorized";
+    }
     throw new Error(`API error: ${response.statusText}`);
   }
 
