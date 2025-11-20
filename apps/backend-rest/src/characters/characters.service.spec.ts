@@ -305,6 +305,7 @@ describe("CharactersService", () => {
         combatStats: createDto.combatStats,
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(null);
       mockPrismaService.character.create.mockResolvedValue(
         expectedCreatedCharacter,
       );
@@ -312,6 +313,9 @@ describe("CharactersService", () => {
       const result = await service.create(createDto);
 
       expect(result).toEqual(expectedCreatedCharacter);
+      expect(prisma.character.findUnique).toHaveBeenCalledWith({
+        where: { characterName: createDto.characterName },
+      });
       expect(prisma.character.create).toHaveBeenCalledTimes(1);
       expect(prisma.character.create).toHaveBeenCalledWith({
         data: expect.objectContaining({
@@ -329,6 +333,21 @@ describe("CharactersService", () => {
         }),
         include: expect.any(Object),
       });
+    });
+
+    it("should throw ConflictException when character name already exists", async () => {
+      const existingCharacter = { ...mockCharacter };
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        existingCharacter,
+      );
+
+      await expect(service.create(createDto)).rejects.toThrow(
+        `Character with name "${createDto.characterName}" already exists`,
+      );
+      expect(prisma.character.findUnique).toHaveBeenCalledWith({
+        where: { characterName: createDto.characterName },
+      });
+      expect(prisma.character.create).not.toHaveBeenCalled();
     });
 
     it("should create a character without optional relations", async () => {
@@ -349,6 +368,7 @@ describe("CharactersService", () => {
         ...minimalDto,
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(null);
       mockPrismaService.character.create.mockResolvedValue(expectedCharacter);
 
       const result = await service.create(minimalDto);

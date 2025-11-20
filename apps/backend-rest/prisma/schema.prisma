@@ -31,7 +31,7 @@ model User {
 
 model Character {
   id                        String        @id @default(cuid())
-  characterName             String
+  characterName             String        @unique
   archetype                 String
   faction                   String
   race                      String

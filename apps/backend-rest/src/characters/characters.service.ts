@@ -1,4 +1,4 @@
-import { Injectable } from "@nestjs/common";
+import { ConflictException, Injectable } from "@nestjs/common";
 import { Character } from "@prisma/client";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCharacterDto } from "./dto/create-character.dto";
@@ -41,6 +41,18 @@ export class CharactersService {
   async create(data: CreateCharacterDto): Promise<Character> {
     const { attributes, domains, combatStats, narrative, ...characterData } =
       data;
+
+    // Check if character name already exists
+    const existingCharacter = await this.prisma.character.findUnique({
+      where: { characterName: characterData.characterName },
+    });
+
+    if (existingCharacter) {
+      throw new ConflictException(
+        `Character with name "${characterData.characterName}" already exists`,
+      );
+    }
+
     return this.prisma.character.create({
       data: {
         ...characterData,
