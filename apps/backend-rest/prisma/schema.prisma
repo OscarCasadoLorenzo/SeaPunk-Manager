@@ -51,6 +51,7 @@ model Character {
   inventories               Inventory[]
   effects                   Effect[]
   auraGifts                 CharacterAuraGift[]
+  essences                  Essence[]
 
   @@map("characters")
 }
@@ -178,6 +179,17 @@ model Effect {
   character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("effects")
+}
+
+model Essence {
+  id          String    @id @default(cuid())
+  characterId String
+  text        String    @db.VarChar(200)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+
+  @@map("essences")
 }
 
 model AuraGift {

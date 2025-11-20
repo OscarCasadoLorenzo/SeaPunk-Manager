@@ -1,10 +1,10 @@
-import { z } from 'zod';
+import { z } from "zod";
 import {
   FieldConfig,
   FormConfig,
   FormSectionConfig,
   FormTabConfig,
-} from './types';
+} from "./types";
 
 /**
  * Creates a Zod validation schema from a form configuration
@@ -41,69 +41,87 @@ function createDefaultValidation(field: FieldConfig): z.ZodType<any> {
   let schema: z.ZodType<any>;
 
   switch (field.type) {
-    case 'text':
-    case 'email':
-    case 'password':
-    case 'url':
-    case 'textarea':
+    case "text":
+    case "email":
+    case "password":
+    case "url":
+    case "textarea":
       schema = z.string();
-      if (field.type === 'email') {
-        schema = (schema as z.ZodString).email('Invalid email format');
+      if (field.type === "email") {
+        schema = (schema as z.ZodString).email("Invalid email format");
       }
-      if (field.type === 'url') {
-        schema = (schema as z.ZodString).url('Invalid URL format');
+      if (field.type === "url") {
+        schema = (schema as z.ZodString).url("Invalid URL format");
       }
-      if ('maxLength' in field && field.maxLength) {
+      if ("maxLength" in field && field.maxLength) {
         schema = (schema as z.ZodString).max(
           field.maxLength,
-          `Maximum ${field.maxLength} characters`
+          `Maximum ${field.maxLength} characters`,
         );
       }
-      if ('minLength' in field && field.minLength) {
+      if ("minLength" in field && field.minLength) {
         schema = (schema as z.ZodString).min(
           field.minLength,
-          `Minimum ${field.minLength} characters`
+          `Minimum ${field.minLength} characters`,
         );
       }
       break;
 
-    case 'number':
+    case "number":
       schema = z.number();
-      if ('min' in field && field.min !== undefined) {
+      if ("min" in field && field.min !== undefined) {
         schema = (schema as z.ZodNumber).min(
           field.min,
-          `Minimum value is ${field.min}`
+          `Minimum value is ${field.min}`,
         );
       }
-      if ('max' in field && field.max !== undefined) {
+      if ("max" in field && field.max !== undefined) {
         schema = (schema as z.ZodNumber).max(
           field.max,
-          `Maximum value is ${field.max}`
+          `Maximum value is ${field.max}`,
         );
       }
       break;
 
-    case 'checkbox':
+    case "checkbox":
       schema = z.boolean();
       break;
 
-    case 'select':
-    case 'radio':
-      if (field.type === 'select' && field.multiple) {
+    case "select":
+    case "radio":
+      if (field.type === "select" && field.multiple) {
         schema = z.array(z.union([z.string(), z.number()]));
       } else {
         schema = z.union([z.string(), z.number()]);
       }
       break;
 
-    case 'date':
-    case 'datetime-local':
-    case 'time':
+    case "date":
+    case "datetime-local":
+    case "time":
       schema = z.string().or(z.date());
       break;
 
-    case 'file':
+    case "file":
       schema = z.any(); // File handling is complex, leave flexible
+      break;
+
+    case "string-list":
+      // Array of objects with text property
+      let itemSchema = z.object({
+        text: z.string(),
+      });
+
+      // Apply maxLength to the text field if specified
+      if ("maxLength" in field && field.maxLength) {
+        itemSchema = z.object({
+          text: z
+            .string()
+            .max(field.maxLength, `Maximum ${field.maxLength} characters`),
+        });
+      }
+
+      schema = z.array(itemSchema);
       break;
 
     default:
@@ -144,21 +162,24 @@ export function extractDefaultValues(config: FormConfig): Record<string, any> {
       } else {
         // Set sensible defaults based on field type
         switch (field.type) {
-          case 'checkbox':
+          case "checkbox":
             defaultValues[field.name] = false;
             break;
-          case 'select':
+          case "select":
             if (field.multiple) {
               defaultValues[field.name] = [];
             } else {
-              defaultValues[field.name] = '';
+              defaultValues[field.name] = "";
             }
             break;
-          case 'number':
+          case "string-list":
+            defaultValues[field.name] = [];
+            break;
+          case "number":
             defaultValues[field.name] = 0;
             break;
           default:
-            defaultValues[field.name] = '';
+            defaultValues[field.name] = "";
             break;
         }
       }

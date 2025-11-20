@@ -52,6 +52,7 @@ export class CharactersService {
           effects: true,
           inventories: true,
           narrative: true,
+          essences: true,
         },
       });
     }
@@ -119,6 +120,7 @@ export class CharactersService {
               effects: true,
               inventories: true,
               narrative: true,
+              essences: true,
             },
       }),
       this.prisma.character.count({ where }),
@@ -143,6 +145,7 @@ export class CharactersService {
         effects: true,
         inventories: true,
         narrative: true,
+        essences: true,
       },
     });
 
@@ -161,8 +164,14 @@ export class CharactersService {
   }
 
   async create(data: CreateCharacterDto): Promise<Character> {
-    const { attributes, domains, combatStats, narrative, ...characterData } =
-      data;
+    const {
+      attributes,
+      domains,
+      combatStats,
+      narrative,
+      essences,
+      ...characterData
+    } = data;
 
     // Check if character name already exists
     const existingCharacter = await this.prisma.character.findUnique({
@@ -181,6 +190,12 @@ export class CharactersService {
         attributes: attributes ? { create: attributes } : undefined,
         domains: domains ? { create: domains } : undefined,
         narrative: narrative ? { create: narrative } : undefined,
+        essences:
+          essences && essences.length > 0
+            ? {
+                create: essences.map((text) => ({ text })),
+              }
+            : undefined,
         combatStats: combatStats
           ? {
               create: {
@@ -215,6 +230,7 @@ export class CharactersService {
         effects: true,
         inventories: true,
         narrative: true,
+        essences: true,
       },
     });
   }
@@ -251,6 +267,7 @@ export class CharactersService {
       domains,
       combatStats,
       narrative,
+      essences,
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       inventories: _,
       ...characterData
@@ -283,6 +300,14 @@ export class CharactersService {
               },
             }
           : undefined,
+        // Handle essences: delete all existing and create new ones
+        essences:
+          essences !== undefined
+            ? {
+                deleteMany: {},
+                create: essences.map((text: string) => ({ text })),
+              }
+            : undefined,
         // Note: Inventories are handled separately as they're a one-to-many relationship
       },
       include: {
@@ -294,6 +319,7 @@ export class CharactersService {
         effects: true,
         inventories: true,
         narrative: true,
+        essences: true,
       },
     });
   }

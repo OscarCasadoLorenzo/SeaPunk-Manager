@@ -34,6 +34,15 @@ const statsFormSchema = z.object({
   level: z.number().min(1, "Level must be at least 1"),
   epicPoints: z.number().min(0, "Epic points cannot be negative"),
 
+  // Character Essences (optional)
+  essences: z
+    .array(
+      z.object({
+        text: z.string().max(200, "Essence text cannot exceed 200 characters"),
+      }),
+    )
+    .default([]),
+
   // Attributes
   strength: z.number().min(1, "Strength must be at least 1"),
   agility: z.number().min(1, "Agility must be at least 1"),
@@ -126,65 +135,74 @@ export const useStatsForm = (
   const createCharacter = useCreateCharacter();
   const updateCharacter = useUpdateCharacter();
 
-  // ✅ Extract default values
-  const getDefaultValues = (): StatsFormData => ({
-    // Basic character info
-    userId: character?.userId || "",
-    characterName: character?.characterName || "",
-    archetype: character?.archetype || "",
-    faction: character?.faction || "",
-    race: character?.race || "",
-    level: character?.level || 1,
-    epicPoints: character?.epicPoints || 0,
+  // ✅ Memoize default values to ensure they update when character changes
+  const defaultValues = React.useMemo(
+    (): StatsFormData => ({
+      // Basic character info
+      userId: character?.userId || "",
+      characterName: character?.characterName || "",
+      archetype: character?.archetype || "",
+      faction: character?.faction || "",
+      race: character?.race || "",
+      level: character?.level || 1,
+      epicPoints: character?.epicPoints || 0,
 
-    // Attributes
-    strength: attributes?.strength || 1,
-    agility: attributes?.agility || 1,
-    willpower: attributes?.willpower || 1,
-    luck: attributes?.luck || 1,
-    intelligence: attributes?.intelligence || 1,
+      // Character Essences - Optional, start with empty array
+      essences:
+        character?.essences && character.essences.length > 0
+          ? character.essences.map((e: any) => ({ text: e.text }))
+          : [],
 
-    // Domains
-    physicalValue: domains?.physicalValue || 0,
-    physicalEssence: domains?.physicalEssence || "",
-    combatValue: domains?.combatValue || 0,
-    combatEssence: domains?.combatEssence || "",
-    socialValue: domains?.socialValue || 0,
-    socialEssence: domains?.socialEssence || "",
-    environmentalValue: domains?.environmentalValue || 0,
-    environmentalEssence: domains?.environmentalEssence || "",
-    stealthValue: domains?.stealthValue || 0,
-    stealthEssence: domains?.stealthEssence || "",
-    knowledgeValue: domains?.knowledgeValue || 0,
-    knowledgeEssence: domains?.knowledgeEssence || "",
-    technicalValue: domains?.technicalValue || 0,
-    technicalEssence: domains?.technicalEssence || "",
-    resourcesValue: domains?.resourcesValue || 0,
-    resourcesEssence: domains?.resourcesEssence || "",
-    demonicValue: domains?.demonicValue || 0,
-    demonicEssence: domains?.demonicEssence || "",
-    auraValue: domains?.auraValue || 0,
-    auraEssence: domains?.auraEssence || "",
+      // Attributes
+      strength: attributes?.strength || 1,
+      agility: attributes?.agility || 1,
+      willpower: attributes?.willpower || 1,
+      luck: attributes?.luck || 1,
+      intelligence: attributes?.intelligence || 1,
 
-    // Combat Stats - Current values (only needed in edit/view mode, not create)
-    physicalHealth: combatStats?.physicalHealth,
-    maxPhysicalHealth: combatStats?.maxPhysicalHealth || 100,
-    physicalResistance: combatStats?.physicalResistance,
-    maxPhysicalResistance: combatStats?.maxPhysicalResistance || 100,
-    mentalHealth: combatStats?.mentalHealth,
-    maxMentalHealth: combatStats?.maxMentalHealth || 100,
-    mentalResistance: combatStats?.mentalResistance,
-    maxMentalResistance: combatStats?.maxMentalResistance || 100,
-    initiative: combatStats?.initiative,
-    maxInitiative: combatStats?.maxInitiative || 0,
-    defense: combatStats?.defense,
-    maxDefense: combatStats?.maxDefense || 0,
-    attack: combatStats?.attack,
-    maxAttack: combatStats?.maxAttack || 0,
-    impact: combatStats?.impact,
-    maxImpact: combatStats?.maxImpact || 0,
-    maxDamage: combatStats?.maxDamage || 0,
-  });
+      // Domains
+      physicalValue: domains?.physicalValue || 0,
+      physicalEssence: domains?.physicalEssence || "",
+      combatValue: domains?.combatValue || 0,
+      combatEssence: domains?.combatEssence || "",
+      socialValue: domains?.socialValue || 0,
+      socialEssence: domains?.socialEssence || "",
+      environmentalValue: domains?.environmentalValue || 0,
+      environmentalEssence: domains?.environmentalEssence || "",
+      stealthValue: domains?.stealthValue || 0,
+      stealthEssence: domains?.stealthEssence || "",
+      knowledgeValue: domains?.knowledgeValue || 0,
+      knowledgeEssence: domains?.knowledgeEssence || "",
+      technicalValue: domains?.technicalValue || 0,
+      technicalEssence: domains?.technicalEssence || "",
+      resourcesValue: domains?.resourcesValue || 0,
+      resourcesEssence: domains?.resourcesEssence || "",
+      demonicValue: domains?.demonicValue || 0,
+      demonicEssence: domains?.demonicEssence || "",
+      auraValue: domains?.auraValue || 0,
+      auraEssence: domains?.auraEssence || "",
+
+      // Combat Stats - Current values (only needed in edit/view mode, not create)
+      physicalHealth: combatStats?.physicalHealth,
+      maxPhysicalHealth: combatStats?.maxPhysicalHealth || 100,
+      physicalResistance: combatStats?.physicalResistance,
+      maxPhysicalResistance: combatStats?.maxPhysicalResistance || 100,
+      mentalHealth: combatStats?.mentalHealth,
+      maxMentalHealth: combatStats?.maxMentalHealth || 100,
+      mentalResistance: combatStats?.mentalResistance,
+      maxMentalResistance: combatStats?.maxMentalResistance || 100,
+      initiative: combatStats?.initiative,
+      maxInitiative: combatStats?.maxInitiative || 0,
+      defense: combatStats?.defense,
+      maxDefense: combatStats?.maxDefense || 0,
+      attack: combatStats?.attack,
+      maxAttack: combatStats?.maxAttack || 0,
+      impact: combatStats?.impact,
+      maxImpact: combatStats?.maxImpact || 0,
+      maxDamage: combatStats?.maxDamage || 0,
+    }),
+    [character, attributes, domains, combatStats],
+  );
 
   // ✅ Form configuration inline
   const formConfig: FormConfig = React.useMemo(
@@ -249,6 +267,28 @@ export const useStatsForm = (
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
+              }),
+            ],
+          }),
+
+          createSection({
+            title: "Esencias del Personaje",
+            description:
+              "Define las esencias fundamentales que caracterizan a tu personaje (opcional, máx. 200 caracteres cada una)",
+            columns: 1,
+            fields: [
+              createField("string-list", {
+                name: "essences",
+                label: "Esencias",
+                required: false,
+                disabled: !isFieldEditable(mode),
+                placeholder:
+                  "Describe una característica esencial del personaje...",
+                maxLength: 200,
+                rows: 2,
+                addButtonText: "Añadir Esencia",
+                emptyStateText:
+                  'No hay esencias definidas. Haz clic en "Añadir Esencia" para comenzar.',
               }),
             ],
           }),
@@ -631,7 +671,7 @@ export const useStatsForm = (
   // Form setup
   const form = useForm<StatsFormData>({
     resolver: zodResolver(statsFormSchema),
-    defaultValues: getDefaultValues(),
+    defaultValues: defaultValues,
     mode: "onChange",
     reValidateMode: "onChange",
     shouldFocusError: true,
@@ -640,9 +680,9 @@ export const useStatsForm = (
   // Update form when character data changes (only in edit/view mode)
   React.useEffect(() => {
     if (character && selectedCharacterId && !isCreateMode(mode)) {
-      form.reset(getDefaultValues());
+      form.reset(defaultValues, { keepDefaultValues: false });
     }
-  }, [character, selectedCharacterId, mode]);
+  }, [character, selectedCharacterId, mode, defaultValues, form]);
 
   // ✅ Submit handler
   const handleSubmit = async (data: StatsFormData): Promise<void> => {
@@ -661,6 +701,14 @@ export const useStatsForm = (
           isVisible: true,
           userId: data.userId,
         };
+
+        // Add essences - filter out empty ones
+        const validEssences = data.essences
+          .filter((e) => e.text.trim() !== "")
+          .map((e) => e.text);
+        if (validEssences.length > 0) {
+          createPayload.essences = validEssences;
+        }
 
         // Add nested attributes
         createPayload.attributes = {
@@ -749,6 +797,12 @@ export const useStatsForm = (
         level: data.level,
         epicPoints: data.epicPoints,
       };
+
+      // Add essences - filter out empty ones
+      const validEssences = data.essences
+        .filter((e) => e.text.trim() !== "")
+        .map((e) => e.text);
+      updatePayload.essences = validEssences;
 
       // Add attributes if they exist
       if (attributes?.id) {

@@ -25,4 +25,5 @@ export class CreateCharacterDto {
   domains?: CreateDomainDto;
   combatStats?: CreateCombatStatsDto;
   narrative?: CreateNarrativeDto;
+  essences?: string[];
 }

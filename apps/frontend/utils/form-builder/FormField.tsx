@@ -13,9 +13,9 @@ import {
   SelectValue,
   Textarea,
 } from "@seapunk/ui";
-import { Trash2 } from "lucide-react";
+import { Plus, Trash2, X } from "lucide-react";
 import React from "react";
-import { Controller, FieldValues } from "react-hook-form";
+import { Controller, useFieldArray, useFormContext } from "react-hook-form";
 import toast from "react-hot-toast";
 import { FieldConfig, FieldProps } from "./types";
 
@@ -34,11 +34,8 @@ const FieldDescription: React.FC<{ description?: string }> = ({
 };
 
 // Text input field
-const TextFieldComponent: React.FC<FieldProps> = ({
-  config,
-  form,
-  className,
-}) => {
+const TextFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
+  const form = useFormContext();
   const fieldConfig = config as Extract<
     FieldConfig,
     { type: "text" | "email" | "password" | "url" }
@@ -79,11 +76,8 @@ const TextFieldComponent: React.FC<FieldProps> = ({
 };
 
 // Number input field
-const NumberFieldComponent: React.FC<FieldProps> = ({
-  config,
-  form,
-  className,
-}) => {
+const NumberFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
+  const form = useFormContext();
   const fieldConfig = config as Extract<FieldConfig, { type: "number" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
@@ -128,9 +122,9 @@ const NumberFieldComponent: React.FC<FieldProps> = ({
 // Textarea field
 const TextareaFieldComponent: React.FC<FieldProps> = ({
   config,
-  form,
   className,
 }) => {
+  const form = useFormContext();
   const fieldConfig = config as Extract<FieldConfig, { type: "textarea" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
@@ -168,11 +162,8 @@ const TextareaFieldComponent: React.FC<FieldProps> = ({
 };
 
 // Select field
-const SelectFieldComponent: React.FC<FieldProps> = ({
-  config,
-  form,
-  className,
-}) => {
+const SelectFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
+  const form = useFormContext();
   const fieldConfig = config as Extract<FieldConfig, { type: "select" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
@@ -231,9 +222,9 @@ const SelectFieldComponent: React.FC<FieldProps> = ({
 // Checkbox field
 const CheckboxFieldComponent: React.FC<FieldProps> = ({
   config,
-  form,
   className,
 }) => {
+  const form = useFormContext();
   const error = form.formState.errors[config.name]?.message as string;
 
   return (
@@ -271,9 +262,9 @@ const CheckboxFieldComponent: React.FC<FieldProps> = ({
 // Radio group field
 const RadioGroupFieldComponent: React.FC<FieldProps> = ({
   config,
-  form,
   className,
 }) => {
+  const form = useFormContext();
   const fieldConfig = config as Extract<FieldConfig, { type: "radio" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
@@ -319,11 +310,8 @@ const RadioGroupFieldComponent: React.FC<FieldProps> = ({
 };
 
 // Date field
-const DateFieldComponent: React.FC<FieldProps> = ({
-  config,
-  form,
-  className,
-}) => {
+const DateFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
+  const form = useFormContext();
   const fieldConfig = config as Extract<
     FieldConfig,
     { type: "date" | "datetime-local" | "time" }
@@ -362,11 +350,8 @@ const DateFieldComponent: React.FC<FieldProps> = ({
 };
 
 // File field
-const FileFieldComponent: React.FC<FieldProps> = ({
-  config,
-  form,
-  className,
-}) => {
+const FileFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
+  const form = useFormContext();
   const fieldConfig = config as Extract<FieldConfig, { type: "file" }>;
   const error = form.formState.errors[config.name]?.message as string;
 
@@ -402,6 +387,121 @@ const FileFieldComponent: React.FC<FieldProps> = ({
       />
       <ErrorMessage message={error} />
       <FieldDescription description={config.description} />
+    </div>
+  );
+};
+
+// String list field component for dynamic arrays of strings
+// String list field component for dynamic arrays of strings
+const StringListFieldComponent: React.FC<FieldProps> = ({
+  config,
+  className,
+}) => {
+  const form = useFormContext();
+  const fieldConfig = config as Extract<FieldConfig, { type: "string-list" }>;
+  const error = form.formState.errors[config.name]?.message as string;
+
+  const { fields, append, remove } = useFieldArray({
+    control: form.control,
+    name: config.name,
+  });
+
+  const handleAdd = () => {
+    append({ text: "" });
+  };
+
+  const handleRemove = (index: number) => {
+    remove(index);
+  };
+
+  const getErrorMessage = (index: number) => {
+    // eslint-disable-next-line @typescript-eslint/no-explicit-any
+    const fieldErrors = form.formState.errors[config.name] as any;
+    return fieldErrors?.[index]?.text?.message;
+  };
+
+  return (
+    <div className={cn("space-y-2", className)}>
+      <div className="flex items-center justify-between">
+        <div>
+          <Label
+            htmlFor={config.name}
+            className={
+              config.required
+                ? "after:content-['*'] after:ml-0.5 after:text-red-500"
+                : ""
+            }
+          >
+            {config.label}
+          </Label>
+          {config.description && (
+            <p className="text-sm text-muted-foreground mt-1">
+              {config.description}
+            </p>
+          )}
+        </div>
+        {!config.disabled && (
+          <Button type="button" variant="outline" size="sm" onClick={handleAdd}>
+            <Plus className="w-4 h-4 mr-2" />
+            {fieldConfig.addButtonText || "Add"}
+          </Button>
+        )}
+      </div>
+
+      <div className="space-y-3 mt-3">
+        {fields.length === 0 ? (
+          <div className="text-center py-8 text-muted-foreground border-2 border-dashed rounded-lg">
+            <p className="text-sm">
+              {fieldConfig.emptyStateText ||
+                `No items added. Click "${fieldConfig.addButtonText || "Add"}" to begin.`}
+            </p>
+          </div>
+        ) : (
+          fields.map((field, index) => (
+            <div key={field.id} className="flex gap-2 items-start">
+              <div className="flex-1">
+                <div className="relative">
+                  <Controller
+                    name={`${config.name}.${index}.text`}
+                    control={form.control}
+                    render={({ field: controllerField }) => (
+                      <Textarea
+                        {...controllerField}
+                        disabled={config.disabled}
+                        placeholder={config.placeholder || "Enter text..."}
+                        maxLength={fieldConfig.maxLength}
+                        rows={fieldConfig.rows || 2}
+                        className={cn(
+                          "resize-none",
+                          getErrorMessage(index) && "border-red-500",
+                        )}
+                      />
+                    )}
+                  />
+                  {getErrorMessage(index) && (
+                    <p className="text-sm text-red-600 mt-1">
+                      {getErrorMessage(index)}
+                    </p>
+                  )}
+                </div>
+              </div>
+              {!config.disabled && (
+                <Button
+                  type="button"
+                  variant="ghost"
+                  size="icon"
+                  onClick={() => handleRemove(index)}
+                  className="mt-1"
+                >
+                  <X className="w-4 h-4" />
+                </Button>
+              )}
+            </div>
+          ))
+        )}
+      </div>
+
+      {error && <ErrorMessage message={error} />}
     </div>
   );
 };
@@ -453,11 +553,7 @@ const CustomFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
 };
 
 // Main field component that renders the appropriate field type
-export const FormField: React.FC<FieldProps<FieldValues>> = ({
-  config,
-  form,
-  className,
-}) => {
+export const FormField: React.FC<FieldProps> = ({ config, className }) => {
   const combinedClassName = cn(config.className, className);
 
   switch (config.type) {
@@ -466,49 +562,28 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
     case "password":
     case "url":
       return (
-        <TextFieldComponent
-          config={config}
-          form={form}
-          className={combinedClassName}
-        />
+        <TextFieldComponent config={config} className={combinedClassName} />
       );
     case "number":
       return (
-        <NumberFieldComponent
-          config={config}
-          form={form}
-          className={combinedClassName}
-        />
+        <NumberFieldComponent config={config} className={combinedClassName} />
       );
     case "textarea":
       return (
-        <TextareaFieldComponent
-          config={config}
-          form={form}
-          className={combinedClassName}
-        />
+        <TextareaFieldComponent config={config} className={combinedClassName} />
       );
     case "select":
       return (
-        <SelectFieldComponent
-          config={config}
-          form={form}
-          className={combinedClassName}
-        />
+        <SelectFieldComponent config={config} className={combinedClassName} />
       );
     case "checkbox":
       return (
-        <CheckboxFieldComponent
-          config={config}
-          form={form}
-          className={combinedClassName}
-        />
+        <CheckboxFieldComponent config={config} className={combinedClassName} />
       );
     case "radio":
       return (
         <RadioGroupFieldComponent
           config={config}
-          form={form}
           className={combinedClassName}
         />
       );
@@ -516,27 +591,22 @@ export const FormField: React.FC<FieldProps<FieldValues>> = ({
     case "datetime-local":
     case "time":
       return (
-        <DateFieldComponent
-          config={config}
-          form={form}
-          className={combinedClassName}
-        />
+        <DateFieldComponent config={config} className={combinedClassName} />
       );
     case "file":
       return (
-        <FileFieldComponent
+        <FileFieldComponent config={config} className={combinedClassName} />
+      );
+    case "string-list":
+      return (
+        <StringListFieldComponent
           config={config}
-          form={form}
           className={combinedClassName}
         />
       );
     case "custom":
       return (
-        <CustomFieldComponent
-          config={config}
-          form={form}
-          className={combinedClassName}
-        />
+        <CustomFieldComponent config={config} className={combinedClassName} />
       );
     default:
       console.warn(`Unknown field type: ${(config as any).type}`);
