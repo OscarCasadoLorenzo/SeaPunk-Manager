@@ -61,6 +61,14 @@ export interface FileFieldConfig extends BaseFieldConfig {
   multiple?: boolean;
 }
 
+export interface StringListFieldConfig extends BaseFieldConfig {
+  type: "string-list";
+  maxLength?: number;
+  rows?: number;
+  addButtonText?: string;
+  emptyStateText?: string;
+}
+
 export interface CustomFieldConfig extends BaseFieldConfig {
   type: "custom";
   customComponent: string;
@@ -77,6 +85,7 @@ export type FieldConfig =
   | RadioGroupFieldConfig
   | DateFieldConfig
   | FileFieldConfig
+  | StringListFieldConfig
   | CustomFieldConfig;
 
 // Form section configuration
@@ -125,9 +134,8 @@ export interface FormBuilderProps<T extends FieldValues = FieldValues> {
 }
 
 // Field component props
-export interface FieldProps<T extends FieldValues = FieldValues> {
+export interface FieldProps {
   config: FieldConfig;
-  form: UseFormReturn<T>;
   className?: string;
 }
 

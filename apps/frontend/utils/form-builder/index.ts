@@ -18,8 +18,9 @@ export type {
   NumberFieldConfig,
   RadioGroupFieldConfig,
   SelectFieldConfig,
-  TextareaFieldConfig,
+  StringListFieldConfig,
   TextFieldConfig,
+  TextareaFieldConfig,
 } from "./types";
 
 // Utilities
