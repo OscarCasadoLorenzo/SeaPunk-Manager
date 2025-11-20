@@ -308,7 +308,7 @@ export const useStatsForm = (
             fields: [
               createField("number", {
                 name: "physicalValue",
-                label: "Físico",
+                label: "Físico (DFIS)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -321,7 +321,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "combatValue",
-                label: "Batalla",
+                label: "Batalla (DBAT)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -330,11 +330,11 @@ export const useStatsForm = (
                 name: "combatEssence",
                 label: "Esencia de Batalla",
                 disabled: !isFieldEditable(mode),
-                placeholder: "Describe el dominio de combate",
+                placeholder: "Describe el dominio de batalla",
               }),
               createField("number", {
                 name: "socialValue",
-                label: "Social",
+                label: "Social (DSOC)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -347,7 +347,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "environmentalValue",
-                label: "Ambiental",
+                label: "Ambiental (DAMB)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -360,7 +360,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "stealthValue",
-                label: "Ocultación",
+                label: "Ocultación (DOCU)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -369,11 +369,11 @@ export const useStatsForm = (
                 name: "stealthEssence",
                 label: "Esencia de Ocultación",
                 disabled: !isFieldEditable(mode),
-                placeholder: "Describe el dominio de sigilo",
+                placeholder: "Describe el dominio de ocultación",
               }),
               createField("number", {
                 name: "knowledgeValue",
-                label: "Conocimiento",
+                label: "Conocimiento (DCON)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -386,7 +386,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "technicalValue",
-                label: "Técnico",
+                label: "Técnico (DTEC)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -399,7 +399,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "resourcesValue",
-                label: "Recursos",
+                label: "Recursos (DREC)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -412,7 +412,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "demonicValue",
-                label: "Demoníaco",
+                label: "Demoníaco (DDEM)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
@@ -425,7 +425,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "auraValue",
-                label: "Aura",
+                label: "Aura (DAUR)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
