@@ -25,17 +25,8 @@ export class ImportStatsDto {
   @ApiProperty({ description: "Number of effects imported", example: 30 })
   effects: number;
 
-  @ApiProperty({ description: "Number of essences imported", example: 50 })
-  essences: number;
-
   @ApiProperty({ description: "Number of aura gifts imported", example: 40 })
   auraGifts: number;
-
-  @ApiProperty({
-    description: "Number of character essences imported",
-    example: 25,
-  })
-  characterEssences: number;
 
   @ApiProperty({
     description: "Number of character aura gifts imported",

@@ -6,7 +6,6 @@ import { AuthModule } from "./auth/auth.module";
 import { CharactersModule } from "./characters/characters.module";
 import { DomainsModule } from "./domains/domains.module";
 import { EffectsModule } from "./effects/effects.module";
-import { EssencesModule } from "./essences/essences.module";
 import { InventoriesModule } from "./inventories/inventories.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SettingsModule } from "./settings/settings.module";
@@ -23,7 +22,6 @@ import { SettingsModule } from "./settings/settings.module";
     AuraGiftsModule,
     DomainsModule,
     EffectsModule,
-    EssencesModule,
     InventoriesModule,
     SettingsModule,
   ],
