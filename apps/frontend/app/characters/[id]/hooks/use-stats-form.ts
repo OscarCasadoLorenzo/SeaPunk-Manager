@@ -724,6 +724,9 @@ export const useStatsForm = (
         } else if (newCharacter?.id) {
           router.push(`/characters/${newCharacter.id}`);
         }
+
+        // Early return to prevent falling through to update logic
+        return;
       } catch (error) {
         toast.error("Error al crear el personaje");
         console.error("Error creating character:", error);
