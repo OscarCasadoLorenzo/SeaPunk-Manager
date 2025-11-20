@@ -23,9 +23,7 @@ interface BackupData {
     narratives?: any[];
     inventories?: any[];
     effects?: any[];
-    essences?: any[];
     auraGifts?: any[];
-    characterEssences?: any[];
     characterAuraGifts?: any[];
   };
 }
@@ -68,9 +66,7 @@ export class SettingsService {
         narratives,
         inventories,
         effects,
-        essences,
         auraGifts,
-        characterEssences,
         characterAuraGifts,
       ] = await Promise.all([
         this.prisma.user.findMany(),
@@ -81,9 +77,7 @@ export class SettingsService {
         this.prisma.narrative.findMany(),
         this.prisma.inventory.findMany(),
         this.prisma.effect.findMany(),
-        this.prisma.essence.findMany(),
         this.prisma.auraGift.findMany(),
-        this.prisma.characterEssence.findMany(),
         this.prisma.characterAuraGift.findMany(),
       ]);
 
@@ -103,9 +97,7 @@ export class SettingsService {
           narratives,
           inventories,
           effects,
-          essences,
           auraGifts,
-          characterEssences,
           characterAuraGifts,
         },
       };
@@ -136,7 +128,6 @@ export class SettingsService {
       await this.prisma.$transaction(async (tx) => {
         // Delete many-to-many relationships first
         await tx.characterAuraGift.deleteMany();
-        await tx.characterEssence.deleteMany();
 
         // Delete dependent tables
         await tx.effect.deleteMany();
@@ -151,7 +142,6 @@ export class SettingsService {
 
         // Delete independent tables
         await tx.auraGift.deleteMany();
-        await tx.essence.deleteMany();
         await tx.user.deleteMany();
       });
 
@@ -210,13 +200,6 @@ export class SettingsService {
         // Import independent tables first
         if (data.users?.length > 0) {
           await tx.user.createMany({ data: data.users, skipDuplicates: true });
-        }
-
-        if (data.essences?.length > 0) {
-          await tx.essence.createMany({
-            data: data.essences,
-            skipDuplicates: true,
-          });
         }
 
         if (data.auraGifts?.length > 0) {
@@ -278,13 +261,6 @@ export class SettingsService {
         }
 
         // Import many-to-many relationships last
-        if (data.characterEssences?.length > 0) {
-          await tx.characterEssence.createMany({
-            data: data.characterEssences,
-            skipDuplicates: true,
-          });
-        }
-
         if (data.characterAuraGifts?.length > 0) {
           await tx.characterAuraGift.createMany({
             data: data.characterAuraGifts,
@@ -303,9 +279,7 @@ export class SettingsService {
         narratives: data.narratives?.length || 0,
         inventories: data.inventories?.length || 0,
         effects: data.effects?.length || 0,
-        essences: data.essences?.length || 0,
         auraGifts: data.auraGifts?.length || 0,
-        characterEssences: data.characterEssences?.length || 0,
         characterAuraGifts: data.characterAuraGifts?.length || 0,
       };
 

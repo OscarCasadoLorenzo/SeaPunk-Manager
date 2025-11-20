@@ -2,6 +2,7 @@
 
 import { useCharacterContext } from "@/contexts/CharacterContext";
 import { useCreateCharacter, useUpdateCharacter } from "@/hooks/useCharacters";
+import type { Character } from "@/types";
 import {
   createField,
   createFormConfig,
@@ -12,10 +13,15 @@ import {
   isFieldEditable,
 } from "@/utils/form-builder";
 import { zodResolver } from "@hookform/resolvers/zod";
+import { useRouter } from "next/navigation";
 import React from "react";
 import { useForm } from "react-hook-form";
 import { toast } from "sonner";
 import { z } from "zod";
+
+interface UseStatsFormOptions {
+  onCreateSuccess?: (characterId: string) => void;
+}
 
 // ✅ Schema defined inline
 const statsFormSchema = z.object({
@@ -25,9 +31,17 @@ const statsFormSchema = z.object({
   archetype: z.string().min(1, "Archetype is required"),
   faction: z.string().min(1, "Faction is required"),
   race: z.string().min(1, "Race is required"),
-  category: z.string().optional(),
   level: z.number().min(1, "Level must be at least 1"),
   epicPoints: z.number().min(0, "Epic points cannot be negative"),
+
+  // Character Essences (optional)
+  essences: z
+    .array(
+      z.object({
+        text: z.string().max(200, "Essence text cannot exceed 200 characters"),
+      }),
+    )
+    .default([]),
 
   // Attributes
   strength: z.number().min(1, "Strength must be at least 1"),
@@ -37,39 +51,68 @@ const statsFormSchema = z.object({
   intelligence: z.number().min(1, "Intelligence must be at least 1"),
 
   // Domains
-  physical: z.number().min(0, "Physical cannot be negative"),
-  combat: z.number().min(0, "Combat cannot be negative"),
-  social: z.number().min(0, "Social cannot be negative"),
-  environmental: z.number().min(0, "Environmental cannot be negative"),
-  stealth: z.number().min(0, "Stealth cannot be negative"),
-  knowledge: z.number().min(0, "Knowledge cannot be negative"),
-  technical: z.number().min(0, "Technical cannot be negative"),
-  resources: z.number().min(0, "Resources cannot be negative"),
-  demonic: z.number().min(0, "Demonic cannot be negative"),
-  aura: z.number().min(0, "Aura cannot be negative"),
+  physicalValue: z.number().min(0, "Physical cannot be negative"),
+  physicalEssence: z.string().default(""),
+  combatValue: z.number().min(0, "Combat cannot be negative"),
+  combatEssence: z.string().default(""),
+  socialValue: z.number().min(0, "Social cannot be negative"),
+  socialEssence: z.string().default(""),
+  environmentalValue: z.number().min(0, "Environmental cannot be negative"),
+  environmentalEssence: z.string().default(""),
+  stealthValue: z.number().min(0, "Stealth cannot be negative"),
+  stealthEssence: z.string().default(""),
+  knowledgeValue: z.number().min(0, "Knowledge cannot be negative"),
+  knowledgeEssence: z.string().default(""),
+  technicalValue: z.number().min(0, "Technical cannot be negative"),
+  technicalEssence: z.string().default(""),
+  resourcesValue: z.number().min(0, "Resources cannot be negative"),
+  resourcesEssence: z.string().default(""),
+  demonicValue: z.number().min(0, "Demonic cannot be negative"),
+  demonicEssence: z.string().default(""),
+  auraValue: z.number().min(0, "Aura cannot be negative"),
+  auraEssence: z.string().default(""),
 
-  // Combat Stats
-  physicalHealth: z.number().min(0, "Physical health cannot be negative"),
+  // Combat Stats - Current values (only for edit/view mode)
+  physicalHealth: z
+    .number()
+    .min(0, "Physical health cannot be negative")
+    .optional(),
+  physicalResistance: z
+    .number()
+    .min(0, "Physical resistance cannot be negative")
+    .optional(),
+  mentalHealth: z
+    .number()
+    .min(0, "Mental health cannot be negative")
+    .optional(),
+  mentalResistance: z
+    .number()
+    .min(0, "Mental resistance cannot be negative")
+    .optional(),
+  initiative: z.number().min(0, "Initiative cannot be negative").optional(),
+  defense: z.number().min(0, "Defense cannot be negative").optional(),
+  attack: z.number().min(0, "Attack cannot be negative").optional(),
+  impact: z.number().min(0, "Impact cannot be negative").optional(),
+
+  // Combat Stats - Max values (required for create, editable in edit/view mode)
   maxPhysicalHealth: z
     .number()
     .min(1, "Max physical health must be at least 1"),
-  physicalResistance: z
-    .number()
-    .min(0, "Physical resistance cannot be negative"),
   maxPhysicalResistance: z
     .number()
     .min(1, "Max physical resistance must be at least 1"),
-  mentalHealth: z.number().min(0, "Mental health cannot be negative"),
   maxMentalHealth: z.number().min(1, "Max mental health must be at least 1"),
-  mentalResistance: z.number().min(0, "Mental resistance cannot be negative"),
   maxMentalResistance: z
     .number()
     .min(1, "Max mental resistance must be at least 1"),
-  initiative: z.number().min(0, "Initiative cannot be negative"),
-  defense: z.number().min(0, "Defense cannot be negative"),
-  attack: z.number().min(0, "Attack cannot be negative"),
-  impact: z.number().min(0, "Impact cannot be negative"),
-  maxDamage: z.number().min(0, "Max damage cannot be negative"),
+  maxInitiative: z
+    .number()
+    .min(0, "Max initiative cannot be negative")
+    .optional(),
+  maxDefense: z.number().min(0, "Max defense cannot be negative").optional(),
+  maxAttack: z.number().min(0, "Max attack cannot be negative").optional(),
+  maxImpact: z.number().min(0, "Max impact cannot be negative").optional(),
+  maxDamage: z.number().min(0, "Max damage cannot be negative").optional(),
 });
 
 type StatsFormData = z.infer<typeof statsFormSchema>;
@@ -78,8 +121,10 @@ export const useStatsForm = (
   character: any,
   mode: FormMode = "view",
   users: Array<{ id: string; name: string; email: string }> = [],
+  options?: UseStatsFormOptions,
 ) => {
   const { selectedCharacterId } = useCharacterContext();
+  const router = useRouter();
 
   // Extract data from character object
   const attributes = character?.attributes;
@@ -90,52 +135,74 @@ export const useStatsForm = (
   const createCharacter = useCreateCharacter();
   const updateCharacter = useUpdateCharacter();
 
-  // ✅ Extract default values
-  const getDefaultValues = (): StatsFormData => ({
-    // Basic character info
-    userId: character?.userId || "",
-    characterName: character?.characterName || "",
-    archetype: character?.archetype || "",
-    faction: character?.faction || "",
-    race: character?.race || "",
-    category: character?.category || "",
-    level: character?.level || 1,
-    epicPoints: character?.epicPoints || 0,
+  // ✅ Memoize default values to ensure they update when character changes
+  const defaultValues = React.useMemo(
+    (): StatsFormData => ({
+      // Basic character info
+      userId: character?.userId || "",
+      characterName: character?.characterName || "",
+      archetype: character?.archetype || "",
+      faction: character?.faction || "",
+      race: character?.race || "",
+      level: character?.level || 1,
+      epicPoints: character?.epicPoints || 0,
 
-    // Attributes
-    strength: attributes?.strength || 1,
-    agility: attributes?.agility || 1,
-    willpower: attributes?.willpower || 1,
-    luck: attributes?.luck || 1,
-    intelligence: attributes?.intelligence || 1,
+      // Character Essences - Optional, start with empty array
+      essences:
+        character?.essences && character.essences.length > 0
+          ? character.essences.map((e: any) => ({ text: e.text }))
+          : [],
 
-    // Domains
-    physical: domains?.physical || 0,
-    combat: domains?.combat || 0,
-    social: domains?.social || 0,
-    environmental: domains?.environmental || 0,
-    stealth: domains?.stealth || 0,
-    knowledge: domains?.knowledge || 0,
-    technical: domains?.technical || 0,
-    resources: domains?.resources || 0,
-    demonic: domains?.demonic || 0,
-    aura: domains?.aura || 0,
+      // Attributes
+      strength: attributes?.strength || 1,
+      agility: attributes?.agility || 1,
+      willpower: attributes?.willpower || 1,
+      luck: attributes?.luck || 1,
+      intelligence: attributes?.intelligence || 1,
 
-    // Combat Stats
-    physicalHealth: combatStats?.physicalHealth || 100,
-    maxPhysicalHealth: combatStats?.maxPhysicalHealth || 100,
-    physicalResistance: combatStats?.physicalResistance || 100,
-    maxPhysicalResistance: combatStats?.maxPhysicalResistance || 100,
-    mentalHealth: combatStats?.mentalHealth || 100,
-    maxMentalHealth: combatStats?.maxMentalHealth || 100,
-    mentalResistance: combatStats?.mentalResistance || 100,
-    maxMentalResistance: combatStats?.maxMentalResistance || 100,
-    initiative: combatStats?.initiative || 0,
-    defense: combatStats?.defense || 0,
-    attack: combatStats?.attack || 0,
-    impact: combatStats?.impact || 0,
-    maxDamage: combatStats?.maxDamage || 0,
-  });
+      // Domains
+      physicalValue: domains?.physicalValue || 0,
+      physicalEssence: domains?.physicalEssence || "",
+      combatValue: domains?.combatValue || 0,
+      combatEssence: domains?.combatEssence || "",
+      socialValue: domains?.socialValue || 0,
+      socialEssence: domains?.socialEssence || "",
+      environmentalValue: domains?.environmentalValue || 0,
+      environmentalEssence: domains?.environmentalEssence || "",
+      stealthValue: domains?.stealthValue || 0,
+      stealthEssence: domains?.stealthEssence || "",
+      knowledgeValue: domains?.knowledgeValue || 0,
+      knowledgeEssence: domains?.knowledgeEssence || "",
+      technicalValue: domains?.technicalValue || 0,
+      technicalEssence: domains?.technicalEssence || "",
+      resourcesValue: domains?.resourcesValue || 0,
+      resourcesEssence: domains?.resourcesEssence || "",
+      demonicValue: domains?.demonicValue || 0,
+      demonicEssence: domains?.demonicEssence || "",
+      auraValue: domains?.auraValue || 0,
+      auraEssence: domains?.auraEssence || "",
+
+      // Combat Stats - Current values (only needed in edit/view mode, not create)
+      physicalHealth: combatStats?.physicalHealth,
+      maxPhysicalHealth: combatStats?.maxPhysicalHealth || 100,
+      physicalResistance: combatStats?.physicalResistance,
+      maxPhysicalResistance: combatStats?.maxPhysicalResistance || 100,
+      mentalHealth: combatStats?.mentalHealth,
+      maxMentalHealth: combatStats?.maxMentalHealth || 100,
+      mentalResistance: combatStats?.mentalResistance,
+      maxMentalResistance: combatStats?.maxMentalResistance || 100,
+      initiative: combatStats?.initiative,
+      maxInitiative: combatStats?.maxInitiative || 0,
+      defense: combatStats?.defense,
+      maxDefense: combatStats?.maxDefense || 0,
+      attack: combatStats?.attack,
+      maxAttack: combatStats?.maxAttack || 0,
+      impact: combatStats?.impact,
+      maxImpact: combatStats?.maxImpact || 0,
+      maxDamage: combatStats?.maxDamage || 0,
+    }),
+    [character, attributes, domains, combatStats],
+  );
 
   // ✅ Form configuration inline
   const formConfig: FormConfig = React.useMemo(
@@ -186,12 +253,6 @@ export const useStatsForm = (
                 disabled: !isFieldEditable(mode),
                 placeholder: "Raza del personaje",
               }),
-              createField("text", {
-                name: "category",
-                label: "Categoría",
-                disabled: !isFieldEditable(mode),
-                placeholder: "Categoría (opcional)",
-              }),
               createField("number", {
                 name: "level",
                 label: "Nivel",
@@ -211,6 +272,28 @@ export const useStatsForm = (
           }),
 
           createSection({
+            title: "Esencias del Personaje",
+            description:
+              "Define las esencias fundamentales que caracterizan a tu personaje (opcional, máx. 200 caracteres cada una)",
+            columns: 1,
+            fields: [
+              createField("string-list", {
+                name: "essences",
+                label: "Esencias",
+                required: false,
+                disabled: !isFieldEditable(mode),
+                placeholder:
+                  "Describe una característica esencial del personaje...",
+                maxLength: 200,
+                rows: 2,
+                addButtonText: "Añadir Esencia",
+                emptyStateText:
+                  'No hay esencias definidas. Haz clic en "Añadir Esencia" para comenzar.',
+              }),
+            ],
+          }),
+
+          createSection({
             title: "Atributos",
             description: "Atributos principales del personaje",
             columns: 3,
@@ -225,7 +308,7 @@ export const useStatsForm = (
               }),
               createField("number", {
                 name: "agility",
-                label: "Agilidad",
+                label: "Dinamismo",
                 required: true,
                 disabled: !isFieldEditable(mode),
                 min: 1,
@@ -261,107 +344,185 @@ export const useStatsForm = (
           createSection({
             title: "Dominios",
             description: "Dominios de conocimiento y habilidad",
-            columns: 3,
+            columns: 2,
             fields: [
               createField("number", {
-                name: "physical",
-                label: "Físico",
+                name: "physicalValue",
+                label: "Físico (DFIS)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "physicalEssence",
+                label: "Esencia Física",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio físico",
+              }),
               createField("number", {
-                name: "combat",
-                label: "Combate",
+                name: "combatValue",
+                label: "Batalla (DBAT)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "combatEssence",
+                label: "Esencia de Batalla",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio de batalla",
+              }),
               createField("number", {
-                name: "social",
-                label: "Social",
+                name: "socialValue",
+                label: "Social (DSOC)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "socialEssence",
+                label: "Esencia Social",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio social",
+              }),
               createField("number", {
-                name: "environmental",
-                label: "Ambiental",
+                name: "environmentalValue",
+                label: "Ambiental (DAMB)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "environmentalEssence",
+                label: "Esencia Ambiental",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio ambiental",
+              }),
               createField("number", {
-                name: "stealth",
-                label: "Sigilo",
+                name: "stealthValue",
+                label: "Ocultación (DOCU)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "stealthEssence",
+                label: "Esencia de Ocultación",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio de ocultación",
+              }),
               createField("number", {
-                name: "knowledge",
-                label: "Conocimiento",
+                name: "knowledgeValue",
+                label: "Conocimiento (DCON)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "knowledgeEssence",
+                label: "Esencia de Conocimiento",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio de conocimiento",
+              }),
               createField("number", {
-                name: "technical",
-                label: "Técnico",
+                name: "technicalValue",
+                label: "Técnico (DTEC)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "technicalEssence",
+                label: "Esencia Técnica",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio técnico",
+              }),
               createField("number", {
-                name: "resources",
-                label: "Recursos",
+                name: "resourcesValue",
+                label: "Recursos (DREC)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "resourcesEssence",
+                label: "Esencia de Recursos",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio de recursos",
+              }),
               createField("number", {
-                name: "demonic",
-                label: "Demoníaco",
+                name: "demonicValue",
+                label: "Demoníaco (DDEM)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+              createField("text", {
+                name: "demonicEssence",
+                label: "Esencia Demoníaca",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio demoníaco",
+              }),
               createField("number", {
-                name: "aura",
-                label: "Aura",
+                name: "auraValue",
+                label: "Aura (DAUR)",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
+              }),
+              createField("text", {
+                name: "auraEssence",
+                label: "Esencia de Aura",
+                disabled: !isFieldEditable(mode),
+                placeholder: "Describe el dominio de aura",
               }),
             ],
           }),
 
           createSection({
             title: "Estadísticas de Combate",
-            description: "Salud, resistencia y estadísticas de combate",
+            description: isCreateMode(mode)
+              ? "Define los valores máximos. Los valores actuales se inicializarán automáticamente."
+              : "Salud, resistencia y estadísticas de combate",
             columns: 2,
             fields: [
-              createField("number", {
-                name: "physicalHealth",
-                label: "Salud Física",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+              // In CREATE mode, only show max* fields
+              // In EDIT/VIEW mode, show both current and max fields
+
+              // Physical Health
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "physicalHealth",
+                      label: "Salud Física",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxPhysicalHealth",
-                label: "Salud Física Máxima",
+                label: isCreateMode(mode)
+                  ? "Salud Física Máxima"
+                  : "Salud Física Máxima",
                 disabled: !isFieldEditable(mode),
                 min: 1,
                 defaultValue: 100,
               }),
-              createField("number", {
-                name: "physicalResistance",
-                label: "Resistencia Física",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+
+              // Physical Resistance
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "physicalResistance",
+                      label: "Resistencia Física",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxPhysicalResistance",
                 label: "Resistencia Física Máxima",
@@ -369,13 +530,19 @@ export const useStatsForm = (
                 min: 1,
                 defaultValue: 100,
               }),
-              createField("number", {
-                name: "mentalHealth",
-                label: "Salud Mental",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+
+              // Mental Health
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "mentalHealth",
+                      label: "Salud Mental",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxMentalHealth",
                 label: "Salud Mental Máxima",
@@ -383,13 +550,19 @@ export const useStatsForm = (
                 min: 1,
                 defaultValue: 100,
               }),
-              createField("number", {
-                name: "mentalResistance",
-                label: "Resistencia Mental",
-                disabled: !isFieldEditable(mode),
-                min: 0,
-                defaultValue: 100,
-              }),
+
+              // Mental Resistance
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "mentalResistance",
+                      label: "Resistencia Mental",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 100,
+                    }),
+                  ]
+                : []),
               createField("number", {
                 name: "maxMentalResistance",
                 label: "Resistencia Mental Máxima",
@@ -397,34 +570,90 @@ export const useStatsForm = (
                 min: 1,
                 defaultValue: 100,
               }),
+
+              // Initiative
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "initiative",
+                      label: "Iniciativa",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "initiative",
-                label: "Iniciativa",
+                name: "maxInitiative",
+                label: isCreateMode(mode)
+                  ? "Iniciativa Máxima"
+                  : "Iniciativa Máxima",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Defense
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "defense",
+                      label: "Defensa",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "defense",
-                label: "Defensa",
+                name: "maxDefense",
+                label: isCreateMode(mode) ? "Defensa Máxima" : "Defensa Máxima",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Attack
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "attack",
+                      label: "Ataque",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "attack",
-                label: "Ataque",
+                name: "maxAttack",
+                label: isCreateMode(mode) ? "Ataque Máximo" : "Ataque Máximo",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Impact
+              ...(!isCreateMode(mode)
+                ? [
+                    createField("number", {
+                      name: "impact",
+                      label: "Impacto",
+                      disabled: !isFieldEditable(mode),
+                      min: 0,
+                      defaultValue: 0,
+                    }),
+                  ]
+                : []),
               createField("number", {
-                name: "impact",
-                label: "Impacto",
+                name: "maxImpact",
+                label: isCreateMode(mode) ? "Impacto Máximo" : "Impacto Máximo",
                 disabled: !isFieldEditable(mode),
                 min: 0,
                 defaultValue: 0,
               }),
+
+              // Max Damage (no current value, always show)
               createField("number", {
                 name: "maxDamage",
                 label: "Daño Máximo",
@@ -442,7 +671,7 @@ export const useStatsForm = (
   // Form setup
   const form = useForm<StatsFormData>({
     resolver: zodResolver(statsFormSchema),
-    defaultValues: getDefaultValues(),
+    defaultValues: defaultValues,
     mode: "onChange",
     reValidateMode: "onChange",
     shouldFocusError: true,
@@ -451,9 +680,9 @@ export const useStatsForm = (
   // Update form when character data changes (only in edit/view mode)
   React.useEffect(() => {
     if (character && selectedCharacterId && !isCreateMode(mode)) {
-      form.reset(getDefaultValues());
+      form.reset(defaultValues, { keepDefaultValues: false });
     }
-  }, [character, selectedCharacterId, mode]);
+  }, [character, selectedCharacterId, mode, defaultValues, form]);
 
   // ✅ Submit handler
   const handleSubmit = async (data: StatsFormData): Promise<void> => {
@@ -465,7 +694,6 @@ export const useStatsForm = (
           archetype: data.archetype,
           faction: data.faction,
           race: data.race,
-          category: data.category || "",
           level: data.level,
           epicPoints: data.epicPoints,
           type: "player",
@@ -473,6 +701,14 @@ export const useStatsForm = (
           isVisible: true,
           userId: data.userId,
         };
+
+        // Add essences - filter out empty ones
+        const validEssences = data.essences
+          .filter((e) => e.text.trim() !== "")
+          .map((e) => e.text);
+        if (validEssences.length > 0) {
+          createPayload.essences = validEssences;
+        }
 
         // Add nested attributes
         createPayload.attributes = {
@@ -485,37 +721,60 @@ export const useStatsForm = (
 
         // Add nested domains
         createPayload.domains = {
-          physical: data.physical,
-          combat: data.combat,
-          social: data.social,
-          environmental: data.environmental,
-          stealth: data.stealth,
-          knowledge: data.knowledge,
-          technical: data.technical,
-          resources: data.resources,
-          demonic: data.demonic,
-          aura: data.aura,
+          physicalValue: data.physicalValue,
+          physicalEssence: data.physicalEssence,
+          combatValue: data.combatValue,
+          combatEssence: data.combatEssence,
+          socialValue: data.socialValue,
+          socialEssence: data.socialEssence,
+          environmentalValue: data.environmentalValue,
+          environmentalEssence: data.environmentalEssence,
+          stealthValue: data.stealthValue,
+          stealthEssence: data.stealthEssence,
+          knowledgeValue: data.knowledgeValue,
+          knowledgeEssence: data.knowledgeEssence,
+          technicalValue: data.technicalValue,
+          technicalEssence: data.technicalEssence,
+          resourcesValue: data.resourcesValue,
+          resourcesEssence: data.resourcesEssence,
+          demonicValue: data.demonicValue,
+          demonicEssence: data.demonicEssence,
+          auraValue: data.auraValue,
+          auraEssence: data.auraEssence,
         };
 
-        // Add nested combat stats
+        // Add nested combat stats - Only max values for creation
+        // Current values will be initialized by the backend service
         createPayload.combatStats = {
-          physicalHealth: data.physicalHealth,
           maxPhysicalHealth: data.maxPhysicalHealth,
-          physicalResistance: data.physicalResistance,
           maxPhysicalResistance: data.maxPhysicalResistance,
-          mentalHealth: data.mentalHealth,
           maxMentalHealth: data.maxMentalHealth,
-          mentalResistance: data.mentalResistance,
           maxMentalResistance: data.maxMentalResistance,
-          initiative: data.initiative,
-          defense: data.defense,
-          attack: data.attack,
-          impact: data.impact,
-          maxDamage: data.maxDamage,
+          maxInitiative: data.maxInitiative ?? 0,
+          maxDefense: data.maxDefense ?? 0,
+          maxAttack: data.maxAttack ?? 0,
+          maxImpact: data.maxImpact ?? 0,
+          maxDamage: data.maxDamage ?? 0,
         };
 
-        await createCharacter.mutateAsync(createPayload);
+        const newCharacter = (await createCharacter.mutateAsync(
+          createPayload,
+        )) as Character;
+
         toast.success("Personaje creado correctamente");
+
+        // Reset form and redirect
+        form.reset();
+
+        // Call onSuccess callback or navigate directly
+        if (options?.onCreateSuccess && newCharacter?.id) {
+          options.onCreateSuccess(newCharacter.id);
+        } else if (newCharacter?.id) {
+          router.push(`/characters/${newCharacter.id}`);
+        }
+
+        // Early return to prevent falling through to update logic
+        return;
       } catch (error) {
         toast.error("Error al crear el personaje");
         console.error("Error creating character:", error);
@@ -535,10 +794,15 @@ export const useStatsForm = (
         archetype: data.archetype,
         faction: data.faction,
         race: data.race,
-        category: data.category,
         level: data.level,
         epicPoints: data.epicPoints,
       };
+
+      // Add essences - filter out empty ones
+      const validEssences = data.essences
+        .filter((e) => e.text.trim() !== "")
+        .map((e) => e.text);
+      updatePayload.essences = validEssences;
 
       // Add attributes if they exist
       if (attributes?.id) {
@@ -557,21 +821,31 @@ export const useStatsForm = (
       if (domains?.id) {
         updatePayload.domains = {
           update: {
-            physical: data.physical,
-            combat: data.combat,
-            social: data.social,
-            environmental: data.environmental,
-            stealth: data.stealth,
-            knowledge: data.knowledge,
-            technical: data.technical,
-            resources: data.resources,
-            demonic: data.demonic,
-            aura: data.aura,
+            physicalValue: data.physicalValue,
+            physicalEssence: data.physicalEssence,
+            combatValue: data.combatValue,
+            combatEssence: data.combatEssence,
+            socialValue: data.socialValue,
+            socialEssence: data.socialEssence,
+            environmentalValue: data.environmentalValue,
+            environmentalEssence: data.environmentalEssence,
+            stealthValue: data.stealthValue,
+            stealthEssence: data.stealthEssence,
+            knowledgeValue: data.knowledgeValue,
+            knowledgeEssence: data.knowledgeEssence,
+            technicalValue: data.technicalValue,
+            technicalEssence: data.technicalEssence,
+            resourcesValue: data.resourcesValue,
+            resourcesEssence: data.resourcesEssence,
+            demonicValue: data.demonicValue,
+            demonicEssence: data.demonicEssence,
+            auraValue: data.auraValue,
+            auraEssence: data.auraEssence,
           },
         };
       }
 
-      // Add combat stats if they exist
+      // Add combat stats if they exist - Include both current and max values
       if (combatStats?.id) {
         updatePayload.combatStats = {
           update: {
@@ -584,9 +858,13 @@ export const useStatsForm = (
             mentalResistance: data.mentalResistance,
             maxMentalResistance: data.maxMentalResistance,
             initiative: data.initiative,
+            maxInitiative: data.maxInitiative,
             defense: data.defense,
+            maxDefense: data.maxDefense,
             attack: data.attack,
+            maxAttack: data.maxAttack,
             impact: data.impact,
+            maxImpact: data.maxImpact,
             maxDamage: data.maxDamage,
           },
         };

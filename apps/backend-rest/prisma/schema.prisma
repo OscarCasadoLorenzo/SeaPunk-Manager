@@ -31,25 +31,16 @@ model User {
 
 model Character {
   id                        String        @id @default(cuid())
-  characterName             String
+  characterName             String        @unique
   archetype                 String
   faction                   String
   race                      String
   level                     Int
-  category                  String
   epicPoints                Int
   type                      String
   isNPC                     Boolean       @default(false)
   isVisible                 Boolean       @default(true)
   userId                    String
-  // Legacy fields from old schema (restored for backward compatibility)
-  bcat                      Int           @default(0)
-  powerLevel                Int           @default(0)
-  physicalResistanceDomain  String?
-  mentalResistanceDomain    String?
-  defenseDomain             String?
-  attackDomain              String?
-  impactDomain              String?
   createdAt                 DateTime      @default(now())
   updatedAt                 DateTime      @updatedAt
   user                      User          @relation(fields: [userId], references: [id], onDelete: Cascade)
@@ -59,8 +50,8 @@ model Character {
   narrative                 Narrative?
   inventories               Inventory[]
   effects                   Effect[]
-  essences                  CharacterEssence[]
   auraGifts                 CharacterAuraGift[]
+  essences                  Essence[]
 
   @@map("characters")
 }
@@ -79,19 +70,29 @@ model Attribute {
 }
 
 model Domain {
-  id            String    @id @default(cuid())
-  characterId   String    @unique
-  physical      Int
-  combat        Int
-  social        Int
-  environmental Int
-  stealth       Int
-  knowledge     Int
-  technical     Int
-  resources     Int
-  demonic       Int
-  aura          Int
-  character     Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
+  id                  String    @id @default(cuid())
+  characterId         String    @unique
+  physicalValue       Int
+  physicalEssence     String    @default("")
+  combatValue         Int
+  combatEssence       String    @default("")
+  socialValue         Int
+  socialEssence       String    @default("")
+  environmentalValue  Int
+  environmentalEssence String   @default("")
+  stealthValue        Int
+  stealthEssence      String    @default("")
+  knowledgeValue      Int
+  knowledgeEssence    String    @default("")
+  technicalValue      Int
+  technicalEssence    String    @default("")
+  resourcesValue      Int
+  resourcesEssence    String    @default("")
+  demonicValue        Int
+  demonicEssence      String    @default("")
+  auraValue           Int
+  auraEssence         String    @default("")
+  character           Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("domains")
 }
@@ -99,25 +100,33 @@ model Domain {
 model CombatStats {
   id                    String    @id @default(cuid())
   characterId           String    @unique
+
   physicalHealth        Int
   maxPhysicalHealth     Int
+
   physicalResistance    Int
   maxPhysicalResistance Int
+
   mentalHealth          Int
   maxMentalHealth       Int
+
   mentalResistance      Int
   maxMentalResistance   Int
-  auraHealth           Int       @default(0)
-  maxAuraHealth        Int       @default(0)
-  auraResistance       Int       @default(0)
-  maxAuraResistance    Int       @default(0)
-  initiative            Int
-  armorClass           Int       @default(10)
-  conditions           String[]  @default([])
-  defense              Int       @default(10)
-  attack               Int       @default(0)
-  impact               Int       @default(0)
-  maxDamage            Int       @default(0)
+
+  initiative            Int       @default(0)
+  maxInitiative         Int       @default(0)
+
+  defense               Int       @default(0)
+  maxDefense            Int       @default(0)
+
+  attack                Int       @default(0)
+  maxAttack             Int       @default(0)
+
+  impact                Int       @default(0)
+  maxImpact             Int       @default(0)
+
+  maxDamage             Int       @default(0)
+
   character             Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("combat_stats")
@@ -173,11 +182,12 @@ model Effect {
 }
 
 model Essence {
-  id         String             @id @default(cuid())
-  name       String             @unique
-  createdAt  DateTime           @default(now())
-  updatedAt  DateTime           @updatedAt
-  characters CharacterEssence[]
+  id          String    @id @default(cuid())
+  characterId String
+  text        String    @db.VarChar(200)
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
 
   @@map("essences")
 }
@@ -193,19 +203,6 @@ model AuraGift {
 }
 
 // Many-to-many relationship tables
-model CharacterEssence {
-  id          String    @id @default(cuid())
-  characterId String
-  essenceId   String
-  level       Int       @default(1)
-  createdAt   DateTime  @default(now())
-  character   Character @relation(fields: [characterId], references: [id], onDelete: Cascade)
-  essence     Essence   @relation(fields: [essenceId], references: [id], onDelete: Cascade)
-
-  @@unique([characterId, essenceId])
-  @@map("character_essences")
-}
-
 model CharacterAuraGift {
   id          String    @id @default(cuid())
   characterId String

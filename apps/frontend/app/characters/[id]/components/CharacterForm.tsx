@@ -20,6 +20,7 @@ interface CharacterFormProps {
   isLoading?: boolean;
   mode?: FormMode;
   onModeChange?: (mode: FormMode) => void;
+  onCreateSuccess?: (characterId: string) => void;
 }
 
 interface TabConfig {
@@ -36,6 +37,7 @@ export const CharacterForm = ({
   isLoading = false,
   mode = "view",
   onModeChange,
+  onCreateSuccess,
 }: CharacterFormProps) => {
   const [internalMode, setInternalMode] = useState<FormMode>(mode);
   const [activeTab, setActiveTab] = useState<string>("stats");
@@ -48,7 +50,9 @@ export const CharacterForm = ({
   const handleModeChange = onModeChange || setInternalMode;
 
   // Individual hooks for each tab
-  const statsForm = useStatsForm(character, currentMode, users);
+  const statsForm = useStatsForm(character, currentMode, users, {
+    onCreateSuccess,
+  });
   const narrativeForm = useNarrativeForm(character, currentMode);
   const inventoryForm = useInventoryForm(character, currentMode);
 
@@ -81,7 +85,6 @@ export const CharacterForm = ({
 
   // Get combined dirty state
   const isDirty = tabs.some((tab) => tab.form.formState.isDirty);
-  const isValid = tabs.every((tab) => tab.form.formState.isValid);
 
   // Handle edit mode toggle
   const handleEditToggle = () => {
@@ -126,6 +129,11 @@ export const CharacterForm = ({
   const renderFormActions = (tabForm: UseFormReturn<any>): ReactNode => {
     if (!isFieldEditable(currentMode)) return null;
 
+    // In create mode, require changes. In edit mode, allow submission without changes
+    const shouldDisable = isCreateMode(currentMode)
+      ? !tabForm.formState.isDirty || !tabForm.formState.isValid || isLoading
+      : !tabForm.formState.isValid || isLoading;
+
     return (
       <div className="flex gap-3 justify-end pt-6 border-t">
         <Button
@@ -136,10 +144,7 @@ export const CharacterForm = ({
         >
           Cancelar
         </Button>
-        <Button
-          type="submit"
-          disabled={!tabForm.formState.isDirty || !isValid || isLoading}
-        >
+        <Button type="submit" disabled={shouldDisable}>
           {isLoading ? "Guardando..." : getSubmitButtonText()}
         </Button>
       </div>

@@ -1,6 +1,11 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import {
+  getPasswordStrengthColor,
+  getPasswordStrengthLabel,
+  validatePasswordStrength,
+} from "@/utils/password-validator";
 import Link from "next/link";
 import { useState } from "react";
 
@@ -11,15 +16,21 @@ export default function RegisterPage() {
   const [confirmPassword, setConfirmPassword] = useState("");
   const [error, setError] = useState("");
   const [isLoading, setIsLoading] = useState(false);
+  const [showPasswordRequirements, setShowPasswordRequirements] =
+    useState(false);
   const { register } = useAuth();
+
+  const passwordStrength = validatePasswordStrength(password);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     setError("");
 
     // Validation
-    if (password.length < 6) {
-      setError("Password must be at least 6 characters long");
+    if (!passwordStrength.isValid) {
+      setError(
+        "Password does not meet security requirements. Please check the requirements below.",
+      );
       return;
     }
 
@@ -123,10 +134,110 @@ export default function RegisterPage() {
                 required
                 value={password}
                 onChange={(e) => setPassword(e.target.value)}
+                onFocus={() => setShowPasswordRequirements(true)}
                 className="relative block w-full rounded-md border-0 px-3 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
-                placeholder="Password (min. 6 characters)"
-                minLength={6}
+                placeholder="Password"
               />
+              {password && (
+                <div className="mt-2 space-y-2">
+                  {/* Password Strength Bar */}
+                  <div className="space-y-1">
+                    <div className="flex justify-between text-xs">
+                      <span className="text-gray-600">Password Strength:</span>
+                      <span
+                        className={`font-medium ${
+                          passwordStrength.score < 25
+                            ? "text-red-600"
+                            : passwordStrength.score < 50
+                              ? "text-orange-600"
+                              : passwordStrength.score < 75
+                                ? "text-yellow-600"
+                                : passwordStrength.score < 90
+                                  ? "text-blue-600"
+                                  : "text-green-600"
+                        }`}
+                      >
+                        {getPasswordStrengthLabel(passwordStrength.score)}
+                      </span>
+                    </div>
+                    <div className="h-2 w-full rounded-full bg-gray-200">
+                      <div
+                        className={`h-2 rounded-full transition-all duration-300 ${getPasswordStrengthColor(
+                          passwordStrength.score,
+                        )}`}
+                        style={{ width: `${passwordStrength.score}%` }}
+                      />
+                    </div>
+                  </div>
+
+                  {/* Requirements Checklist */}
+                  {showPasswordRequirements && (
+                    <div className="rounded-md bg-gray-50 p-3 text-xs">
+                      <p className="mb-2 font-medium text-gray-700">
+                        Password Requirements:
+                      </p>
+                      <ul className="space-y-1">
+                        <li
+                          className={
+                            passwordStrength.requirements.minLength
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {passwordStrength.requirements.minLength ? "✓" : "○"}{" "}
+                          At least 8 characters
+                        </li>
+                        <li
+                          className={
+                            passwordStrength.requirements.hasUppercase
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {passwordStrength.requirements.hasUppercase
+                            ? "✓"
+                            : "○"}{" "}
+                          One uppercase letter
+                        </li>
+                        <li
+                          className={
+                            passwordStrength.requirements.hasLowercase
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {passwordStrength.requirements.hasLowercase
+                            ? "✓"
+                            : "○"}{" "}
+                          One lowercase letter
+                        </li>
+                        <li
+                          className={
+                            passwordStrength.requirements.hasNumber
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {passwordStrength.requirements.hasNumber ? "✓" : "○"}{" "}
+                          One number
+                        </li>
+                        <li
+                          className={
+                            passwordStrength.requirements.hasSpecialChar
+                              ? "text-green-600"
+                              : "text-gray-500"
+                          }
+                        >
+                          {passwordStrength.requirements.hasSpecialChar
+                            ? "✓"
+                            : "○"}{" "}
+                          One special character (@$!%*?&#, etc.)
+                        </li>
+                      </ul>
+                    </div>
+                  )}
+                </div>
+              )}
             </div>
             <div>
               <label htmlFor="confirm-password" className="sr-only">
@@ -140,10 +251,22 @@ export default function RegisterPage() {
                 required
                 value={confirmPassword}
                 onChange={(e) => setConfirmPassword(e.target.value)}
-                className="relative block w-full rounded-md border-0 px-3 py-2 text-gray-900 ring-1 ring-inset ring-gray-300 placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6"
+                className={`relative block w-full rounded-md border-0 px-3 py-2 text-gray-900 ring-1 ring-inset ${
+                  confirmPassword &&
+                  (password === confirmPassword
+                    ? "ring-green-500"
+                    : "ring-red-500")
+                } placeholder:text-gray-400 focus:z-10 focus:ring-2 focus:ring-inset focus:ring-blue-600 sm:text-sm sm:leading-6`}
                 placeholder="Confirm password"
-                minLength={6}
               />
+              {confirmPassword && password !== confirmPassword && (
+                <p className="mt-1 text-xs text-red-600">
+                  Passwords do not match
+                </p>
+              )}
+              {confirmPassword && password === confirmPassword && (
+                <p className="mt-1 text-xs text-green-600">✓ Passwords match</p>
+              )}
             </div>
           </div>
 

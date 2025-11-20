@@ -1,4 +1,10 @@
-import { PartialType } from '@nestjs/swagger';
-import { CreateEssenceDto } from './create-essence.dto';
+import { IsOptional, IsString, MaxLength } from "class-validator";
 
-export class UpdateEssenceDto extends PartialType(CreateEssenceDto) {}
+export class UpdateEssenceDto {
+  @IsOptional()
+  @IsString()
+  @MaxLength(200, {
+    message: "Essence text cannot exceed 200 characters",
+  })
+  text?: string;
+}

@@ -5,17 +5,35 @@ export interface Character {
   faction: string;
   race: string;
   level: number;
-  category: string;
   epicPoints: number;
   type: string;
   isNPC: boolean;
   isVisible: boolean;
-  playerId: string;
+  userId: string; // Changed from playerId to match backend
   createdAt: string;
   updatedAt: string;
   attributes?: CharacterAttributes;
   domains?: CharacterDomains;
   combatStats?: CombatStats;
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+  auraGifts?: unknown[];
+  effects?: unknown[];
+  inventories?: unknown[];
+  narrative?: unknown;
+  essences?: Essence[];
+}
+
+export interface Essence {
+  id: string;
+  characterId: string;
+  text: string;
+  createdAt: string;
+  updatedAt: string;
 }
 
 export interface CharacterAttributes {
@@ -31,16 +49,26 @@ export interface CharacterAttributes {
 export interface CharacterDomains {
   id: string;
   characterId: string;
-  physical: number;
-  combat: number;
-  social: number;
-  environmental: number;
-  stealth: number;
-  knowledge: number;
-  technical: number;
-  resources: number;
-  demonic: number;
-  aura: number;
+  physicalValue: number;
+  physicalEssence: string;
+  combatValue: number;
+  combatEssence: string;
+  socialValue: number;
+  socialEssence: string;
+  environmentalValue: number;
+  environmentalEssence: string;
+  stealthValue: number;
+  stealthEssence: string;
+  knowledgeValue: number;
+  knowledgeEssence: string;
+  technicalValue: number;
+  technicalEssence: string;
+  resourcesValue: number;
+  resourcesEssence: string;
+  demonicValue: number;
+  demonicEssence: string;
+  auraValue: number;
+  auraEssence: string;
 }
 
 export interface CombatStats {
@@ -56,5 +84,24 @@ export interface CombatStats {
 
 export type CreateCharacterDto = Omit<
   Character,
-  'id' | 'createdAt' | 'updatedAt'
+  "id" | "createdAt" | "updatedAt"
 >;
+
+// Pagination types
+export interface PaginationMeta {
+  total: number;
+  count: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  currentPage: number;
+  totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: PaginationMeta;
+}
+
+// Helper type to handle both paginated and non-paginated responses
+export type MaybePaginated<T> = T[] | PaginatedResponse<T>;

@@ -1,14 +1,14 @@
-import { ApiProperty } from '@nestjs/swagger';
-import { IsNotEmpty, IsString } from 'class-validator';
+import { IsNotEmpty, IsString, MaxLength } from "class-validator";
 
 export class CreateEssenceDto {
-  @ApiProperty({ description: 'Name of the essence' })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Character ID is required" })
   @IsString()
-  name: string;
+  characterId: string;
 
-  @ApiProperty({ description: 'Description of the essence' })
-  @IsNotEmpty()
+  @IsNotEmpty({ message: "Essence text is required" })
   @IsString()
-  description: string;
+  @MaxLength(200, {
+    message: "Essence text cannot exceed 200 characters",
+  })
+  text: string;
 }

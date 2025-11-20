@@ -1,8 +1,9 @@
 "use client";
 
+import { DeleteCharacterModal } from "@/components/DeleteCharacterModal";
 import { ProtectedRoute } from "@/components/ProtectedRoute";
 import { useCharacterContext } from "@/contexts/CharacterContext";
-import { useCharacters } from "@/hooks";
+import { useCharacters, useDeleteCharacter } from "@/hooks";
 import { Character } from "@/types";
 import {
   Button,
@@ -12,9 +13,9 @@ import {
   CardTitle,
   Skeleton,
 } from "@seapunk/ui";
-import { Plus } from "lucide-react";
-import { useRouter } from "next/navigation";
-import { useEffect } from "react";
+import { Plus, Trash2 } from "lucide-react";
+import { usePathname, useRouter } from "next/navigation";
+import { useEffect, useState } from "react";
 
 export default function CharactersLayout({
   children,
@@ -22,8 +23,20 @@ export default function CharactersLayout({
   children: React.ReactNode;
 }) {
   const router = useRouter();
+  const pathname = usePathname();
   const { data, isLoading, isError } = useCharacters();
   const { selectedCharacterId, setSelectedCharacterId } = useCharacterContext();
+  const deleteCharacter = useDeleteCharacter();
+
+  const [deleteModal, setDeleteModal] = useState<{
+    isOpen: boolean;
+    characterId: string;
+    characterName: string;
+  }>({
+    isOpen: false,
+    characterId: "",
+    characterName: "",
+  });
 
   useEffect(() => {
     console.log("CharacterList component mounted");
@@ -31,13 +44,59 @@ export default function CharactersLayout({
   }, [data]);
 
   const handleCharacterSelect = (characterId: string) => {
+    console.log("=== handleCharacterSelect called ===");
+    console.log("Character ID:", characterId);
+    console.log("Current pathname:", pathname);
+    console.log("Current selectedCharacterId:", selectedCharacterId);
+
     setSelectedCharacterId(characterId);
-    router.push(`/characters/${characterId}`);
+
+    // Force hard navigation if on /new page, otherwise use router
+    if (pathname === "/characters/new") {
+      console.log("On /new page, forcing hard navigation");
+      //TODO: Replace by next/navigation method when available
+      window.location.href = `/characters/${characterId}`;
+    } else {
+      router.push(`/characters/${characterId}`);
+      console.log("Navigation triggered to:", `/characters/${characterId}`);
+    }
   };
 
   const handleCreateNew = () => {
     setSelectedCharacterId(null);
     router.push("/characters/new");
+  };
+
+  const handleDeleteClick = (
+    e: React.MouseEvent,
+    characterId: string,
+    characterName: string,
+  ) => {
+    e.stopPropagation();
+    setDeleteModal({
+      isOpen: true,
+      characterId,
+      characterName,
+    });
+  };
+
+  const handleConfirmDelete = async (characterId: string) => {
+    try {
+      await deleteCharacter.mutateAsync(characterId);
+      setDeleteModal({ isOpen: false, characterId: "", characterName: "" });
+
+      // If the deleted character was selected, redirect to characters page
+      if (selectedCharacterId === characterId) {
+        setSelectedCharacterId(null);
+        router.push("/characters");
+      }
+    } catch (error) {
+      console.error("Error deleting character:", error);
+    }
+  };
+
+  const handleCloseModal = () => {
+    setDeleteModal({ isOpen: false, characterId: "", characterName: "" });
   };
 
   return (
@@ -69,12 +128,27 @@ export default function CharactersLayout({
                   data.map((char: Character) => (
                     <div
                       key={char.id}
-                      className={`p-2 rounded cursor-pointer hover:bg-muted/50 transition-colors ${
+                      className={`p-2 rounded cursor-pointer hover:bg-muted/50 transition-colors flex items-center justify-between group ${
                         selectedCharacterId === char.id ? "bg-muted" : ""
                       }`}
-                      onClick={() => handleCharacterSelect(char.id)}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        e.stopPropagation();
+                        handleCharacterSelect(char.id);
+                      }}
                     >
                       <span className="font-medium">{char.characterName}</span>
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        className=" h-8 w-8 p-0"
+                        onClick={(e) =>
+                          handleDeleteClick(e, char.id, char.characterName)
+                        }
+                        title="Eliminar personaje"
+                      >
+                        <Trash2 className="h-4 w-4 text-destructive" />
+                      </Button>
                     </div>
                   ))
                 ) : (
@@ -88,8 +162,20 @@ export default function CharactersLayout({
         </Card>
 
         {/* Main Content Area - Renders child routes */}
-        <div className="flex-1 overflow-auto">{children}</div>
+        <div key={pathname} className="flex-1 overflow-auto">
+          {children}
+        </div>
       </div>
+
+      {/* Delete Confirmation Modal */}
+      <DeleteCharacterModal
+        isOpen={deleteModal.isOpen}
+        onClose={handleCloseModal}
+        characterName={deleteModal.characterName}
+        characterId={deleteModal.characterId}
+        onConfirmDelete={handleConfirmDelete}
+        isDeleting={deleteCharacter.isPending}
+      />
     </ProtectedRoute>
   );
 }

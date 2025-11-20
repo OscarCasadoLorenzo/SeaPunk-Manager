@@ -44,7 +44,23 @@ export async function fetchApi<TData>(
     throw new Error(`API error: ${response.statusText}`);
   }
 
-  return response.json();
+  // Handle empty responses (like DELETE operations)
+  const contentType = response.headers.get("content-type");
+  const contentLength = response.headers.get("content-length");
+
+  // If no content or content-length is 0, return undefined
+  if (contentLength === "0" || response.status === 204) {
+    return undefined as TData;
+  }
+
+  // If content-type is JSON, parse it
+  if (contentType && contentType.includes("application/json")) {
+    return response.json();
+  }
+
+  // For other content types or empty responses, try to parse as JSON
+  const text = await response.text();
+  return text ? JSON.parse(text) : (undefined as TData);
 }
 
 // Variant for raw response (e.g., file downloads)
@@ -85,6 +101,10 @@ export async function fetchApiRaw(
       localStorage.removeItem("auth_token");
       localStorage.removeItem("auth_user");
       window.location.href = "/login";
+    }
+    // Handle 403 Forbidden
+    if (response.status === 403 && typeof window !== "undefined") {
+      window.location.href = "/unauthorized";
     }
     throw new Error(`API error: ${response.statusText}`);
   }

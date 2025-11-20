@@ -52,7 +52,7 @@ export class AuthService {
       throw new ConflictException("User with this email already exists");
     }
 
-    const hashedPassword = await bcrypt.hash(registerDto.password, 10);
+    const hashedPassword = await bcrypt.hash(registerDto.password, 12);
 
     const user = await this.usersService.create({
       email: registerDto.email,

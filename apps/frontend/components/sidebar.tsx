@@ -1,7 +1,15 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
-import { Dice6, Home, LogOut, Settings, Shield, Users } from "lucide-react";
+import {
+  Dice6,
+  Home,
+  LogOut,
+  Settings,
+  Shield,
+  UserCog,
+  Users,
+} from "lucide-react";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 
@@ -81,6 +89,21 @@ export function Sidebar() {
           <Dice6 className="h-5 w-5" />
           <span>Dice Roller</span>
         </Link>
+
+        {/* Admin only: User Management */}
+        {hasRole(["ADMIN"]) && (
+          <Link
+            href="/admin"
+            className={`flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+              isActive("/admin")
+                ? "bg-blue-100 text-blue-900"
+                : "text-gray-700 hover:bg-gray-100"
+            }`}
+          >
+            <UserCog className="h-5 w-5" />
+            <span>User Management</span>
+          </Link>
+        )}
 
         {/* Admin/Master only: Settings */}
         {hasRole(["ADMIN", "MASTER"]) && (

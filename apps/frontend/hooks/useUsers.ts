@@ -9,8 +9,26 @@ export interface User {
   updatedAt: string;
 }
 
-export const useUsers = () => {
-  return useApiQuery<User[]>("/users");
+interface UsersResponse {
+  data: User[];
+  meta: {
+    total: number;
+    page: number;
+    limit: number;
+    totalPages: number;
+  };
+}
+
+export const useUsers = (page = 1, limit = 100) => {
+  const result = useApiQuery<UsersResponse>(
+    `/users?page=${page}&limit=${limit}`,
+  );
+
+  return {
+    ...result,
+    data: result.data?.data ?? [],
+    meta: result.data?.meta,
+  };
 };
 
 export const useUser = (id: string) => {

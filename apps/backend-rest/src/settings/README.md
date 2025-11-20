@@ -55,9 +55,7 @@ Export a complete backup of the entire database as a JSON file.
     "narratives": [...],
     "inventories": [...],
     "effects": [...],
-    "essences": [...],
     "auraGifts": [...],
-    "characterEssences": [...],
     "characterAuraGifts": [...]
   }
 }
@@ -100,9 +98,7 @@ Import data from a previously exported backup file.
     "narratives": 10,
     "inventories": 20,
     "effects": 30,
-    "essences": 50,
     "auraGifts": 40,
-    "characterEssences": 25,
     "characterAuraGifts": 20
   }
 }
@@ -142,10 +138,10 @@ Import data from a previously exported backup file.
 
 **Deletion Order:**
 
-1. Many-to-many relationships (characterAuraGift, characterEssence)
+1. Many-to-many relationships (characterAuraGift)
 2. Dependent tables (effects, inventories, narratives, combatStats, domains, attributes)
 3. Characters
-4. Independent tables (auraGifts, essences, players, users)
+4. Independent tables (auraGifts, players, users)
 
 ## Architecture
 
