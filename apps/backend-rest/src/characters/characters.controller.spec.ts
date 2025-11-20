@@ -1,11 +1,20 @@
 import { Test, TestingModule } from "@nestjs/testing";
-import { Character } from "@prisma/client";
+import { Character, UserRole } from "@prisma/client";
 import { CharactersController } from "./characters.controller";
 import { CharactersService } from "./characters.service";
 
 describe("CharactersController", () => {
   let controller: CharactersController;
   let service: CharactersService;
+
+  const mockRequest = {
+    user: {
+      id: "user-id-123",
+      role: UserRole.ADMIN,
+      email: "admin@test.com",
+      username: "admin",
+    },
+  };
 
   const mockCharacter: Character = {
     id: "test-id-123",
@@ -58,17 +67,17 @@ describe("CharactersController", () => {
       const mockCharacters = [mockCharacter];
       mockCharactersService.findAll.mockResolvedValue(mockCharacters);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll(mockRequest);
 
       expect(result).toEqual(mockCharacters);
       expect(service.findAll).toHaveBeenCalledTimes(1);
-      expect(service.findAll).toHaveBeenCalledWith();
+      expect(service.findAll).toHaveBeenCalledWith(undefined);
     });
 
     it("should return an empty array when no characters exist", async () => {
       mockCharactersService.findAll.mockResolvedValue([]);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll(mockRequest);
 
       expect(result).toEqual([]);
       expect(service.findAll).toHaveBeenCalledTimes(1);
@@ -90,7 +99,7 @@ describe("CharactersController", () => {
       ];
       mockCharactersService.findAll.mockResolvedValue(mockCharacters);
 
-      const result = await controller.findAll();
+      const result = await controller.findAll(mockRequest);
 
       expect(result).toHaveLength(3);
       expect(result).toEqual(mockCharacters);
@@ -100,7 +109,7 @@ describe("CharactersController", () => {
       const error = new Error("Database connection failed");
       mockCharactersService.findAll.mockRejectedValue(error);
 
-      await expect(controller.findAll()).rejects.toThrow(
+      await expect(controller.findAll(mockRequest)).rejects.toThrow(
         "Database connection failed",
       );
       expect(service.findAll).toHaveBeenCalledTimes(1);
@@ -111,20 +120,26 @@ describe("CharactersController", () => {
     it("should return a single character by id", async () => {
       mockCharactersService.findOne.mockResolvedValue(mockCharacter);
 
-      const result = await controller.findOne("test-id-123");
+      const result = await controller.findOne("test-id-123", mockRequest);
 
       expect(result).toEqual(mockCharacter);
       expect(service.findOne).toHaveBeenCalledTimes(1);
-      expect(service.findOne).toHaveBeenCalledWith("test-id-123");
+      expect(service.findOne).toHaveBeenCalledWith(
+        "test-id-123",
+        mockRequest.user,
+      );
     });
 
     it("should return null when character does not exist", async () => {
       mockCharactersService.findOne.mockResolvedValue(null);
 
-      const result = await controller.findOne("non-existent-id");
+      const result = await controller.findOne("non-existent-id", mockRequest);
 
       expect(result).toBeNull();
-      expect(service.findOne).toHaveBeenCalledWith("non-existent-id");
+      expect(service.findOne).toHaveBeenCalledWith(
+        "non-existent-id",
+        mockRequest.user,
+      );
     });
 
     it("should handle different valid UUID formats", async () => {
@@ -140,9 +155,9 @@ describe("CharactersController", () => {
           id: uuid,
         });
 
-        const result = await controller.findOne(uuid);
+        const result = await controller.findOne(uuid, mockRequest);
 
-        expect(service.findOne).toHaveBeenCalledWith(uuid);
+        expect(service.findOne).toHaveBeenCalledWith(uuid, mockRequest.user);
         expect(result.id).toBe(uuid);
       }
     });
@@ -151,19 +166,22 @@ describe("CharactersController", () => {
       const error = new Error("Invalid UUID format");
       mockCharactersService.findOne.mockRejectedValue(error);
 
-      await expect(controller.findOne("invalid-uuid")).rejects.toThrow(
-        "Invalid UUID format",
+      await expect(
+        controller.findOne("invalid-uuid", mockRequest),
+      ).rejects.toThrow("Invalid UUID format");
+      expect(service.findOne).toHaveBeenCalledWith(
+        "invalid-uuid",
+        mockRequest.user,
       );
-      expect(service.findOne).toHaveBeenCalledWith("invalid-uuid");
     });
 
     it("should handle database errors", async () => {
       const dbError = new Error("Database timeout");
       mockCharactersService.findOne.mockRejectedValue(dbError);
 
-      await expect(controller.findOne("test-id-123")).rejects.toThrow(
-        "Database timeout",
-      );
+      await expect(
+        controller.findOne("test-id-123", mockRequest),
+      ).rejects.toThrow("Database timeout");
     });
   });
 
@@ -325,11 +343,19 @@ describe("CharactersController", () => {
 
       mockCharactersService.update.mockResolvedValue(updatedCharacter);
 
-      const result = await controller.update("test-id-123", updateDto);
+      const result = await controller.update(
+        "test-id-123",
+        updateDto,
+        mockRequest,
+      );
 
       expect(result).toEqual(updatedCharacter);
       expect(service.update).toHaveBeenCalledTimes(1);
-      expect(service.update).toHaveBeenCalledWith("test-id-123", updateDto);
+      expect(service.update).toHaveBeenCalledWith(
+        "test-id-123",
+        updateDto,
+        mockRequest.user,
+      );
     });
 
     it("should update only one field", async () => {
@@ -341,10 +367,18 @@ describe("CharactersController", () => {
 
       mockCharactersService.update.mockResolvedValue(updatedCharacter);
 
-      const result = await controller.update("test-id-123", updateDto);
+      const result = await controller.update(
+        "test-id-123",
+        updateDto,
+        mockRequest,
+      );
 
       expect(result.isVisible).toBe(false);
-      expect(service.update).toHaveBeenCalledWith("test-id-123", updateDto);
+      expect(service.update).toHaveBeenCalledWith(
+        "test-id-123",
+        updateDto,
+        mockRequest.user,
+      );
     });
 
     it("should update nested relations", async () => {
@@ -371,10 +405,18 @@ describe("CharactersController", () => {
 
       mockCharactersService.update.mockResolvedValue(updatedCharacter);
 
-      const result = await controller.update("test-id-123", updateDto);
+      const result = await controller.update(
+        "test-id-123",
+        updateDto,
+        mockRequest,
+      );
 
       expect(result).toEqual(updatedCharacter);
-      expect(service.update).toHaveBeenCalledWith("test-id-123", updateDto);
+      expect(service.update).toHaveBeenCalledWith(
+        "test-id-123",
+        updateDto,
+        mockRequest.user,
+      );
     });
 
     it("should handle updating non-existent character", async () => {
@@ -383,19 +425,31 @@ describe("CharactersController", () => {
       mockCharactersService.update.mockRejectedValue(error);
 
       await expect(
-        controller.update("non-existent-id", updateDto),
+        controller.update("non-existent-id", updateDto, mockRequest),
       ).rejects.toThrow("Record to update not found");
-      expect(service.update).toHaveBeenCalledWith("non-existent-id", updateDto);
+      expect(service.update).toHaveBeenCalledWith(
+        "non-existent-id",
+        updateDto,
+        mockRequest.user,
+      );
     });
 
     it("should handle empty update object", async () => {
       const emptyUpdate = {};
       mockCharactersService.update.mockResolvedValue(mockCharacter);
 
-      const result = await controller.update("test-id-123", emptyUpdate);
+      const result = await controller.update(
+        "test-id-123",
+        emptyUpdate,
+        mockRequest,
+      );
 
       expect(result).toEqual(mockCharacter);
-      expect(service.update).toHaveBeenCalledWith("test-id-123", emptyUpdate);
+      expect(service.update).toHaveBeenCalledWith(
+        "test-id-123",
+        emptyUpdate,
+        mockRequest.user,
+      );
     });
 
     it("should update with complex nested data", async () => {
@@ -424,10 +478,18 @@ describe("CharactersController", () => {
 
       mockCharactersService.update.mockResolvedValue(updatedCharacter);
 
-      const result = await controller.update("test-id-123", complexUpdate);
+      const result = await controller.update(
+        "test-id-123",
+        complexUpdate,
+        mockRequest,
+      );
 
       expect(result).toEqual(updatedCharacter);
-      expect(service.update).toHaveBeenCalledWith("test-id-123", complexUpdate);
+      expect(service.update).toHaveBeenCalledWith(
+        "test-id-123",
+        complexUpdate,
+        mockRequest.user,
+      );
     });
 
     it("should handle concurrent update conflicts", async () => {
@@ -437,9 +499,9 @@ describe("CharactersController", () => {
       );
       mockCharactersService.update.mockRejectedValue(concurrencyError);
 
-      await expect(controller.update("test-id-123", updateDto)).rejects.toThrow(
-        "Record has been modified by another transaction",
-      );
+      await expect(
+        controller.update("test-id-123", updateDto, mockRequest),
+      ).rejects.toThrow("Record has been modified by another transaction");
     });
 
     it("should handle validation errors for invalid data types", async () => {
@@ -451,7 +513,7 @@ describe("CharactersController", () => {
       mockCharactersService.update.mockRejectedValue(validationError);
 
       await expect(
-        controller.update("test-id-123", invalidUpdate),
+        controller.update("test-id-123", invalidUpdate, mockRequest),
       ).rejects.toThrow("Invalid input type");
     });
   });
@@ -460,20 +522,26 @@ describe("CharactersController", () => {
     it("should successfully delete a character", async () => {
       mockCharactersService.remove.mockResolvedValue(undefined);
 
-      await controller.remove("test-id-123");
+      await controller.remove("test-id-123", mockRequest);
 
       expect(service.remove).toHaveBeenCalledTimes(1);
-      expect(service.remove).toHaveBeenCalledWith("test-id-123");
+      expect(service.remove).toHaveBeenCalledWith(
+        "test-id-123",
+        mockRequest.user,
+      );
     });
 
     it("should handle deletion of non-existent character", async () => {
       const error = new Error("Record to delete not found");
       mockCharactersService.remove.mockRejectedValue(error);
 
-      await expect(controller.remove("non-existent-id")).rejects.toThrow(
-        "Record to delete not found",
+      await expect(
+        controller.remove("non-existent-id", mockRequest),
+      ).rejects.toThrow("Record to delete not found");
+      expect(service.remove).toHaveBeenCalledWith(
+        "non-existent-id",
+        mockRequest.user,
       );
-      expect(service.remove).toHaveBeenCalledWith("non-existent-id");
     });
 
     it("should handle multiple deletions sequentially", async () => {
@@ -481,22 +549,22 @@ describe("CharactersController", () => {
       mockCharactersService.remove.mockResolvedValue(undefined);
 
       for (const id of idsToDelete) {
-        await controller.remove(id);
+        await controller.remove(id, mockRequest);
       }
 
       expect(service.remove).toHaveBeenCalledTimes(3);
-      expect(service.remove).toHaveBeenCalledWith("id-1");
-      expect(service.remove).toHaveBeenCalledWith("id-2");
-      expect(service.remove).toHaveBeenCalledWith("id-3");
+      expect(service.remove).toHaveBeenCalledWith("id-1", mockRequest.user);
+      expect(service.remove).toHaveBeenCalledWith("id-2", mockRequest.user);
+      expect(service.remove).toHaveBeenCalledWith("id-3", mockRequest.user);
     });
 
     it("should propagate database errors during deletion", async () => {
       const dbError = new Error("Connection lost during delete operation");
       mockCharactersService.remove.mockRejectedValue(dbError);
 
-      await expect(controller.remove("test-id-123")).rejects.toThrow(
-        "Connection lost during delete operation",
-      );
+      await expect(
+        controller.remove("test-id-123", mockRequest),
+      ).rejects.toThrow("Connection lost during delete operation");
     });
 
     it("should handle invalid character ID format", async () => {
@@ -504,10 +572,10 @@ describe("CharactersController", () => {
       const error = new Error("Invalid ID format");
       mockCharactersService.remove.mockRejectedValue(error);
 
-      await expect(controller.remove(invalidId)).rejects.toThrow(
+      await expect(controller.remove(invalidId, mockRequest)).rejects.toThrow(
         "Invalid ID format",
       );
-      expect(service.remove).toHaveBeenCalledWith(invalidId);
+      expect(service.remove).toHaveBeenCalledWith(invalidId, mockRequest.user);
     });
 
     it("should handle foreign key constraint errors on deletion", async () => {
@@ -516,9 +584,9 @@ describe("CharactersController", () => {
       );
       mockCharactersService.remove.mockRejectedValue(fkError);
 
-      await expect(controller.remove("test-id-123")).rejects.toThrow(
-        "Cannot delete character with existing references",
-      );
+      await expect(
+        controller.remove("test-id-123", mockRequest),
+      ).rejects.toThrow("Cannot delete character with existing references");
     });
   });
 
@@ -526,7 +594,7 @@ describe("CharactersController", () => {
     it("should handle service returning undefined", async () => {
       mockCharactersService.findOne.mockResolvedValue(undefined);
 
-      const result = await controller.findOne("test-id-123");
+      const result = await controller.findOne("test-id-123", mockRequest);
 
       expect(result).toBeUndefined();
     });
@@ -535,14 +603,16 @@ describe("CharactersController", () => {
       const timeoutError = new Error("Operation timed out");
       mockCharactersService.findAll.mockRejectedValue(timeoutError);
 
-      await expect(controller.findAll()).rejects.toThrow("Operation timed out");
+      await expect(controller.findAll(mockRequest)).rejects.toThrow(
+        "Operation timed out",
+      );
     });
 
     it("should maintain proper separation of concerns", async () => {
       // Controller should delegate all business logic to service
       mockCharactersService.findAll.mockResolvedValue([mockCharacter]);
 
-      await controller.findAll();
+      await controller.findAll(mockRequest);
 
       // Verify controller only calls service, doesn't do any data manipulation
       expect(service.findAll).toHaveBeenCalled();

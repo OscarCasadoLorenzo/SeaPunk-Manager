@@ -1,4 +1,6 @@
 import { Test, TestingModule } from "@nestjs/testing";
+import { UserRole } from "@prisma/client";
+import { PaginationService } from "../common/services/pagination.service";
 import { PrismaService } from "../prisma/prisma.service";
 import { CharactersService } from "./characters.service";
 import { CreateCharacterDto } from "./dto/create-character.dto";
@@ -7,14 +9,26 @@ describe("CharactersService", () => {
   let service: CharactersService;
   let prisma: PrismaService;
 
+  const mockUser = {
+    id: "user-id-123",
+    role: UserRole.ADMIN,
+    email: "admin@test.com",
+    username: "admin",
+  };
+
   const mockPrismaService = {
     character: {
       findMany: jest.fn(),
+      count: jest.fn(),
       findUnique: jest.fn(),
       create: jest.fn(),
       update: jest.fn(),
       delete: jest.fn(),
     },
+  };
+
+  const mockPaginationService = {
+    parsePaginationQuery: jest.fn(),
   };
 
   const mockCharacter = {
@@ -111,6 +125,10 @@ describe("CharactersService", () => {
           provide: PrismaService,
           useValue: mockPrismaService,
         },
+        {
+          provide: PaginationService,
+          useValue: mockPaginationService,
+        },
       ],
     }).compile();
 
@@ -135,6 +153,7 @@ describe("CharactersService", () => {
       expect(result).toEqual(mockCharacters);
       expect(prisma.character.findMany).toHaveBeenCalledTimes(1);
       expect(prisma.character.findMany).toHaveBeenCalledWith({
+        where: {},
         include: {
           attributes: true,
           domains: true,
@@ -193,12 +212,12 @@ describe("CharactersService", () => {
       });
     });
 
-    it("should return null when character does not exist", async () => {
+    it("should throw NotFoundException when character does not exist", async () => {
       mockPrismaService.character.findUnique.mockResolvedValue(null);
 
-      const result = await service.findOne("non-existent-id");
-
-      expect(result).toBeNull();
+      await expect(service.findOne("non-existent-id")).rejects.toThrow(
+        'Character with ID "non-existent-id" not found',
+      );
       expect(prisma.character.findUnique).toHaveBeenCalledTimes(1);
     });
 
@@ -280,8 +299,8 @@ describe("CharactersService", () => {
 
     it("should create a character with all nested relations", async () => {
       const expectedCreatedCharacter = {
-        id: "new-id-123",
         ...mockCharacter,
+        id: "new-id-123",
         characterName: createDto.characterName,
         archetype: createDto.archetype,
         attributes: createDto.attributes,
@@ -355,8 +374,8 @@ describe("CharactersService", () => {
       };
 
       const expectedCharacter = {
-        id: "minimal-id-123",
         ...mockCharacter,
+        id: "minimal-id-123",
         ...minimalDto,
       };
 
@@ -428,9 +447,12 @@ describe("CharactersService", () => {
         ...updateData,
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockResolvedValue(updatedCharacter);
 
-      const result = await service.update("test-id-123", updateData);
+      const result = await service.update("test-id-123", updateData, mockUser);
 
       expect(result).toEqual(updatedCharacter);
       expect(prisma.character.update).toHaveBeenCalledWith({
@@ -463,9 +485,12 @@ describe("CharactersService", () => {
         },
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockResolvedValue(updatedCharacter);
 
-      const result = await service.update("test-id-123", updateData);
+      const result = await service.update("test-id-123", updateData, mockUser);
 
       expect(result).toEqual(updatedCharacter);
       expect(prisma.character.update).toHaveBeenCalledWith({
@@ -498,9 +523,12 @@ describe("CharactersService", () => {
         },
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockResolvedValue(updatedCharacter);
 
-      const result = await service.update("test-id-123", updateData);
+      const result = await service.update("test-id-123", updateData, mockUser);
 
       expect(result).toEqual(updatedCharacter);
       expect(prisma.character.update).toHaveBeenCalledWith({
@@ -531,9 +559,12 @@ describe("CharactersService", () => {
         },
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockResolvedValue(updatedCharacter);
 
-      const result = await service.update("test-id-123", updateData);
+      const result = await service.update("test-id-123", updateData, mockUser);
 
       expect(result).toEqual(updatedCharacter);
       expect(prisma.character.update).toHaveBeenCalledWith({
@@ -561,9 +592,12 @@ describe("CharactersService", () => {
         characterName: updateData.characterName,
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockResolvedValue(updatedCharacter);
 
-      const result = await service.update("test-id-123", updateData);
+      const result = await service.update("test-id-123", updateData, mockUser);
 
       expect(result).toEqual(updatedCharacter);
       // Inventories should be excluded from the update data
@@ -576,25 +610,26 @@ describe("CharactersService", () => {
       });
     });
 
-    it("should return null when updating non-existent character", async () => {
-      mockPrismaService.character.update.mockRejectedValue(
-        new Error("Record to update not found"),
-      );
+    it("should throw NotFoundException when updating non-existent character", async () => {
+      mockPrismaService.character.findUnique.mockResolvedValue(null);
 
       await expect(
-        service.update("non-existent-id", { level: 5 }),
-      ).rejects.toThrow("Record to update not found");
+        service.update("non-existent-id", { level: 5 }, mockUser),
+      ).rejects.toThrow('Character with ID "non-existent-id" not found');
     });
 
     it("should handle concurrent update conflicts", async () => {
       const dbError = new Error(
         "Record has been modified by another transaction",
       );
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockRejectedValue(dbError);
 
-      await expect(service.update("test-id-123", { level: 5 })).rejects.toThrow(
-        "Record has been modified by another transaction",
-      );
+      await expect(
+        service.update("test-id-123", { level: 5 }, mockUser),
+      ).rejects.toThrow("Record has been modified by another transaction");
     });
 
     it("should handle validation errors for invalid data types", async () => {
@@ -603,19 +638,23 @@ describe("CharactersService", () => {
       };
 
       const dbError = new Error("Invalid input type");
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockRejectedValue(dbError);
 
       await expect(
-        service.update("test-id-123", invalidUpdateData),
+        service.update("test-id-123", invalidUpdateData, mockUser),
       ).rejects.toThrow("Invalid input type");
     });
   });
 
   describe("remove", () => {
     it("should successfully delete a character", async () => {
+      mockPrismaService.character.findUnique.mockResolvedValue(mockCharacter);
       mockPrismaService.character.delete.mockResolvedValue(mockCharacter);
 
-      await service.remove("test-id-123");
+      await service.remove("test-id-123", mockUser);
 
       expect(prisma.character.delete).toHaveBeenCalledTimes(1);
       expect(prisma.character.delete).toHaveBeenCalledWith({
@@ -623,23 +662,25 @@ describe("CharactersService", () => {
       });
     });
 
-    it("should handle deletion of non-existent character", async () => {
-      const dbError = new Error("Record to delete not found");
-      mockPrismaService.character.delete.mockRejectedValue(dbError);
+    it("should throw NotFoundException when deleting non-existent character", async () => {
+      mockPrismaService.character.findUnique.mockResolvedValue(null);
 
-      await expect(service.remove("non-existent-id")).rejects.toThrow(
-        "Record to delete not found",
+      await expect(service.remove("non-existent-id", mockUser)).rejects.toThrow(
+        'Character with ID "non-existent-id" not found',
       );
-      expect(prisma.character.delete).toHaveBeenCalledTimes(1);
+      expect(prisma.character.delete).not.toHaveBeenCalled();
     });
 
     it("should handle cascade deletion of related records", async () => {
       // Prisma handles cascade automatically based on schema
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.delete.mockResolvedValue(
         mockCharacterWithRelations,
       );
 
-      await service.remove("test-id-123");
+      await service.remove("test-id-123", mockUser);
 
       expect(prisma.character.delete).toHaveBeenCalledWith({
         where: { id: "test-id-123" },
@@ -648,20 +689,20 @@ describe("CharactersService", () => {
 
     it("should handle database connection errors during deletion", async () => {
       const dbError = new Error("Connection lost during delete operation");
+      mockPrismaService.character.findUnique.mockResolvedValue(mockCharacter);
       mockPrismaService.character.delete.mockRejectedValue(dbError);
 
-      await expect(service.remove("test-id-123")).rejects.toThrow(
+      await expect(service.remove("test-id-123", mockUser)).rejects.toThrow(
         "Connection lost during delete operation",
       );
     });
 
-    it("should handle invalid character ID format", async () => {
+    it("should throw NotFoundException for invalid character ID format", async () => {
       const invalidId = "";
-      const dbError = new Error("Invalid ID format");
-      mockPrismaService.character.delete.mockRejectedValue(dbError);
+      mockPrismaService.character.findUnique.mockResolvedValue(null);
 
-      await expect(service.remove(invalidId)).rejects.toThrow(
-        "Invalid ID format",
+      await expect(service.remove(invalidId, mockUser)).rejects.toThrow(
+        'Character with ID "" not found',
       );
     });
   });
@@ -689,9 +730,12 @@ describe("CharactersService", () => {
         isVisible: false,
       };
 
+      mockPrismaService.character.findUnique.mockResolvedValue(
+        mockCharacterWithRelations,
+      );
       mockPrismaService.character.update.mockResolvedValue(updatedCharacter);
 
-      const result = await service.update("test-id-123", updateData);
+      const result = await service.update("test-id-123", updateData, mockUser);
 
       expect(result.isVisible).toBe(false);
       expect(prisma.character.update).toHaveBeenCalledWith({
