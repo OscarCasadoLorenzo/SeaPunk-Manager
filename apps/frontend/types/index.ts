@@ -9,12 +9,22 @@ export interface Character {
   type: string;
   isNPC: boolean;
   isVisible: boolean;
-  playerId: string;
+  userId: string; // Changed from playerId to match backend
   createdAt: string;
   updatedAt: string;
   attributes?: CharacterAttributes;
   domains?: CharacterDomains;
   combatStats?: CombatStats;
+  user?: {
+    id: string;
+    email: string;
+    name: string;
+    role: string;
+  };
+  auraGifts?: unknown[];
+  effects?: unknown[];
+  inventories?: unknown[];
+  narrative?: unknown;
 }
 
 export interface CharacterAttributes {
@@ -67,3 +77,22 @@ export type CreateCharacterDto = Omit<
   Character,
   "id" | "createdAt" | "updatedAt"
 >;
+
+// Pagination types
+export interface PaginationMeta {
+  total: number;
+  count: number;
+  limit: number;
+  offset: number;
+  hasMore: boolean;
+  currentPage: number;
+  totalPages: number;
+}
+
+export interface PaginatedResponse<T> {
+  data: T[];
+  meta: PaginationMeta;
+}
+
+// Helper type to handle both paginated and non-paginated responses
+export type MaybePaginated<T> = T[] | PaginatedResponse<T>;
