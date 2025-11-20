@@ -25,7 +25,6 @@ const statsFormSchema = z.object({
   archetype: z.string().min(1, "Archetype is required"),
   faction: z.string().min(1, "Faction is required"),
   race: z.string().min(1, "Race is required"),
-  category: z.string().optional(),
   level: z.number().min(1, "Level must be at least 1"),
   epicPoints: z.number().min(0, "Epic points cannot be negative"),
 
@@ -98,7 +97,6 @@ export const useStatsForm = (
     archetype: character?.archetype || "",
     faction: character?.faction || "",
     race: character?.race || "",
-    category: character?.category || "",
     level: character?.level || 1,
     epicPoints: character?.epicPoints || 0,
 
@@ -185,12 +183,6 @@ export const useStatsForm = (
                 required: true,
                 disabled: !isFieldEditable(mode),
                 placeholder: "Raza del personaje",
-              }),
-              createField("text", {
-                name: "category",
-                label: "Categoría",
-                disabled: !isFieldEditable(mode),
-                placeholder: "Categoría (opcional)",
               }),
               createField("number", {
                 name: "level",
@@ -465,7 +457,6 @@ export const useStatsForm = (
           archetype: data.archetype,
           faction: data.faction,
           race: data.race,
-          category: data.category || "",
           level: data.level,
           epicPoints: data.epicPoints,
           type: "player",
@@ -535,7 +526,6 @@ export const useStatsForm = (
         archetype: data.archetype,
         faction: data.faction,
         race: data.race,
-        category: data.category,
         level: data.level,
         epicPoints: data.epicPoints,
       };

@@ -5,7 +5,6 @@ export interface Character {
   faction: string;
   race: string;
   level: number;
-  category: string;
   epicPoints: number;
   type: string;
   isNPC: boolean;
@@ -56,5 +55,5 @@ export interface CombatStats {
 
 export type CreateCharacterDto = Omit<
   Character,
-  'id' | 'createdAt' | 'updatedAt'
+  "id" | "createdAt" | "updatedAt"
 >;

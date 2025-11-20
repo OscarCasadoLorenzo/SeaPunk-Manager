@@ -16,7 +16,6 @@ export class CreateCharacterDto {
   faction: string;
   race: string;
   level: number;
-  category: string;
   epicPoints: number;
   type: string;
   isNPC?: boolean;

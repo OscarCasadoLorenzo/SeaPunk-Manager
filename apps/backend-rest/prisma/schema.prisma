@@ -36,7 +36,6 @@ model Character {
   faction                   String
   race                      String
   level                     Int
-  category                  String
   epicPoints                Int
   type                      String
   isNPC                     Boolean       @default(false)
