@@ -125,31 +125,15 @@ export const useNarrativeForm = (character: any, mode: FormMode = "view") => {
     }
 
     try {
-      const updatePayload: any = {};
-
-      // Add narrative if it exists
-      if (narrative?.id) {
-        updatePayload.narrative = {
-          update: {
-            physicalDescription: data.physicalDescription || "",
-            externalProfile: data.externalProfile || "",
-            internalProfile: data.internalProfile || "",
-            background: data.background || "",
-            specialties: data.specialties || "",
-          },
-        };
-      } else {
-        // Create narrative if it doesn't exist
-        updatePayload.narrative = {
-          create: {
-            physicalDescription: data.physicalDescription || "",
-            externalProfile: data.externalProfile || "",
-            internalProfile: data.internalProfile || "",
-            background: data.background || "",
-            specialties: data.specialties || "",
-          },
-        };
-      }
+      const updatePayload: any = {
+        narrative: {
+          physicalDescription: data.physicalDescription || "",
+          externalProfile: data.externalProfile || "",
+          internalProfile: data.internalProfile || "",
+          background: data.background || "",
+          specialties: data.specialties || "",
+        },
+      };
 
       await updateCharacter.mutateAsync({
         id: selectedCharacterId,
