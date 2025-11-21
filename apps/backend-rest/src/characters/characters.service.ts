@@ -13,6 +13,7 @@ import {
 } from "../common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCharacterDto } from "./dto/create-character.dto";
+import { UpdateCharacterDto } from "./dto/update-character.dto";
 
 @Injectable()
 export class CharactersService {
@@ -237,14 +238,13 @@ export class CharactersService {
 
   async update(
     id: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any, // Using any to allow flexible nested updates
+    data: UpdateCharacterDto,
     user?: { id: string; role: UserRole },
   ): Promise<Character> {
     // Verify ownership before updating
     const existingCharacter = await this.prisma.character.findUnique({
       where: { id },
-      select: { userId: true },
+      select: { userId: true, narrative: true },
     });
 
     if (!existingCharacter) {
@@ -268,8 +268,6 @@ export class CharactersService {
       combatStats,
       narrative,
       essences,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      inventories: _,
       ...characterData
     } = data;
 
@@ -277,26 +275,14 @@ export class CharactersService {
       where: { id },
       data: {
         ...characterData,
-        attributes: attributes?.update
-          ? { update: attributes.update }
-          : attributes
-            ? { update: attributes }
-            : undefined,
-        domains: domains?.update
-          ? { update: domains.update }
-          : domains
-            ? { update: domains }
-            : undefined,
-        combatStats: combatStats?.update
-          ? { update: combatStats.update }
-          : combatStats
-            ? { update: combatStats }
-            : undefined,
+        attributes: attributes ? { update: attributes } : undefined,
+        domains: domains ? { update: domains } : undefined,
+        combatStats: combatStats ? { update: combatStats } : undefined,
         narrative: narrative
           ? {
               upsert: {
-                create: narrative.update || narrative,
-                update: narrative.update || narrative,
+                create: narrative,
+                update: narrative,
               },
             }
           : undefined,

@@ -16,6 +16,7 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { PaginatedResponseDto, PaginationQueryDto } from "../common";
 import { CharactersService } from "./characters.service";
+import { UpdateCharacterDto } from "./dto/update-character.dto";
 
 @ApiTags("characters")
 @Controller("characters")
@@ -79,7 +80,7 @@ export class CharactersController {
   })
   update(
     @Param("id") id: string,
-    @Body() updateCharacterDto: any, // Allow flexible nested updates
+    @Body() updateCharacterDto: UpdateCharacterDto,
     @Request() req: any,
   ): Promise<Character> {
     return this.charactersService.update(id, updateCharacterDto, req.user);
