@@ -2,11 +2,14 @@ import { PartialType } from "@nestjs/swagger";
 import { CreateAttributeDto } from "../../attributes/dto/create-attribute.dto";
 import { CreateCombatStatsDto } from "../../combat-stats/dto/create-combat-stats.dto";
 import { CreateDomainDto } from "../../domains/dto/create-domain.dto";
-import { CreateCharacterDto, CreateNarrativeDto } from "./create-character.dto";
+import { CreateNarrativeDto } from "./create-character.dto";
 
 export class UpdateNarrativeDto extends PartialType(CreateNarrativeDto) {}
+export class UpdateAttributeDto extends PartialType(CreateAttributeDto) {}
+export class UpdateDomainDto extends PartialType(CreateDomainDto) {}
+export class UpdateCombatStatsDto extends PartialType(CreateCombatStatsDto) {}
 
-export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {
+export class UpdateCharacterDto {
   characterName?: string;
   archetype?: string;
   faction?: string;
@@ -17,9 +20,9 @@ export class UpdateCharacterDto extends PartialType(CreateCharacterDto) {
   isNPC?: boolean;
   isVisible?: boolean;
   userId?: string;
-  attributes?: CreateAttributeDto;
-  domains?: CreateDomainDto;
-  combatStats?: CreateCombatStatsDto;
+  attributes?: UpdateAttributeDto;
+  domains?: UpdateDomainDto;
+  combatStats?: UpdateCombatStatsDto;
   narrative?: UpdateNarrativeDto;
   essences?: string[];
 }
