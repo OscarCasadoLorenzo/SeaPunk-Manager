@@ -49,12 +49,28 @@ export const CharacterForm = ({
   const currentMode = onModeChange ? mode : internalMode;
   const handleModeChange = onModeChange || setInternalMode;
 
+  // Callback to switch back to view mode after successful submission
+  const handleSuccessfulSubmit = () => {
+    if (!isCreateMode(currentMode)) {
+      handleModeChange("view");
+    }
+  };
+
   // Individual hooks for each tab
   const statsForm = useStatsForm(character, currentMode, users, {
     onCreateSuccess,
+    onSuccess: handleSuccessfulSubmit,
   });
-  const narrativeForm = useNarrativeForm(character, currentMode);
-  const inventoryForm = useInventoryForm(character, currentMode);
+  const narrativeForm = useNarrativeForm(
+    character,
+    currentMode,
+    handleSuccessfulSubmit,
+  );
+  const inventoryForm = useInventoryForm(
+    character,
+    currentMode,
+    handleSuccessfulSubmit,
+  );
 
   // Tab configuration - only stats in create mode, all tabs otherwise
   const tabs: TabConfig[] = isCreateMode(currentMode)
@@ -129,10 +145,9 @@ export const CharacterForm = ({
   const renderFormActions = (tabForm: UseFormReturn<any>): ReactNode => {
     if (!isFieldEditable(currentMode)) return null;
 
-    // In create mode, require changes. In edit mode, allow submission without changes
-    const shouldDisable = isCreateMode(currentMode)
-      ? !tabForm.formState.isDirty || !tabForm.formState.isValid || isLoading
-      : !tabForm.formState.isValid || isLoading;
+    // Submit button should be disabled if form is not dirty, invalid, or loading
+    const shouldDisable =
+      !tabForm.formState.isDirty || !tabForm.formState.isValid || isLoading;
 
     return (
       <div className="flex gap-3 justify-end pt-6 border-t">

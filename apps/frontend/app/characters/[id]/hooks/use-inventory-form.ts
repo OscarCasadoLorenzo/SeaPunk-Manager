@@ -34,7 +34,11 @@ const inventoryFormSchema = z
 
 type InventoryFormData = z.infer<typeof inventoryFormSchema>;
 
-export const useInventoryForm = (character: any, mode: FormMode = "view") => {
+export const useInventoryForm = (
+  character: any,
+  mode: FormMode = "view",
+  onSuccess?: () => void,
+) => {
   const { selectedCharacterId } = useCharacterContext();
 
   // Extract data from the passed character object
@@ -245,6 +249,7 @@ export const useInventoryForm = (character: any, mode: FormMode = "view") => {
       }
 
       toast.success("Inventario actualizado correctamente");
+      onSuccess?.();
     } catch (error) {
       toast.error("Error al actualizar el inventario");
       console.error("Error updating inventory:", error);
