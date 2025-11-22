@@ -510,28 +510,72 @@ const StringListFieldComponent: React.FC<FieldProps> = ({
 const CustomFieldComponent: React.FC<FieldProps> = ({ config, className }) => {
   const fieldConfig = config as Extract<FieldConfig, { type: "custom" }>;
 
-  const handleDeleteClick = () => {
-    if (
-      fieldConfig.customComponent === "deleteButton" &&
-      fieldConfig.customProps
-    ) {
-      const { itemId, itemName } = fieldConfig.customProps;
+  // Handle delete button for inventory items
+  if (fieldConfig.customComponent === "delete-button") {
+    const { itemId, itemName, onDelete, isMarkedForDeletion } =
+      fieldConfig.customProps || {};
 
-      if (
-        window.confirm(`¿Estás seguro de que quieres eliminar "${itemName}"?`)
-      ) {
-        // Get the delete handler from the form context or global context
-        const deleteHandler = (window as any).__deleteInventoryHandler;
-        if (deleteHandler) {
-          deleteHandler(itemId, itemName);
-        } else {
-          toast.error("No se pudo eliminar el objeto. Inténtalo de nuevo.");
+    const handleDeleteClick = () => {
+      if (onDelete && typeof onDelete === "function") {
+        onDelete(itemId, itemName);
+      } else {
+        toast.error("No se pudo marcar el objeto para eliminación.");
+      }
+    };
+
+    return (
+      <div className={cn("space-y-2 flex items-end", className)}>
+        <Button
+          type="button"
+          variant={
+            isMarkedForDeletion
+              ? "outline"
+              : fieldConfig.customProps?.variant || "destructive"
+          }
+          size={fieldConfig.customProps?.size || "sm"}
+          onClick={handleDeleteClick}
+          className={cn(
+            "w-full",
+            isMarkedForDeletion &&
+              "border-green-500 text-green-600 hover:bg-green-50",
+          )}
+        >
+          {isMarkedForDeletion ? (
+            <>
+              <X className="h-4 w-4 mr-2" />
+              Restaurar
+            </>
+          ) : (
+            <>
+              <Trash2 className="h-4 w-4 mr-2" />
+              Marcar para eliminar
+            </>
+          )}
+        </Button>
+      </div>
+    );
+  }
+
+  // Legacy deleteButton support (kept for backward compatibility)
+  if (fieldConfig.customComponent === "deleteButton") {
+    const handleDeleteClick = () => {
+      if (fieldConfig.customProps) {
+        const { itemId, itemName } = fieldConfig.customProps;
+
+        if (
+          window.confirm(`¿Estás seguro de que quieres eliminar "${itemName}"?`)
+        ) {
+          // Get the delete handler from the form context or global context
+          const deleteHandler = (window as any).__deleteInventoryHandler;
+          if (deleteHandler) {
+            deleteHandler(itemId, itemName);
+          } else {
+            toast.error("No se pudo eliminar el objeto. Inténtalo de nuevo.");
+          }
         }
       }
-    }
-  };
+    };
 
-  if (fieldConfig.customComponent === "deleteButton") {
     return (
       <div className={cn("space-y-2", className)}>
         <Label>{fieldConfig.label}</Label>
