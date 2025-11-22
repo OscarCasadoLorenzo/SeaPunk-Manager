@@ -85,6 +85,24 @@ export class CharactersController {
     return this.charactersService.update(id, updateCharacterDto, req.user);
   }
 
+  @Put(":id/inventory")
+  @ApiOperation({ summary: "Bulk update character inventory" })
+  @ApiResponse({
+    status: 200,
+    description: "The character inventory has been updated.",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User does not own this character.",
+  })
+  updateInventory(
+    @Param("id") id: string,
+    @Body() inventories: any[],
+    @Request() req: any,
+  ): Promise<Character> {
+    return this.charactersService.updateInventory(id, inventories, req.user);
+  }
+
   @Delete(":id")
   @ApiOperation({ summary: "Delete a character" })
   @ApiResponse({ status: 200, description: "The character has been deleted." })
