@@ -69,7 +69,16 @@ export class SettingsService {
         auraGifts,
         characterAuraGifts,
       ] = await Promise.all([
-        this.prisma.user.findMany(),
+        this.prisma.user.findMany({
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        }),
         this.prisma.character.findMany(),
         this.prisma.attribute.findMany(),
         this.prisma.domain.findMany(),
