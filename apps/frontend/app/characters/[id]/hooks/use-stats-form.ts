@@ -21,6 +21,7 @@ import { z } from "zod";
 
 interface UseStatsFormOptions {
   onCreateSuccess?: (characterId: string) => void;
+  onSuccess?: () => void;
 }
 
 // ✅ Schema defined inline
@@ -876,6 +877,7 @@ export const useStatsForm = (
       });
 
       toast.success("Personaje actualizado correctamente");
+      options?.onSuccess?.();
     } catch (error) {
       toast.error("Error al actualizar el personaje");
       console.error("Error updating character:", error);

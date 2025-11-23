@@ -16,7 +16,7 @@ export class AuthService {
   ) {}
 
   async validateUser(email: string, password: string): Promise<any> {
-    const user = await this.usersService.findByEmail(email);
+    const user = await this.usersService.findByEmailForAuth(email);
     if (user && (await bcrypt.compare(password, user.password))) {
       // eslint-disable-next-line @typescript-eslint/no-unused-vars
       const { password: _, ...result } = user;
@@ -47,7 +47,9 @@ export class AuthService {
 
   async register(registerDto: RegisterDto) {
     // Check if user already exists
-    const existingUser = await this.usersService.findByEmail(registerDto.email);
+    const existingUser = await this.usersService.findByEmailForAuth(
+      registerDto.email,
+    );
     if (existingUser) {
       throw new ConflictException("User with this email already exists");
     }
@@ -61,18 +63,15 @@ export class AuthService {
       // role defaults to PLAYER in the database schema
     });
 
-    // eslint-disable-next-line @typescript-eslint/no-unused-vars
-    const { password: _, ...userWithoutPassword } = user;
-
     const payload = { email: user.email, sub: user.id, role: user.role };
 
     return {
       access_token: this.jwtService.sign(payload),
       user: {
-        id: userWithoutPassword.id,
-        email: userWithoutPassword.email,
-        name: userWithoutPassword.name,
-        role: userWithoutPassword.role,
+        id: user.id,
+        email: user.email,
+        name: user.name,
+        role: user.role,
       },
     };
   }

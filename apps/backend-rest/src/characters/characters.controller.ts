@@ -16,6 +16,7 @@ import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
 import { PaginatedResponseDto, PaginationQueryDto } from "../common";
 import { CharactersService } from "./characters.service";
+import { UpdateCharacterDto } from "./dto/update-character.dto";
 
 @ApiTags("characters")
 @Controller("characters")
@@ -77,12 +78,37 @@ export class CharactersController {
     status: 403,
     description: "Forbidden - User does not own this character.",
   })
+  @Put(":id")
+  @ApiOperation({ summary: "Update a character" })
+  @ApiResponse({ status: 200, description: "The character has been updated." })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User does not own this character.",
+  })
   update(
     @Param("id") id: string,
-    @Body() updateCharacterDto: any, // Allow flexible nested updates
+    @Body() updateCharacterDto: UpdateCharacterDto,
     @Request() req: any,
   ): Promise<Character> {
     return this.charactersService.update(id, updateCharacterDto, req.user);
+  }
+
+  @Put(":id/inventory")
+  @ApiOperation({ summary: "Bulk update character inventory" })
+  @ApiResponse({
+    status: 200,
+    description: "The character inventory has been updated.",
+  })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User does not own this character.",
+  })
+  updateInventory(
+    @Param("id") id: string,
+    @Body() inventories: any[],
+    @Request() req: any,
+  ): Promise<Character> {
+    return this.charactersService.updateInventory(id, inventories, req.user);
   }
 
   @Delete(":id")

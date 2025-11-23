@@ -13,6 +13,7 @@ import {
 } from "../common";
 import { PrismaService } from "../prisma/prisma.service";
 import { CreateCharacterDto } from "./dto/create-character.dto";
+import { UpdateCharacterDto } from "./dto/update-character.dto";
 
 @Injectable()
 export class CharactersService {
@@ -47,7 +48,16 @@ export class CharactersService {
           attributes: true,
           domains: true,
           combatStats: true,
-          user: true,
+          user: {
+            select: {
+              id: true,
+              email: true,
+              name: true,
+              role: true,
+              createdAt: true,
+              updatedAt: true,
+            },
+          },
           auraGifts: true,
           effects: true,
           inventories: true,
@@ -115,7 +125,16 @@ export class CharactersService {
               attributes: true,
               domains: true,
               combatStats: true,
-              user: true,
+              user: {
+                select: {
+                  id: true,
+                  email: true,
+                  name: true,
+                  role: true,
+                  createdAt: true,
+                  updatedAt: true,
+                },
+              },
               auraGifts: true,
               effects: true,
               inventories: true,
@@ -140,7 +159,16 @@ export class CharactersService {
         attributes: true,
         domains: true,
         combatStats: true,
-        user: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
         auraGifts: true,
         effects: true,
         inventories: true,
@@ -225,7 +253,16 @@ export class CharactersService {
         attributes: true,
         domains: true,
         combatStats: true,
-        user: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
         auraGifts: true,
         effects: true,
         inventories: true,
@@ -237,14 +274,13 @@ export class CharactersService {
 
   async update(
     id: string,
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-    data: any, // Using any to allow flexible nested updates
+    data: UpdateCharacterDto,
     user?: { id: string; role: UserRole },
   ): Promise<Character> {
     // Verify ownership before updating
     const existingCharacter = await this.prisma.character.findUnique({
       where: { id },
-      select: { userId: true },
+      select: { userId: true, narrative: true },
     });
 
     if (!existingCharacter) {
@@ -268,8 +304,6 @@ export class CharactersService {
       combatStats,
       narrative,
       essences,
-      // eslint-disable-next-line @typescript-eslint/no-unused-vars
-      inventories: _,
       ...characterData
     } = data;
 
@@ -277,26 +311,14 @@ export class CharactersService {
       where: { id },
       data: {
         ...characterData,
-        attributes: attributes?.update
-          ? { update: attributes.update }
-          : attributes
-            ? { update: attributes }
-            : undefined,
-        domains: domains?.update
-          ? { update: domains.update }
-          : domains
-            ? { update: domains }
-            : undefined,
-        combatStats: combatStats?.update
-          ? { update: combatStats.update }
-          : combatStats
-            ? { update: combatStats }
-            : undefined,
+        attributes: attributes ? { update: attributes } : undefined,
+        domains: domains ? { update: domains } : undefined,
+        combatStats: combatStats ? { update: combatStats } : undefined,
         narrative: narrative
           ? {
               upsert: {
-                create: narrative.update || narrative,
-                update: narrative.update || narrative,
+                create: narrative,
+                update: narrative,
               },
             }
           : undefined,
@@ -314,7 +336,79 @@ export class CharactersService {
         attributes: true,
         domains: true,
         combatStats: true,
-        user: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
+        auraGifts: true,
+        effects: true,
+        inventories: true,
+        narrative: true,
+        essences: true,
+      },
+    });
+  }
+
+  async updateInventory(
+    id: string,
+    inventories: any[],
+    user?: { id: string; role: UserRole },
+  ): Promise<Character> {
+    // Verify ownership before updating
+    const existingCharacter = await this.prisma.character.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!existingCharacter) {
+      throw new NotFoundException(`Character with ID "${id}" not found`);
+    }
+
+    // Authorization check
+    if (
+      user &&
+      user.role !== UserRole.ADMIN &&
+      existingCharacter.userId !== user.id
+    ) {
+      throw new ForbiddenException(
+        "You do not have permission to update this character's inventory",
+      );
+    }
+
+    // Delete all existing inventories and create new ones
+    return this.prisma.character.update({
+      where: { id },
+      data: {
+        inventories: {
+          deleteMany: {},
+          create: inventories.map((inv) => ({
+            name: inv.name,
+            description: inv.description || "",
+            quantity: inv.quantity,
+            type: inv.type,
+          })),
+        },
+      },
+      include: {
+        attributes: true,
+        domains: true,
+        combatStats: true,
+        user: {
+          select: {
+            id: true,
+            email: true,
+            name: true,
+            role: true,
+            createdAt: true,
+            updatedAt: true,
+          },
+        },
         auraGifts: true,
         effects: true,
         inventories: true,
