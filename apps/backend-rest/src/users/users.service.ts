@@ -11,6 +11,14 @@ export class UsersService {
   async create(createUserDto: CreateUserDto) {
     return this.prisma.user.create({
       data: createUserDto,
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
@@ -64,6 +72,20 @@ export class UsersService {
   async findByEmail(email: string) {
     return this.prisma.user.findUnique({
       where: { email },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
+    });
+  }
+
+  async findByEmailForAuth(email: string) {
+    return this.prisma.user.findUnique({
+      where: { email },
     });
   }
 
@@ -93,6 +115,14 @@ export class UsersService {
   async remove(id: string) {
     return this.prisma.user.delete({
       where: { id },
+      select: {
+        id: true,
+        email: true,
+        name: true,
+        role: true,
+        createdAt: true,
+        updatedAt: true,
+      },
     });
   }
 
