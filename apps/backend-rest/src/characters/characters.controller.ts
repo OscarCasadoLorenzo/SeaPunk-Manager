@@ -78,6 +78,13 @@ export class CharactersController {
     status: 403,
     description: "Forbidden - User does not own this character.",
   })
+  @Put(":id")
+  @ApiOperation({ summary: "Update a character" })
+  @ApiResponse({ status: 200, description: "The character has been updated." })
+  @ApiResponse({
+    status: 403,
+    description: "Forbidden - User does not own this character.",
+  })
   update(
     @Param("id") id: string,
     @Body() updateCharacterDto: UpdateCharacterDto,
