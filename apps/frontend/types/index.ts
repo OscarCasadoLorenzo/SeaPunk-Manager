@@ -23,7 +23,7 @@ export interface Character {
   };
   auraGifts?: unknown[];
   effects?: unknown[];
-  inventories?: unknown[];
+  inventories?: Inventory[];
   narrative?: unknown;
   essences?: Essence[];
 }
@@ -80,6 +80,17 @@ export interface CombatStats {
   initiative: number;
   defense: number;
   resistance: number;
+}
+
+export interface Inventory {
+  id: string;
+  characterId: string;
+  name: string;
+  description: string;
+  quantity: number;
+  type: "Objeto" | "Consumible";
+  createdAt: string;
+  updatedAt: string;
 }
 
 export type CreateCharacterDto = Omit<

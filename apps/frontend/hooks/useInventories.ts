@@ -1,6 +1,6 @@
-import { useApiMutation, useApiQuery } from '@/hooks/use-api-query';
-import { fetchApi } from '@/lib/api';
-import { useMutation, useQueryClient } from '@tanstack/react-query';
+import { useApiMutation, useApiQuery } from "@/hooks/use-api-query";
+import { fetchApi } from "@/lib/api";
+import { useMutation, useQueryClient } from "@tanstack/react-query";
 
 export const useInventories = (characterId: string) => {
   return useApiQuery(`/inventories/character/${characterId}`, {
@@ -23,13 +23,13 @@ export const useInventoriesByType = (characterId: string, type: string) => {
 export const useCreateInventory = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/inventories', 'post', {
+  return useApiMutation("/inventories", "post", {
     onSuccess: (newInventory: any) => {
       queryClient.invalidateQueries({
-        queryKey: ['/inventories/character', newInventory.characterId],
+        queryKey: ["/inventories/character", newInventory.characterId],
       });
       queryClient.invalidateQueries({
-        queryKey: ['/characters', newInventory.characterId],
+        queryKey: ["/characters", newInventory.characterId],
       });
     },
   });
@@ -41,7 +41,7 @@ export const useUpdateInventory = () => {
   return useMutation({
     mutationFn: async ({ id, data }: { id: string; data: any }) => {
       return fetchApi(`/inventories/${id}`, {
-        method: 'PATCH',
+        method: "PATCH",
         body: data,
       });
     },
@@ -60,10 +60,41 @@ export const useUpdateInventory = () => {
 export const useDeleteInventory = () => {
   const queryClient = useQueryClient();
 
-  return useApiMutation('/inventories', 'delete', {
+  return useMutation({
+    mutationFn: async (id: string) => {
+      return fetchApi(`/inventories/${id}`, {
+        method: "DELETE",
+      });
+    },
     onSuccess: () => {
-      queryClient.invalidateQueries({ queryKey: ['/inventories'] });
-      queryClient.invalidateQueries({ queryKey: ['/characters'] });
+      queryClient.invalidateQueries({ queryKey: ["/inventories"] });
+      queryClient.invalidateQueries({ queryKey: ["/characters"] });
+    },
+  });
+};
+
+export const useBulkUpdateInventory = () => {
+  const queryClient = useQueryClient();
+
+  return useMutation({
+    mutationFn: async ({
+      characterId,
+      inventories,
+    }: {
+      characterId: string;
+      inventories: any[];
+    }) => {
+      return fetchApi(`/characters/${characterId}/inventory`, {
+        method: "PUT",
+        body: inventories,
+      });
+    },
+    onSuccess: (updatedCharacter: any) => {
+      queryClient.invalidateQueries({ queryKey: ["/inventories"] });
+      queryClient.invalidateQueries({
+        queryKey: ["/characters", updatedCharacter.id],
+      });
+      queryClient.invalidateQueries({ queryKey: ["/characters"] });
     },
   });
 };

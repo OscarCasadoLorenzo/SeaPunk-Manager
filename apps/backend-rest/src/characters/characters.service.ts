@@ -310,6 +310,60 @@ export class CharactersService {
     });
   }
 
+  async updateInventory(
+    id: string,
+    inventories: any[],
+    user?: { id: string; role: UserRole },
+  ): Promise<Character> {
+    // Verify ownership before updating
+    const existingCharacter = await this.prisma.character.findUnique({
+      where: { id },
+      select: { userId: true },
+    });
+
+    if (!existingCharacter) {
+      throw new NotFoundException(`Character with ID "${id}" not found`);
+    }
+
+    // Authorization check
+    if (
+      user &&
+      user.role !== UserRole.ADMIN &&
+      existingCharacter.userId !== user.id
+    ) {
+      throw new ForbiddenException(
+        "You do not have permission to update this character's inventory",
+      );
+    }
+
+    // Delete all existing inventories and create new ones
+    return this.prisma.character.update({
+      where: { id },
+      data: {
+        inventories: {
+          deleteMany: {},
+          create: inventories.map((inv) => ({
+            name: inv.name,
+            description: inv.description || "",
+            quantity: inv.quantity,
+            type: inv.type,
+          })),
+        },
+      },
+      include: {
+        attributes: true,
+        domains: true,
+        combatStats: true,
+        user: true,
+        auraGifts: true,
+        effects: true,
+        inventories: true,
+        narrative: true,
+        essences: true,
+      },
+    });
+  }
+
   async remove(
     id: string,
     user?: { id: string; role: UserRole },

@@ -1,22 +1,24 @@
 "use client";
 
 import { useUsers } from "@/hooks";
+import type { Character } from "@/types";
 import {
   FormBuilder,
   isCreateMode,
   isFieldEditable,
   isViewMode,
+  type FormConfig,
   type FormMode,
 } from "@/utils/form-builder";
 import { Button, Tabs, TabsContent, TabsList, TabsTrigger } from "@seapunk/ui";
 import { useState, type ReactNode } from "react";
-import { type UseFormReturn } from "react-hook-form";
+import { type FieldValues, type UseFormReturn } from "react-hook-form";
 import { useInventoryForm } from "../hooks/use-inventory-form";
 import { useNarrativeForm } from "../hooks/use-narrative-form";
 import { useStatsForm } from "../hooks/use-stats-form";
 
 interface CharacterFormProps {
-  character?: any;
+  character?: Character | null;
   isLoading?: boolean;
   mode?: FormMode;
   onModeChange?: (mode: FormMode) => void;
@@ -26,9 +28,9 @@ interface CharacterFormProps {
 interface TabConfig {
   id: string;
   label: string;
-  form: UseFormReturn<any>;
-  formConfig: any;
-  handleSubmit: (data: any) => Promise<void>;
+  form: UseFormReturn<FieldValues>;
+  formConfig: FormConfig;
+  handleSubmit: (data: FieldValues) => Promise<void>;
   isLoading: boolean;
 }
 
@@ -49,39 +51,57 @@ export const CharacterForm = ({
   const currentMode = onModeChange ? mode : internalMode;
   const handleModeChange = onModeChange || setInternalMode;
 
+  // Callback to switch back to view mode after successful submission
+  const handleSuccessfulSubmit = () => {
+    if (!isCreateMode(currentMode)) {
+      handleModeChange("view");
+    }
+  };
+
   // Individual hooks for each tab
   const statsForm = useStatsForm(character, currentMode, users, {
     onCreateSuccess,
+    onSuccess: handleSuccessfulSubmit,
   });
-  const narrativeForm = useNarrativeForm(character, currentMode);
-  const inventoryForm = useInventoryForm(character, currentMode);
+  const narrativeForm = useNarrativeForm(
+    character,
+    currentMode,
+    handleSuccessfulSubmit,
+  );
+  const inventoryForm = useInventoryForm(
+    character,
+    currentMode,
+    handleSuccessfulSubmit,
+  );
 
   // Tab configuration - only stats in create mode, all tabs otherwise
-  const tabs: TabConfig[] = isCreateMode(currentMode)
-    ? [
-        {
-          id: "stats",
-          label: "Estadísticas",
-          ...statsForm,
-        },
-      ]
-    : [
-        {
-          id: "stats",
-          label: "Estadísticas",
-          ...statsForm,
-        },
-        {
-          id: "narrative",
-          label: "Narrativa",
-          ...narrativeForm,
-        },
-        {
-          id: "inventory",
-          label: "Inventario",
-          ...inventoryForm,
-        },
-      ];
+  const tabs: TabConfig[] = (
+    isCreateMode(currentMode)
+      ? [
+          {
+            id: "stats",
+            label: "Estadísticas",
+            ...statsForm,
+          },
+        ]
+      : [
+          {
+            id: "stats",
+            label: "Estadísticas",
+            ...statsForm,
+          },
+          {
+            id: "narrative",
+            label: "Narrativa",
+            ...narrativeForm,
+          },
+          {
+            id: "inventory",
+            label: "Inventario",
+            ...inventoryForm,
+          },
+        ]
+  ) as TabConfig[];
 
   // Get combined dirty state
   const isDirty = tabs.some((tab) => tab.form.formState.isDirty);
@@ -126,13 +146,14 @@ export const CharacterForm = ({
   };
 
   // Render form actions
-  const renderFormActions = (tabForm: UseFormReturn<any>): ReactNode => {
+  const renderFormActions = (
+    tabForm: UseFormReturn<FieldValues>,
+  ): ReactNode => {
     if (!isFieldEditable(currentMode)) return null;
 
-    // In create mode, require changes. In edit mode, allow submission without changes
-    const shouldDisable = isCreateMode(currentMode)
-      ? !tabForm.formState.isDirty || !tabForm.formState.isValid || isLoading
-      : !tabForm.formState.isValid || isLoading;
+    // Submit button should be disabled if form is not dirty, invalid, or loading
+    const shouldDisable =
+      !tabForm.formState.isDirty || !tabForm.formState.isValid || isLoading;
 
     return (
       <div className="flex gap-3 justify-end pt-6 border-t">

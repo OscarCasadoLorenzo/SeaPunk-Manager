@@ -28,7 +28,11 @@ const narrativeFormSchema = z.object({
 
 type NarrativeFormData = z.infer<typeof narrativeFormSchema>;
 
-export const useNarrativeForm = (character: any, mode: FormMode = "view") => {
+export const useNarrativeForm = (
+  character: any,
+  mode: FormMode = "view",
+  onSuccess?: () => void,
+) => {
   const { selectedCharacterId } = useCharacterContext();
 
   // Extract data from character object
@@ -86,14 +90,6 @@ export const useNarrativeForm = (character: any, mode: FormMode = "view") => {
                 placeholder: "Cuenta la historia del personaje...",
                 rows: 6,
               }),
-              createField("textarea", {
-                name: "specialties",
-                label: "Especialidades",
-                disabled: !isFieldEditable(mode),
-                placeholder:
-                  "Describe las habilidades especiales del personaje...",
-                rows: 4,
-              }),
             ],
           }),
         ],
@@ -141,6 +137,7 @@ export const useNarrativeForm = (character: any, mode: FormMode = "view") => {
       });
 
       toast.success("Narrativa actualizada correctamente");
+      onSuccess?.();
     } catch (error) {
       toast.error("Error al actualizar la narrativa");
       console.error("Error updating narrative:", error);

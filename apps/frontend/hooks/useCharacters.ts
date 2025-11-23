@@ -38,7 +38,7 @@ export const useCharacter = (id: string) => {
 };
 
 export const useCharacterWithDetails = (id: string) => {
-  return useApiQuery(`/characters/${id}`, {
+  return useApiQuery<Character>(`/characters/${id}`, {
     enabled: !!id,
   });
 };
