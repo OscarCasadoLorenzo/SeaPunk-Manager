@@ -6,6 +6,7 @@ import {
 } from "@nestjs/common";
 import * as bcrypt from "bcrypt";
 import { PrismaService } from "../prisma/prisma.service";
+import { AdminChangePasswordDto } from "./dto/admin-change-password.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { CreateUserDto } from "./dto/create-user.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
@@ -220,5 +221,31 @@ export class UsersService {
     });
 
     return { message: "Password changed successfully" };
+  }
+
+  async adminChangePassword(
+    id: string,
+    adminChangePasswordDto: AdminChangePasswordDto,
+  ) {
+    const user = await this.prisma.user.findUnique({
+      where: { id },
+    });
+
+    if (!user) {
+      throw new UnauthorizedException("User not found");
+    }
+
+    // Hash new password
+    const hashedPassword = await bcrypt.hash(
+      adminChangePasswordDto.password,
+      12,
+    );
+
+    await this.prisma.user.update({
+      where: { id },
+      data: { password: hashedPassword },
+    });
+
+    return { message: "Password changed successfully by admin" };
   }
 }

@@ -12,6 +12,7 @@ import { UserRole } from "@prisma/client";
 import { Roles } from "../auth/decorators/roles.decorator";
 import { JwtAuthGuard } from "../auth/guards/jwt-auth.guard";
 import { RolesGuard } from "../auth/guards/roles.guard";
+import { AdminChangePasswordDto } from "./dto/admin-change-password.dto";
 import { ChangePasswordDto } from "./dto/change-password.dto";
 import { UpdateProfileDto } from "./dto/update-profile.dto";
 import { UpdateUserRoleDto } from "./dto/update-user-role.dto";
@@ -66,5 +67,18 @@ export class UsersController {
     @Body() changePasswordDto: ChangePasswordDto,
   ) {
     return this.usersService.changePassword(id, changePasswordDto);
+  }
+
+  @Patch(":id/reset-password")
+  @Roles(UserRole.ADMIN)
+  @ApiOperation({
+    summary: "Admin: Change user password without current password",
+  })
+  @ApiResponse({ status: 200, description: "Password changed successfully" })
+  async adminChangePassword(
+    @Param("id") id: string,
+    @Body() adminChangePasswordDto: AdminChangePasswordDto,
+  ) {
+    return this.usersService.adminChangePassword(id, adminChangePasswordDto);
   }
 }
