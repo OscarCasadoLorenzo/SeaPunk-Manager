@@ -5,6 +5,7 @@ import { CharacterProvider } from "@/contexts/CharacterContext";
 import { QueryClient, QueryClientProvider } from "@tanstack/react-query";
 import { ReactQueryDevtools } from "@tanstack/react-query-devtools";
 import { useState, type ReactNode } from "react";
+import { Toaster } from "react-hot-toast";
 
 export function Providers({ children }: { children: ReactNode }) {
   const [queryClient] = useState(
@@ -24,6 +25,7 @@ export function Providers({ children }: { children: ReactNode }) {
       <AuthProvider>
         <CharacterProvider>
           {children}
+          <Toaster position="top-right" />
           <ReactQueryDevtools initialIsOpen={false} />
         </CharacterProvider>
       </AuthProvider>
