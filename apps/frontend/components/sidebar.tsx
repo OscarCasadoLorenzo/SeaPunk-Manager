@@ -7,6 +7,7 @@ import {
   LogOut,
   Settings,
   Shield,
+  User,
   UserCog,
   Users,
 } from "lucide-react";
@@ -90,6 +91,19 @@ export function Sidebar() {
           <span>Dice Roller</span>
         </Link>
 
+        {/* Profile Settings - Available to all users */}
+        <Link
+          href="/profile"
+          className={`flex items-center space-x-3 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+            isActive("/profile")
+              ? "bg-blue-100 text-blue-900"
+              : "text-gray-700 hover:bg-gray-100"
+          }`}
+        >
+          <User className="h-5 w-5" />
+          <span>Profile</span>
+        </Link>
+
         {/* Admin only: User Management */}
         {hasRole(["ADMIN"]) && (
           <Link
@@ -105,7 +119,7 @@ export function Sidebar() {
           </Link>
         )}
 
-        {/* Admin/Master only: Settings */}
+        {/* Admin/Master only: Database Settings */}
         {hasRole(["ADMIN", "MASTER"]) && (
           <Link
             href="/settings"
@@ -116,7 +130,7 @@ export function Sidebar() {
             }`}
           >
             <Settings className="h-5 w-5" />
-            <span>Settings</span>
+            <span>Database Settings</span>
           </Link>
         )}
       </nav>

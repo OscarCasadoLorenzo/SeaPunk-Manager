@@ -16,6 +16,8 @@ export interface User {
   id: string;
   email: string;
   name: string;
+  username?: string;
+  language: string;
   role: UserRole;
 }
 
@@ -27,6 +29,7 @@ interface AuthContextType {
   register: (email: string, password: string, name: string) => Promise<void>;
   logout: () => void;
   hasRole: (roles: UserRole[]) => boolean;
+  updateUser: (user: User) => void;
 }
 
 const AuthContext = createContext<AuthContextType | undefined>(undefined);
@@ -134,6 +137,11 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     return roles.includes(user.role);
   };
 
+  const updateUser = (updatedUser: User) => {
+    setUser(updatedUser);
+    localStorage.setItem("auth_user", JSON.stringify(updatedUser));
+  };
+
   return (
     <AuthContext.Provider
       value={{
@@ -144,6 +152,7 @@ export function AuthProvider({ children }: { children: ReactNode }) {
         register,
         logout,
         hasRole,
+        updateUser,
       }}
     >
       {children}
