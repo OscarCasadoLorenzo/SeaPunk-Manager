@@ -11,6 +11,8 @@ import {
   User as UserIcon,
 } from "lucide-react";
 import { useCallback, useEffect, useState } from "react";
+import toast from "react-hot-toast";
+import { ChangePasswordModal } from "./components/ChangePasswordModal";
 import { RoleEditModal } from "./components/RoleEditModal";
 
 interface User {
@@ -39,6 +41,7 @@ export default function AdminPage() {
   const [currentPage, setCurrentPage] = useState(1);
   const [selectedUser, setSelectedUser] = useState<User | null>(null);
   const [isModalOpen, setIsModalOpen] = useState(false);
+  const [isPasswordModalOpen, setIsPasswordModalOpen] = useState(false);
   const { user: currentUser } = useAuth();
 
   const fetchUsers = useCallback(async (page: number) => {
@@ -77,6 +80,21 @@ export default function AdminPage() {
     }
   };
 
+  const handlePasswordChange = async (userId: string, password: string) => {
+    try {
+      await fetchApi(`/users/${userId}/reset-password`, {
+        method: "PATCH",
+        body: { password },
+      });
+      toast.success("Password changed successfully");
+      setIsPasswordModalOpen(false);
+      setSelectedUser(null);
+    } catch (error) {
+      console.error("Failed to change password:", error);
+      toast.error("Failed to change password. Please try again.");
+    }
+  };
+
   const openRoleModal = (user: User) => {
     setSelectedUser(user);
     setIsModalOpen(true);
@@ -84,6 +102,16 @@ export default function AdminPage() {
 
   const closeRoleModal = () => {
     setIsModalOpen(false);
+    setSelectedUser(null);
+  };
+
+  const openPasswordModal = (user: User) => {
+    setSelectedUser(user);
+    setIsPasswordModalOpen(true);
+  };
+
+  const closePasswordModal = () => {
+    setIsPasswordModalOpen(false);
     setSelectedUser(null);
   };
 
@@ -196,13 +224,23 @@ export default function AdminPage() {
                         {new Date(user.createdAt).toLocaleDateString()}
                       </td>
                       <td className="whitespace-nowrap px-6 py-4 text-right text-sm font-medium">
-                        <button
-                          onClick={() => openRoleModal(user)}
-                          disabled={currentUser?.id === user.id}
-                          className="text-blue-600 hover:text-blue-900 disabled:text-gray-400 disabled:cursor-not-allowed"
-                        >
-                          Edit Role
-                        </button>
+                        <div className="flex items-center justify-end gap-3">
+                          <button
+                            onClick={() => openRoleModal(user)}
+                            disabled={currentUser?.id === user.id}
+                            className="text-blue-600 hover:text-blue-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                          >
+                            Edit Role
+                          </button>
+                          <span className="text-gray-300">|</span>
+                          <button
+                            onClick={() => openPasswordModal(user)}
+                            disabled={currentUser?.id === user.id}
+                            className="text-purple-600 hover:text-purple-900 disabled:text-gray-400 disabled:cursor-not-allowed"
+                          >
+                            Change Password
+                          </button>
+                        </div>
                       </td>
                     </tr>
                   ))}
@@ -305,6 +343,16 @@ export default function AdminPage() {
             onClose={closeRoleModal}
             user={selectedUser}
             onUpdateRole={handleRoleUpdate}
+          />
+        )}
+
+        {/* Change Password Modal */}
+        {selectedUser && (
+          <ChangePasswordModal
+            isOpen={isPasswordModalOpen}
+            onClose={closePasswordModal}
+            user={selectedUser}
+            onChangePassword={handlePasswordChange}
           />
         )}
       </div>
