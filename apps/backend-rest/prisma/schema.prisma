@@ -17,14 +17,16 @@ enum UserRole {
 }
 
 model User {
-  id        String      @id @default(cuid())
-  email     String      @unique
-  password  String      // hashed password
-  name      String
-  role      UserRole    @default(PLAYER)
-  createdAt DateTime    @default(now())
-  updatedAt DateTime    @updatedAt
-  characters Character[]
+  id          String      @id @default(cuid())
+  email       String      @unique
+  password    String      // hashed password
+  name        String
+  username    String?     @unique
+  language    String      @default("en")
+  role        UserRole    @default(PLAYER)
+  createdAt   DateTime    @default(now())
+  updatedAt   DateTime    @updatedAt
+  characters  Character[]
 
   @@map("users")
 }
