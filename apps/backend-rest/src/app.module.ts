@@ -8,6 +8,7 @@ import { CommonModule } from "./common/common.module";
 import { DomainsModule } from "./domains/domains.module";
 import { EffectsModule } from "./effects/effects.module";
 import { EssencesModule } from "./essences/essences.module";
+import { HealthModule } from "./health/health.module";
 import { InventoriesModule } from "./inventories/inventories.module";
 import { PrismaModule } from "./prisma/prisma.module";
 import { SettingsModule } from "./settings/settings.module";
@@ -19,6 +20,7 @@ import { SettingsModule } from "./settings/settings.module";
     }),
     CommonModule,
     PrismaModule,
+    HealthModule,
     AuthModule,
     CharactersModule,
     AttributesModule,
