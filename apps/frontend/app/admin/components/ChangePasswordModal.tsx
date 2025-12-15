@@ -1,5 +1,7 @@
 "use client";
 
+import { PasswordStrengthIndicator } from "@/components/PasswordStrengthIndicator";
+import { calculatePasswordStrength } from "@/lib/password-utils";
 import { Eye, EyeOff, KeyRound, X } from "lucide-react";
 import { useState } from "react";
 
@@ -14,19 +16,6 @@ interface ChangePasswordModalProps {
   onClose: () => void;
   user: User;
   onChangePassword: (userId: string, password: string) => Promise<void>;
-}
-
-interface PasswordStrength {
-  score: number;
-  label: string;
-  color: string;
-  requirements: {
-    minLength: boolean;
-    hasUppercase: boolean;
-    hasLowercase: boolean;
-    hasNumber: boolean;
-    hasSpecial: boolean;
-  };
 }
 
 export function ChangePasswordModal({
@@ -44,41 +33,7 @@ export function ChangePasswordModal({
 
   if (!isOpen) return null;
 
-  const calculatePasswordStrength = (pwd: string): PasswordStrength => {
-    const requirements = {
-      minLength: pwd.length >= 8,
-      hasUppercase: /[A-Z]/.test(pwd),
-      hasLowercase: /[a-z]/.test(pwd),
-      hasNumber: /\d/.test(pwd),
-      hasSpecial: /[@$!%*?&#^()_+=\-[\]{}|;:'",.<>/\\`~]/.test(pwd),
-    };
-
-    const score = Object.values(requirements).filter(Boolean).length;
-
-    let label = "Very Weak";
-    let color = "bg-red-500";
-
-    if (score === 5) {
-      label = "Strong";
-      color = "bg-green-500";
-    } else if (score === 4) {
-      label = "Good";
-      color = "bg-yellow-500";
-    } else if (score === 3) {
-      label = "Fair";
-      color = "bg-orange-500";
-    } else if (score >= 1) {
-      label = "Weak";
-      color = "bg-red-400";
-    }
-
-    return { score, label, color, requirements };
-  };
-
   const passwordStrength = calculatePasswordStrength(password);
-  const isPasswordValid = Object.values(passwordStrength.requirements).every(
-    Boolean,
-  );
   const doPasswordsMatch =
     password === confirmPassword && confirmPassword !== "";
 
@@ -86,7 +41,7 @@ export function ChangePasswordModal({
     e.preventDefault();
     setError(null);
 
-    if (!isPasswordValid) {
+    if (!passwordStrength.isValid) {
       setError("Password does not meet all requirements");
       return;
     }
@@ -193,79 +148,7 @@ export function ChangePasswordModal({
 
                 {/* Password Strength Indicator */}
                 {password && (
-                  <div className="space-y-2">
-                    <div className="flex items-center justify-between">
-                      <span className="text-xs font-medium text-gray-700">
-                        Password Strength:
-                      </span>
-                      <span className="text-xs font-medium text-gray-700">
-                        {passwordStrength.label}
-                      </span>
-                    </div>
-                    <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
-                      <div
-                        className={`h-full transition-all duration-300 ${passwordStrength.color}`}
-                        style={{
-                          width: `${(passwordStrength.score / 5) * 100}%`,
-                        }}
-                      />
-                    </div>
-
-                    {/* Requirements Checklist */}
-                    <div className="mt-3 space-y-1">
-                      <p className="text-xs font-medium text-gray-700 mb-2">
-                        Requirements:
-                      </p>
-                      {[
-                        {
-                          key: "minLength",
-                          label: "At least 8 characters",
-                        },
-                        {
-                          key: "hasUppercase",
-                          label: "One uppercase letter",
-                        },
-                        {
-                          key: "hasLowercase",
-                          label: "One lowercase letter",
-                        },
-                        { key: "hasNumber", label: "One number" },
-                        {
-                          key: "hasSpecial",
-                          label: "One special character",
-                        },
-                      ].map(({ key, label }) => (
-                        <div key={key} className="flex items-center text-xs">
-                          <span
-                            className={`mr-2 ${
-                              passwordStrength.requirements[
-                                key as keyof typeof passwordStrength.requirements
-                              ]
-                                ? "text-green-600"
-                                : "text-gray-400"
-                            }`}
-                          >
-                            {passwordStrength.requirements[
-                              key as keyof typeof passwordStrength.requirements
-                            ]
-                              ? "✓"
-                              : "○"}
-                          </span>
-                          <span
-                            className={
-                              passwordStrength.requirements[
-                                key as keyof typeof passwordStrength.requirements
-                              ]
-                                ? "text-gray-700"
-                                : "text-gray-500"
-                            }
-                          >
-                            {label}
-                          </span>
-                        </div>
-                      ))}
-                    </div>
-                  </div>
+                  <PasswordStrengthIndicator strength={passwordStrength} />
                 )}
 
                 {/* Confirm Password Input */}
@@ -331,7 +214,9 @@ export function ChangePasswordModal({
             <div className="border-t border-gray-200 bg-gray-50 px-6 py-4 sm:flex sm:flex-row-reverse">
               <button
                 type="submit"
-                disabled={isSubmitting || !isPasswordValid || !doPasswordsMatch}
+                disabled={
+                  isSubmitting || !passwordStrength.isValid || !doPasswordsMatch
+                }
                 className="inline-flex w-full justify-center rounded-md border border-transparent bg-blue-600 px-4 py-2 text-base font-medium text-white shadow-sm hover:bg-blue-700 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:ring-offset-2 disabled:opacity-50 disabled:cursor-not-allowed sm:ml-3 sm:w-auto sm:text-sm"
               >
                 {isSubmitting ? "Changing Password..." : "Change Password"}
