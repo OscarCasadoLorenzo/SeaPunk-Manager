@@ -25,14 +25,6 @@ export class UsersService {
         createdAt: true,
         updatedAt: true,
       },
-      select: {
-        id: true,
-        email: true,
-        name: true,
-        role: true,
-        createdAt: true,
-        updatedAt: true,
-      },
     });
   }
 
