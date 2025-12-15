@@ -45,10 +45,22 @@ export function PasswordStrengthIndicator({
       </div>
       <div className="h-2 w-full bg-gray-200 rounded-full overflow-hidden">
         <div
-          className={`h-full transition-all duration-300 ${strength.color}`}
           style={{
             width: `${(strength.score / 5) * 100}%`,
+            backgroundColor:
+              strength.score === 0
+                ? "#d1d5db"
+                : strength.score === 1
+                  ? "#dc2626"
+                  : strength.score === 2
+                    ? "#ef4444"
+                    : strength.score === 3
+                      ? "#f97316"
+                      : strength.score === 4
+                        ? "#eab308"
+                        : "#22c55e",
           }}
+          className="h-full transition-all duration-300"
         />
       </div>
 
