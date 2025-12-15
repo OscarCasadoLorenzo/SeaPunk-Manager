@@ -1,6 +1,7 @@
 "use client";
 
 import { useAuth } from "@/contexts/AuthContext";
+import { calculatePasswordStrength } from "@/lib/password-utils";
 import {
   Button,
   Card,
@@ -17,12 +18,6 @@ import { Eye, EyeOff, Lock, Mail } from "lucide-react";
 import { useState } from "react";
 import toast from "react-hot-toast";
 import { changePassword, updateProfile } from "../actions";
-
-interface PasswordStrength {
-  score: number;
-  label: string;
-  color: string;
-}
 
 export function SecuritySection() {
   const { user, updateUser } = useAuth();
@@ -70,34 +65,6 @@ export function SecuritySection() {
       toast.error(`Failed to update email: ${error.message}`);
     },
   });
-
-  const calculatePasswordStrength = (password: string): PasswordStrength => {
-    if (!password) {
-      return { score: 0, label: "No password", color: "bg-gray-300" };
-    }
-
-    let score = 0;
-
-    // Length check
-    if (password.length >= 8) score += 1;
-    if (password.length >= 12) score += 1;
-
-    // Character variety checks
-    if (/[a-z]/.test(password)) score += 1;
-    if (/[A-Z]/.test(password)) score += 1;
-    if (/[0-9]/.test(password)) score += 1;
-    if (/[^a-zA-Z0-9]/.test(password)) score += 1;
-
-    if (score <= 2) {
-      return { score, label: "Weak", color: "bg-red-500" };
-    } else if (score <= 4) {
-      return { score, label: "Fair", color: "bg-orange-500" };
-    } else if (score <= 5) {
-      return { score, label: "Good", color: "bg-yellow-500" };
-    } else {
-      return { score, label: "Strong", color: "bg-green-500" };
-    }
-  };
 
   const passwordStrength = calculatePasswordStrength(passwordData.newPassword);
 
